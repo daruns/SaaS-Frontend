@@ -1,0 +1,52 @@
+{
+  "name": "oc_front_end",
+  "version": "0.0.1",
+  "description": "oneconnect",
+  "productName": "oneconnect",
+  "author": "",
+  "private": true,
+  "scripts": {
+    "deploy": "serve -s build",
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "dependencies": {
+    "@quasar/extras": "^1.0.0",
+    "axios": "^0.21.1",
+    "core-js": "^3.6.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "path": "^0.12.7",
+    "quasar": "^2.0.0",
+    "underscore": "^1.13.1",
+    "v-calendar": "^3.0.0-alpha.6",
+    "vue-file-agent": "^1.7.3",
+    "vue-i18n": "^9.0.0",
+    "vue-kanban": "^1.8.0",
+    "vue-phone-number-input": "^1.1.12",
+    "vue-tel-input": "^6.0.0-beta.4",
+    "vue3-date-time-picker": "^2.3.6",
+    "vue3-draggable": "^2.0.9",
+    "vue3-q-tel-input": "^1.0.20",
+    "vuedraggable": "^4.1.0",
+    "vuex": "^4.0.1"
+  },
+  "devDependencies": {
+    "@quasar/app": "^3.0.0"
+  },
+  "browserslist": [
+    "last 10 Chrome versions",
+    "last 10 Firefox versions",
+    "last 4 Edge versions",
+    "last 7 Safari versions",
+    "last 8 Android versions",
+    "last 8 ChromeAndroid versions",
+    "last 8 FirefoxAndroid versions",
+    "last 10 iOS versions",
+    "last 5 Opera versions"
+  ],
+  "engines": {
+    "node": ">= 12.22.1",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  }
+}

@@ -1,0 +1,388 @@
+<template>
+    <q-page class="q-pa-md" style="overflow-x: hidden !important;">
+     <div class="flex items-center justify-between">
+       <div>
+        <p class="text-h4">Tasks</p>
+        <breadcrmps :map="crumps" />
+        </div>
+         <q-btn @click="this.action = 'Add'; dialogue = true" color="primary" label="Create Board" unelevated rounded no-caps />
+        </div>
+        <div class="row">
+        </div>
+        <q-scroll-area :thumb-style="thumbStyle" :bar-style="barStyle" style="height: 70vh; width: 100% !important;">
+        <q-markup-table class="flex q-mt-md tasks-table bg-secondary" flat>
+          <thead>
+            <tr>
+              <th class="round-borders"  :style="`background-color: ${column.boardAttribute.color}`" v-for="column in columns" :key="column.id"
+              >
+               <div class="flex items-center justify-between">
+              <p class="q-mb-none text-white">{{column.name}}</p>
+              <q-btn color="white" style="z-index:10;" dense round flat icon="more_vert">
+              <q-menu
+                transition-show="scale"
+                transition-hide="scale"
+                
+              >
+                <q-list style="min-width: 75px">
+                  <q-item @click="delBoard(column.id)" style="padding 0 !important" clickable v-close-popup>
+                    <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
+                  </q-item>
+                  <q-separator />
+                  <q-item @click="body = column; action = 'Edit'; dialogue = true;"  clickable v-close-popup>
+                    <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+              </q-btn>
+               </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+          <td v-for="column in columns" :key="column.id" :style="`background-color: ${column.boardAttribute.accent};`" class="q-mr-sm round-borders" style="width:15rem; height:auto;">
+            <q-scroll-area :thumb-style="thumbStyle1" :bar-style="barStyle1" style="height: 50vh; width: 15rem;">
+            <div style="height: auto;">
+          <draggable
+            style="height: 49vh;"
+            tag="div"
+            class="q-mt-sm"
+            :clone="clone"
+            :group="{ name: 'people', pull: pullFunction }"
+            @start="start"
+            :component-data="{ tag: 'div' }"
+            @change="change"
+           :list="column.tasks" 
+           @clone="clone"
+           item-key="id">
+            <template #item="{element}">
+                <div class="bg-white relative-position q-pa-sm q-mb-xs q-ml-xs q-mr-xs rounded-borders" style="border: 0.25px solid lightgrey;max-width: 14.5rem !important;">
+                  <div class="flex items-center justify-between">
+                    <p @click="taskBody = element;taskDialogue = true" class="q-mb-none cursor-pointer" style="width:50% !important;overflow:hidden !important;text-overflow: ellipsis !important;">{{element.name}}</p>
+                    <q-btn style="z-index:10;border: 0.25px solid lightgrey;" dense round flat icon="more_vert">
+                    <q-menu
+                      transition-show="scale"
+                      transition-hide="scale"
+                      
+                    >
+                      <q-list style="min-width: 75px">
+                        <q-item @click="delTask({id: element.id})" style="padding 0 !important" clickable v-close-popup>
+                          <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
+                        </q-item>
+                        <q-separator />
+                        <q-item @click="openDialogue(element, column.id)" clickable v-close-popup>
+                          <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
+                        </q-item>
+                      </q-list>
+                    </q-menu>
+                    </q-btn>
+                    </div>
+                  <p class="q-mt-none text-grey" style="width:50% !important;overflow:hidden !important;text-overflow: ellipsis !important;" v-html="element.description"></p>
+                  <div class="row">
+                    <div class="flex">
+                    <div class="q-mr-xs q-mt-xs q-mb-xs" v-for="(member,i) in element.memberUsers.slice(0, 2)" :key="member.id">
+                    <q-avatar  size="30px">
+                     <q-btn round size="5px" @click="delMember({id:element.id,members: [member.userId]})" icon="close" color="negative" class="absolute-top-right"/>
+                    <img src="~/assets/one_logo_neat.png">
+                    <!-- <q-tooltip>
+                      {{member}}
+                    </q-tooltip> -->
+                    </q-avatar>
+                    </div>
+                    </div>
+                   <p v-if="element.memberUsers.length > 2"  class="q-mt-sm text-subtitle1 text-grey">....+{{element.memberUsers.length - 2}}</p>
+                    <div class="flex items-start q-mt-xs q-ml-xs">
+                    <q-btn @click="getUserOptions(element)" round size="11px" text-color="black" unelevated color="grey-4" icon="add">
+                        <q-popup-edit v-model="members" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
+                        <q-select
+                            ref="clientRef"
+                            :rules="[val => (val !== null) || 'This field is required']"
+                            bg-color="white"
+                            outlined
+                            counter
+                            multiple
+                            use-chips
+                            v-model="members" 
+                            :options="options"
+                            label="Choose members"
+                            :loading="isLoaded"
+                            :disable="options.length === 0"
+                            :hint="options.length === 0 ? 'All users has been added' : ''"
+                          >
+                            <template v-slot:option="scope">
+                            <q-item v-bind="scope.itemProps">
+                                <q-item-section class="avatar-list">
+                                <q-avatar class="q-mr-xs" size="30px">
+                                   <img src="~/assets/one_logo_neat.png">
+                                </q-avatar>
+                                <q-item-label>{{ scope.opt.label }}</q-item-label>       
+                                </q-item-section>
+                            </q-item>
+                            </template>
+                        </q-select>
+                        <q-btn @click="addMembs(element.id)" no-caps flat label="submit" color="primary" :disable="members.length === 0" v-close-popup />
+                        </q-popup-edit>
+                    </q-btn>
+                    <q-chip square :class="priority(element.priority)" class="absolute-bottom-right q-mb-sm q-mr-sm" size="sm">{{element.priority}}</q-chip>
+                    </div>
+                </div>
+                </div>
+            </template>
+          </draggable>
+            </div>
+            </q-scroll-area>
+          <div class="justify-end flex">
+          <q-btn icon="add" size="10px" @click="bId = column.id; actiont = 'Add'; dialoguet = true" unelevated round no-caps color="primary"/>
+          </div>
+        </td>
+        </tbody>
+        </q-markup-table>
+        </q-scroll-area>
+        <q-dialog seamless position="right" v-model="dialogue">
+          <modal @closeDialogue="getAll" :action="action" :body="body" />
+        </q-dialog>
+        <q-dialog seamless position="right" v-model="dialoguet">
+          <modalt @closeDialogue="getAll" :action="actiont" :boardId="bId" :body="bodyt" />
+        </q-dialog>   
+        <q-dialog v-model="taskDialogue">   
+          <task :task="taskBody" />
+        </q-dialog>
+    </q-page>
+</template>
+<script>
+import { mapActions, mapState } from 'vuex';
+import breadcrmps from '../../../components/globalComponents/BreadCrumps.vue';
+import draggable from 'vuedraggable'
+import axios from 'axios';
+import modal from '../components/AddEditBoard.vue'
+import modalt from '../components/AddEditTask'
+import task from '../components/TaskDialogue.vue'
+export default {
+  components : {
+      breadcrmps,
+      draggable,
+      modal,
+      modalt,
+      task
+  },
+  data() {
+    return{
+      taskBody: null,
+      taskDialogue: false,
+      projectsToChoose: [],
+      project: null,
+      projects: [],
+      isLoaded: false,
+      members: [],
+      options: [],
+      columns: [],
+      attempt:0,
+      dialogue: false,
+      dialoguet: false,
+      action: 'Add',
+      actiont: 'Add',
+      boardId: null,
+      body:null,
+      bodyt:null,
+      bId: null,
+      thumbStyle: {
+        bottom: '2px',
+        borderRadius: '7px',
+        backgroundColor: '#027be3',
+        width: '100%',
+        height: '4px',
+        opacity: 0.75
+      },
+      barStyle: {
+        bottom: '-.75px',
+        borderRadius: '9px',
+        backgroundColor: '#027be3',
+        width: '100%',
+        height: '8px',
+        opacity: 0.2
+      },
+      thumbStyle1: {
+        right: '4px',
+        borderRadius: '7px',
+        backgroundColor: '#027be3',
+        width: '4px',
+        opacity: 0.75
+      },
+
+      barStyle1: {
+        right: '2px',
+        borderRadius: '9px',
+        backgroundColor: '#027be3',
+        width: '8px',
+        opacity: 0.2
+      },
+    }
+  },
+  computed: {
+    ...mapState('userStore', ['users'])
+  },
+  methods: {
+    ...mapActions('projectStore',['getProjects','deleteBoard', 'addMembers', 'deleteTask', 'deleteMember']),
+    ...mapActions('userStore',['getUsers']),
+    priority(priority) {
+      switch(priority){
+
+      case 'High':
+      return 'text-positive bg-green-1'
+
+      case 'Medium':
+      return 'text-warning bg-yellow-2'
+
+      case 'Low':
+      return 'text-negative bg-red-1'
+      }
+    },
+    clone({ name, description, memberUsers, id, priority }) {
+      return { name, description, memberUsers, id: id, priority };
+    },
+    pullFunction() {
+      return this.controlOnStart ? "clone" : true;
+    },
+    start({ originalEvent }) {
+      this.controlOnStart = originalEvent.ctrlKey;
+    },
+    getAccentColor(color) {
+      switch(color) {
+        case '#308be5':
+        return '#a1d2f8' 
+
+        case '#82b865':
+        return '#c6dfb9'
+
+        case '#cc444b':
+        return '#e4b1ab'
+
+        case '#ffae30':
+        return '#ffd899'
+
+        case '#1d1d1d':
+        return 'lightgrey'
+      }
+
+    },
+    openDialogue(payload, bId) {
+      let time = 0
+      if(this.dialoguet === true) {
+        this.dialoguet = false
+        time = 200;
+      }else{
+        time = 0
+      }
+      setTimeout(() => {
+          this.bodyt = payload;
+          this.actiont = 'Edit';
+          this.dialoguet = true; 
+          this.boardId = bId
+      }, time);
+    },
+    async delTask(payload) {
+      await this.deleteTask(payload);
+      this.getAll();
+    },
+    async delMember(payload) {
+      await this.deleteMember(payload);
+      this.getAll();
+    },
+    async addMembs(taskId) {
+      let membersToAdd = []
+      for(let i = 0; i<this.members.length; i++) {
+        membersToAdd.push(this.members[i].id);
+      }
+      await this.addMembers({id:taskId, members: membersToAdd});
+      await this.getAll();
+      this.members = []
+    },
+    getUserOptions(payload) {
+      let optionsA = [];
+      let optionsB = [];
+      this.options = [];
+      setTimeout(() => {
+      if(!payload) return
+      for(let i = 0; i<this.users.length; i++) {
+      for(let j = 0; j<payload.memberUsers.length; j++) {
+        if(Number(payload.memberUsers[j].userId) === Number(this.users[i].id)){
+          optionsB.push({id:this.users[i].id, label: this.users[j].name});
+        }
+      }
+          optionsA.push({id:this.users[i].id, label: this.users[i].name});
+      }
+      this.options = optionsA.filter(({ id: id1 }) => !optionsB.some(({ id: id2 }) => id2 === id1));
+      }, 200);
+    },
+   async change(evt) {
+      this.attempt += 1
+      if(this.attempt%2 !== 0){
+             for(let i = 0; i<this.columns.length; i++) {
+               for(let j = 0; j<this.columns[i].tasks.length; j++) {
+                   if(Number(this.columns[i].tasks[j].id) === Number(evt.added.element.id)){
+                      let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/tasks/changeBoard',  
+                      {id:Number(evt.added.element.id), boardId:Number(this.columns[i].id)  }, 
+                      {headers: {Authorization: localStorage.getItem('accessToken')}})
+                   }
+               }
+             }
+      }
+    },
+     async getAll() {
+    let res = await axios.get('https://onconnect-backend-api.herokuapp.com/api/v1/boards', {headers: {Authorization: localStorage.getItem('accessToken')}});
+    this.columns = res.data.data;
+    for(let i = 0; i<this.columns.length; i++) {
+      this.columns[i].boardAttribute = {
+        ...this.columns[i].boardAttribute,
+        accent: this.getAccentColor(this.columns[i].boardAttribute.color)
+        }
+    }
+    if(this.dialogue === true) this.dialogue = false;
+    if(this.dialoguet === true) this.dialoguet = false;
+
+
+  },
+  async delBoard(id) {
+    await this.deleteBoard({id: id});
+    this.getAll();
+  }
+  },
+ async mounted() {
+   this.isLoaded = true
+  await this.getAll();
+  await this.getUsers();
+  await this.getUserOptions();
+    this.isLoaded = false;
+  },
+  setup () {
+    return {
+      crumps: [
+        {id:1,name:'OneConnect',icon: 'home',path: '/'},
+        {id:2,name:'Tasks',icon: 'task',path: '/projects/tasks'}
+        ],
+    }
+  }
+}
+</script>
+<style scoped>
+.q-table tbody td{
+  width: 16rem !important;
+  min-width: 16rem !important;
+  margin: 10px !important;
+}
+
+.q-table th, .q-table td {
+    padding-top: 7px ;
+    padding-bottom: 7px ;
+    padding-right: 7px ;
+    padding-left: 7px ;
+
+}
+
+div.q-avatar div.q-avatar__content img {
+    border: none !important;
+}
+
+.q-markup-table.q-table__container.q-table__card.q-table--horizontal-separator.q-table--flat.q-table--no-wrap.flex.q-mt-md.tasks-table.bg-secondary {
+  border-radius: 0 !important;
+}
+</style>

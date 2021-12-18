@@ -1,0 +1,162 @@
+<template>
+<q-page class="q-pa-md">
+  <q-skeleton v-if="!currentClient.name" class="custom-skeleton-border" height="250px" />
+     <q-card v-else class="row items-center q-pa-md">
+       <q-btn @click="dialogue = true" class="absolute-top-right q-mt-xs q-mr-xs" flat text-color="grey" size="sm" round unelevated icon="edit" color="primary" />
+       <div class="flex items-center col-md-6 col-sm-12 q-pb-md avatar">
+        <q-avatar v-if="currentClient.logo" size="120px">
+            <img :src="currentClient.logo" />
+        </q-avatar>
+        <q-avatar v-else size="120px" font-size="52px" color="grey" text-color="white" icon="person" />
+        <div>
+        <p class="q-ml-md text-h5 text-weight-medium q-pb-sm q-mt-lg q-ma-none">{{currentClient.name}}</p>
+        <p class="text-subtitle2 text-grey q-ml-md q-ma-none">{{currentClient.businessType}}</p>
+        <q-btn class="q-ml-md q-mt-md" color="primary" no-caps label="Send Message" unelevated />
+        </div>
+       </div>
+        <div class="row client-infos col-md-6 col-sm-12 q-pa-md" >
+          <div class="column col-12">
+            <div class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+            <p>Type:</p>
+            <p class="text-grey">{{currentClient.clientType}}</p>
+            </div>
+            <div class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+            <p>Phone:</p>
+            <p class="text-grey">{{currentClient.phoneNumbers}}</p>
+            </div>
+             <div class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+            <p>E-mail:</p>
+            <p class="text-grey">{{currentClient.email}}</p>
+            </div>
+            <div v-if="currentClient.address"  class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+            <p>Address:</p>
+            <p class="text-grey">{{currentClient.address}}</p>
+            </div>
+             <div v-if="currentClient.zipCode"  class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+            <p>Zipcode:</p>
+            <p class="text-grey">{{currentClient.zipCode}}</p>
+            </div>
+            <div v-if="currentClient.website"  class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+            <p>Website:</p>
+            <p class="text-grey">{{currentClient.website}}</p>
+            </div>
+            </div>
+        </div>
+     </q-card>
+      <div class="q-mt-lg">
+    <q-tabs
+        v-model="tab"    
+        class="text-grey bg-white rounded-borders bordered"
+        active-color="primary"
+        indicator-color="primary"
+        align="justify"
+        no-caps
+      >
+        <q-tab name="meetings" @click="updateTab('meetings')" no-caps label="Meetings" />
+        <q-tab name="contacts" @click="updateTab('contacts')" no-caps label="Contact Persons" />
+        <q-tab name="sociallinks" @click="updateTab('sociallinks')" no-caps label="Social links" />
+        <q-tab name="users" @click="updateTab('users')" no-caps label="Users" />
+      </q-tabs>
+
+      <q-tab-panels v-model="tab" animated>
+        <q-tab-panel name="meetings" class="q-pa-none">
+            <meetings />
+        </q-tab-panel>
+
+        <q-tab-panel name="contacts">
+            <contacts />
+        </q-tab-panel>
+
+        <q-tab-panel name="sociallinks">
+            <sociallinks />
+        </q-tab-panel>
+        <q-tab-panel name="users">
+            <users />
+        </q-tab-panel>
+      </q-tab-panels>
+      <q-dialog :inProfile="true" seamless position="right" v-model="dialogue">
+          <modal @closeDialogue="dialogue = false" :body="currentClient" :type="currentClient.clientType" actionType="Edit" :id="$route.params.id" />
+      </q-dialog>
+    </div>
+</q-page>
+</template>
+<script>
+import contacts from '../components/Contacts.vue'
+import { ref } from 'vue'
+import { mapActions, mapState } from 'vuex'
+import meetings from '../components/Meetings.vue'
+import sociallinks from '../components/SocialMediaLinks.vue';
+import users from '../components/UsersTable.vue';
+import AddEditClient from '../components/AddEditClient.vue';
+import axios from 'axios'
+export default {
+    components: {
+        meetings,
+        sociallinks,
+        contacts,
+        modal: AddEditClient,
+        users
+    },
+    data() {
+        return {
+          dialogue: false,
+          close: false,
+          user: {
+            name: '',
+            username: '',
+            password: ''
+          }
+        }
+    },
+    computed: {
+       ...mapState('crmStore', ['currentClient']), 
+    },
+    methods: {
+        ...mapActions('crmStore', ['getOneClient']),
+        updateTab(tab) {
+          localStorage.setItem('tab', tab)
+        },
+       async submit() {
+            this.$refs.nameRef.validate();
+            this.$refs.userNameRef.validate();
+            if(
+            this.$refs.nameRef.hasError ||
+            this.$refs.userNameRef.hasError
+            ){
+            return
+            }
+        this.close = true;
+        if(!this.currentClient.user){
+          try{
+        let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/clients/addUser',
+        {...this.user, id:this.$route.params.id},
+        {headers: {Authorization: localStorage.getItem('accessToken')}}
+         );
+          }catch(e) {
+            console.log(e.response)
+          }
+        }else{
+        let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/clients/editUser',
+        {...this.user, id:this.$route.params.id},
+        {headers: {Authorization: localStorage.getItem('accessToken')}}
+         );
+         console.log(response);
+        }
+        await this.getOneClient(this.$route.params.id);
+        }
+    },
+   async mounted() {
+      await this.getOneClient(this.$route.params.id);
+      if(this.currentClient.user) {
+        this.user.name = this.currentClient.user.name;
+        this.user.username = this.currentClient.user.username;
+        this.user.password = this.currentClient.user.password;
+      }
+    },
+      setup () {
+    return {
+      tab: ref(localStorage.getItem('tab') ? localStorage.getItem('tab'): 'meetings'),
+    }
+  }
+}
+</script>
