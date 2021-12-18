@@ -2,8 +2,8 @@
     <q-page class="q-pa-md">
     <q-toolbar class="text-primary bg-white absolute-top" style="height:54px !important;">
       <q-toolbar-title>
-           <div class="flex">
-            <div class="flex q-mt-sm" v-for="(u, i) in chat.users" :key="u.id">
+           <div v-if="chat" class="flex">
+            <div  class="flex q-mt-sm" v-for="(u, i) in chat.users" :key="u.id">
             <q-avatar v-if="u.id !== user.id" :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
               <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
             </q-avatar>
@@ -21,7 +21,7 @@
     </q-toolbar>
     <div class="q-mt-xl">
     <q-scroll-area ref="scroll" style="height: 80vh" class="scroll-center" >
-    <div style="width: 100% !important;">
+    <div v-if="chat" style="width: 100% !important;">
     <div v-for="(m, i) in chat.messages" :key="m.id">
       <q-chat-message
         :name="m.user.name"

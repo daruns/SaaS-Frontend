@@ -4,7 +4,6 @@ export async function getRooms({commit}, payload) {
 
 export async function getChat({commit}, payload) {
     commit('GET_CHAT', payload)
-    console.log(payload)
 }
 
 export async function getMessage({commit}, payload) {

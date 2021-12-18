@@ -71,7 +71,7 @@
                     <q-item v-bind="scope.itemProps">
                         <q-item-section class="avatar-list">
                         <q-avatar class="q-mr-xs" size="30px">
-                            <img src="~/assets/one_logo_neat.png">
+                            <img :src="scope.opt.avatar ? scope.opt.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
                         </q-avatar>
                         <q-item-label>{{ scope.opt.label }}</q-item-label>       
                         </q-item-section>
@@ -90,7 +90,8 @@
           </template>
           </q-input>
         </q-item>
-        <div v-for="(room, i) in rooms" :key="i">
+        <div v-if="rooms.length === 0" class="q-pa-md text-grey">No rooms to show!</div>
+        <div v-else v-for="(room, i) in rooms" :key="i">
         <q-item :class="room.id === chat.id ? 'bg-blue-1' : ''" 
         :style="room.id === chat.id ? 'border: .5px solid skyblue' : ''" @click="getMessages(room, i)" clickable v-ripple>
         <q-item-section>
@@ -126,7 +127,7 @@
           class="bg-grey-1"
           style="overflow-y: hidden !important;"
            >
-           <div class="fit flex items-center q-pl-md justify-start column  bg-grey-1">
+           <div v-if="chat" class="fit flex items-center q-pl-md justify-start column  bg-grey-1">
              <div class="row full-width">
                <div v-for="u in chat.users" :key="u.id" class="flex column flex-center q-ma-sm">
                 <q-avatar size="75px">
@@ -216,7 +217,7 @@ export default {
       this.options = [];
       setTimeout(() => {
       for(let i = 0; i<this.users.length; i++) {
-          optionsB.push({id:this.users[i].id, label: this.users[i].name});
+          optionsB.push({id:this.users[i].id, label: this.users[i].name, avatar: this.users[i].avatar});
       }
       }, 100);
       this.options = optionsB
@@ -231,6 +232,7 @@ export default {
 
       socket.addEventListener('message', async function (event) {
       const result = JSON.parse(event.data);
+      console.log(result);
       if (result.rooms) {
       self.rooms = [];
       self.rooms = JSON.parse(event.data).rooms.rooms;
