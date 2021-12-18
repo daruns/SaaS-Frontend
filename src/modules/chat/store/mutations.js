@@ -3,6 +3,7 @@ export function GET_ROOMS (state, payload) {
 }
 
 export function GET_CHAT (state, payload) {
+    state.chat = []
     state.chat = payload;
 }
 

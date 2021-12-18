@@ -157,19 +157,21 @@ export default {
       socket.send(JSON.stringify({accessToken: localStorage.getItem('accessToken').substring(7, localStorage.getItem('accessToken').length)}));
       });
       socket.addEventListener('message', async function (event) {
-        self.setScrollPos();
         if(self.init === 1){
           self.init = 2;
-        }else if(JSON.parse(event.data).messagePerRoom){
+        }
+        else if(JSON.parse(event.data).messagePerRoom){
          await self.getMessage(JSON.parse(event.data).messagePerRoom.messfinal);
           self.setScrollPos();
-        }else if(JSON.parse(event.data).userTyping) {
+        }
+        else if(JSON.parse(event.data).userTyping) {
           self.room_id = JSON.parse(event.data).userTyping.room_id ;
           self.isTyping = true;
           setTimeout(() => {    
             self.isTyping = false;
           }, 2000);
         }
+         self.setScrollPos();
       });
     },
     setup () {

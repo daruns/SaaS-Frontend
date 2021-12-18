@@ -178,6 +178,7 @@ export default {
       members: [],
       options: [],
       rooms: [],
+      roomInfo: null,
       isLoading: false,
       drawer: false
     }
@@ -192,9 +193,11 @@ export default {
     ...mapActions('example', ['getUser']),
     ...mapActions('chatStore', ['getChat']),
    async getMessages(room, i) {
-     if(document.body.offsetWidth <= 1185) this.drawer = false
+     if(document.body.offsetWidth <= 1185) this.drawer = false;
      localStorage.setItem('roomIndex', i);
-     await this.getChat(room);
+     socket.send(JSON.stringify({getMessagesByRoomId: {room_id: room.id}}));
+     this.roomInfo = room
+    //  await this.getChat(room);
     },
      format(dt) {
         return date.formatDate(dt, 'HH:mm');
@@ -232,7 +235,10 @@ export default {
 
       socket.addEventListener('message', async function (event) {
       const result = JSON.parse(event.data);
-      console.log(result);
+      if(result.messagePerRoom) {
+        console.log(result.messagePerRoom);
+        await self.getChat({id: self.roomInfo.id, users: self.roomInfo.users, messages : result.messagePerRoom});
+      }
       if (result.rooms) {
       self.rooms = [];
       self.rooms = JSON.parse(event.data).rooms.rooms;
