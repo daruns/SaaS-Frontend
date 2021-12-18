@@ -235,22 +235,35 @@ export default {
 
       socket.addEventListener('message', async function (event) {
       const result = JSON.parse(event.data);
+      if(result.messagesByRoomId) {
+        await self.getChat({id: self.roomInfo.id, users: self.roomInfo.users, messages : result.messagesByRoomId});
+      }
       if(result.messagePerRoom) {
-        console.log(result.messagePerRoom);
-        await self.getChat({id: self.roomInfo.id, users: self.roomInfo.users, messages : result.messagePerRoom});
+        for(let i = 0; i<self.rooms.length; i++) {
+          if(self.rooms[i].id === result.messagePerRoom.messfinal.room_id) {
+            self.rooms[i].messages.push(result.messagePerRoom.messfinal)
+          }
+        }
+        
       }
       if (result.rooms) {
       self.rooms = [];
       self.rooms = JSON.parse(event.data).rooms.rooms;
       if(self.chat) {
         if(localStorage.getItem('roomIndex') && Number(localStorage.getItem('roomIndex')) >= 0 && (self.rooms.length >= Number(localStorage.getItem('roomIndex')))){
-        await self.getChat(self.rooms[Number(localStorage.getItem('roomIndex'))]);
+        socket.send(JSON.stringify({getMessagesByRoomId: {room_id: self.rooms[Number(localStorage.getItem('roomIndex'))].id}}));
+        self.roomInfo = self.rooms[Number(localStorage.getItem('roomIndex'))];
+        // await self.getChat(self.rooms[Number(localStorage.getItem('roomIndex'))]);
         }else{
-        await self.getChat(self.rooms[0]);
+        socket.send(JSON.stringify({getMessagesByRoomId: {room_id: self.rooms[0].id}}));
+        self.roomInfo = self.rooms[0];
+        // await self.getChat(self.rooms[0]);
         localStorage.setItem('roomIndex', 0)
         }
       }else { 
-        await self.getChat(self.rooms[0]);
+        socket.send(JSON.stringify({getMessagesByRoomId: {room_id: self.rooms[0].id}}));
+        self.roomInfo = self.rooms[0];
+        // await self.getChat(self.rooms[0]);
         localStorage.setItem('roomIndex', 0)
       }
       } else if (result.typing) {

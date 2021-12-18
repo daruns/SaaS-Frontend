@@ -161,8 +161,10 @@ export default {
           self.init = 2;
         }
         else if(JSON.parse(event.data).messagePerRoom){
+         if(JSON.parse(event.data).messagePerRoom.messfinal.room_id === Number(self.chat.id)){
          await self.getMessage(JSON.parse(event.data).messagePerRoom.messfinal);
-          self.setScrollPos();
+         self.setScrollPos();
+         }
         }
         else if(JSON.parse(event.data).userTyping) {
           self.room_id = JSON.parse(event.data).userTyping.room_id ;
