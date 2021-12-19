@@ -47,8 +47,8 @@
       <div class="q-mb-xl" v-if="i === chat.messages.length-1">
         <div class="q-ma-none flex" :class="user.id !== m.user_id ? 'q-ml-xl' : 'q-mr-xl justify-end'">
           <div v-for="msg in m.messageRecipients" :key="msg.user.id">
-          <q-avatar v-if="msg.status === 'delivered'" class="q-ml-xs" size="15px">
-          <img :src="msg.user.avatar">
+          <q-avatar v-if="msg.status === 'seen'" class="q-ml-xs" size="15px">
+          <img :src="msg.user.avatar ? msg.user.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
         </q-avatar>
           </div>
         </div>

@@ -7,6 +7,10 @@ export function GET_CHAT (state, payload) {
     state.chat = payload;
 }
 
+export function CLEAR_CHAT (state) {
+    state.chat = []
+}
+
 export function GET_MESSAGE (state, payload) {
     state.chat.messages.push({...payload});
 }

@@ -131,9 +131,10 @@
            >
            <div v-if="chat" class="fit flex items-center q-pl-md justify-start column  bg-grey-1">
              <div class="row full-width">
-               <div v-for="u in chat.users" :key="u.id" class="flex column flex-center q-ma-sm">
+               <div v-for="u in allUsers" :key="u.id" class="flex column flex-center q-ma-sm">
                 <q-avatar size="75px">
-                <q-btn round size="5px" @click="membToDelete = u.id; cnfrm=true;" icon="close" color="negative" class="absolute-top-right"/>
+                <q-badge rounded :color="u.online ? 'green' : 'grey-5'" class="absolute-bottom-right q-mr-sm"/>
+                <q-btn v-if="roomInfo && user.id === roomInfo.creator_id || u.id === user.id" round size="5px" @click="membToDelete = u.id; cnfrm=true;" icon="close" color="negative" class="absolute-top-right"/>
                 <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
                 </q-avatar>
                 <p class="text-h6 q-ma-none text-grey">{{u.name}}</p>
@@ -216,6 +217,8 @@ export default {
       options: [],
       members1: [],
       options1: [],
+      onlineUsers: [],
+      allUsers: [],
       rooms: [],
       roomInfo: null,
       isLoading: false,
@@ -227,7 +230,7 @@ export default {
   computed : {
     ...mapState('example', ['user']),
     ...mapState('userStore', ['users']),
-    ...mapState('chatStore', ['chat'])
+    ...mapState('chatStore', ['chat']),
   },
   components : {
     confirm
@@ -235,7 +238,7 @@ export default {
   methods: {
     ...mapActions('userStore',['getUsers']),
     ...mapActions('example', ['getUser']),
-    ...mapActions('chatStore', ['getChat']),
+    ...mapActions('chatStore', ['getChat', 'clearChat']),
     addNewMembers() {
       let self = this;
       let membsToAdd = [];
@@ -255,9 +258,13 @@ export default {
    async getMessages(room, i) {
      if(document.body.offsetWidth <= 1185) this.drawer = false;
      localStorage.setItem('roomIndex', i);
-     socket.send(JSON.stringify({getMessagesByRoomId: {room_id: room.id}}));
      this.roomInfo = room
+     socket.send(JSON.stringify({getMessagesByRoomId: {room_id: room.id}}));
     //  await this.getChat(room);
+    },
+    getMessagesImmediate() {
+      let self = this;
+      socket.send(JSON.stringify({getMessagesByRoomId: {room_id: Number(self.chat.id)}}));
     },
      format(dt) {
         return date.formatDate(dt, 'HH:mm');
@@ -316,15 +323,37 @@ export default {
 
       socket.addEventListener('message', async function (event) {
       const result = JSON.parse(event.data);
-      console.log(result)
+
+      if(result.onlineUsers) {
+        self.onlineUsers = result.onlineUsers
+        let ofUsers = self.chat.users.filter(({ id: id1 }) => !result.onlineUsers.some(({ id: id2 }) => id2 === id1));
+        let onUsers = self.chat.users.filter(({ id: id1 }) => result.onlineUsers.some(({ id: id2 }) => id2 === id1));
+
+        self.allUsers = [];
+
+        for(let i = 0; i<onUsers.length; i++) {
+          self.allUsers.push({...onUsers[i], online:true})
+        }
+
+        for(let i = 0; i<ofUsers.length; i++) {
+          self.allUsers.push({...ofUsers[i], online:false})
+        }
+
+      }
+
       if(result.messagesByRoomId) {
-        console.log(result)
-        await self.getChat({id: self.roomInfo.id, users: self.roomInfo.users, messages : result.messagesByRoomId});
+        if(self.roomInfo.id === result.messagesByRoomId.room_id){
+          await self.getChat({id: self.roomInfo.id, users: self.roomInfo.users, messages : result.messagesByRoomId.roomMessages});
+          socket.send(JSON.stringify({ping: true}));
+        }
+        // console.log(self.rooms[Number(localStorage.getItem('roomIndex'))].id)
+        // if(Number(self.chat.id) === Number(self.rooms[Number(localStorage.getItem('roomIndex'))].id))
       }
       if(result.messagePerRoom) {
         for(let i = 0; i<self.rooms.length; i++) {
           if(self.rooms[i].id === result.messagePerRoom.messfinal.room_id) {
-            self.rooms[i].messages.push(result.messagePerRoom.messfinal)
+            self.rooms[i].messages.push(result.messagePerRoom.messfinal);
+            await self.getMessagesImmediate()
           }
         }
         
@@ -332,12 +361,19 @@ export default {
       if (result.rooms) {
       self.rooms = [];
       self.rooms = JSON.parse(event.data).rooms.rooms;
+      if(self.rooms.length === 0) {
+        await self.clearChat();
+        return
+      }
       if(self.chat) {
         if(localStorage.getItem('roomIndex') && Number(localStorage.getItem('roomIndex')) >= 0 && (self.rooms.length >= Number(localStorage.getItem('roomIndex')))){
-        socket.send(JSON.stringify({getMessagesByRoomId: {room_id: self.rooms[Number(localStorage.getItem('roomIndex'))].id}}));
+          setTimeout(() => {
+            socket.send(JSON.stringify({getMessagesByRoomId: {room_id: self.rooms[Number(localStorage.getItem('roomIndex'))].id}}));
+          }, 100);
         self.roomInfo = self.rooms[Number(localStorage.getItem('roomIndex'))];
         // await self.getChat(self.rooms[Number(localStorage.getItem('roomIndex'))]);
-        }else{
+        }
+        else{
         socket.send(JSON.stringify({getMessagesByRoomId: {room_id: self.rooms[0].id}}));
         self.roomInfo = self.rooms[0];
         // await self.getChat(self.rooms[0]);
@@ -358,6 +394,12 @@ export default {
     this.getUserOptions();
     // this.getMemberOptions();
     this.isLoading = false;
+
+    socket.send(JSON.stringify({ping: true}));
+
+    setInterval(() => {
+      socket.send(JSON.stringify({ping: true}));
+    }, 10000);
 
   }
 }
