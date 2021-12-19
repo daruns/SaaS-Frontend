@@ -4,11 +4,10 @@
       <q-toolbar-title>
            <div v-if="chat" class="flex">
             <div  class="flex q-mt-sm" v-for="(u, i) in chat.users" :key="u.id">
-            <q-avatar v-if="u.id !== user.id" :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
+            <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
               <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
             </q-avatar>
-            <div class="q-mt-sm q-ml-sm" v-if="chat.users.length === 2 && i === 0">
-            <p class="text-subtitle2 text-black">{{u.name}}</p>
+            <div class="q-mt-sm q-ml-xs" v-if="chat.users.length === 2 && i === 0">
             </div>
             </div>
             <div class="q-mt-md" v-if="chat.users">
@@ -23,10 +22,11 @@
     <q-scroll-area ref="scroll" style="height: 80vh" class="scroll-center" >
     <div v-if="chat" style="width: 100% !important;">
     <div v-for="(m, i) in chat.messages" :key="m.id">
+      <div>
       <q-chat-message
         :name="m.user.name"
         :avatar="user.id === m.user_id ? user.avatar : m.user.avatar"
-        class="q-pb-lg text-grey"
+        class="q-pb-sm text-grey"
         :class="user.id !== m.user_id && 'q-ml-xl'"
         :bg-color="user.id !== m.user_id ? 'primary' : 'grey-4'"
         :text-color="user.id === m.user_id ? 'black' : 'white'"
@@ -44,6 +44,16 @@
          </div>
         </div>
       </q-chat-message>
+      <div class="q-mb-xl" v-if="i === chat.messages.length-1">
+        <div class="q-ma-none flex" :class="user.id !== m.user_id ? 'q-ml-xl' : 'q-mr-xl justify-end'">
+          <div v-for="msg in m.messageRecipients" :key="msg.user.id">
+          <q-avatar v-if="msg.status === 'delivered'" class="q-ml-xs" size="15px">
+          <img :src="msg.user.avatar">
+        </q-avatar>
+          </div>
+        </div>
+      </div>
+      </div>
         <div class="q-mb-xl" v-if="i === chat.messages.length-1 && isTyping && room_id === this.chat.id" >
          <q-spinner-dots size="md" />
         </div>

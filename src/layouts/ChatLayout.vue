@@ -22,6 +22,7 @@
               <q-badge rounded color="red" floating>2</q-badge>
             </q-btn>
         </div>
+            <q-btn flat round icon="menu_open" @click="drawer1 = !drawer1"/>
             <q-btn flat round>
                  <img
                   alt="User logo"
@@ -98,7 +99,7 @@
           <q-item-label>
            <div class="flex">
             <div class="text-ellipses" v-for="(u, i) in room.users" :key="u.id">
-            <q-avatar v-if="u.id !== user.id" :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="25px">
+            <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="25px">
               <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
             </q-avatar>
             </div><p class="q-mt-sm text-grey">{{room.users.length > 2 ? `...+${room.users.length - 2}` : ''}}</p>
@@ -122,7 +123,8 @@
            show-if-above 
            side="right" 
            bordered
-          :width="400"
+           v-model="drawer1"
+          :width="350"
           :breakpoint="1185"
           class="bg-grey-1"
           style="overflow-y: hidden !important;"
@@ -131,6 +133,7 @@
              <div class="row full-width">
                <div v-for="u in chat.users" :key="u.id" class="flex column flex-center q-ma-sm">
                 <q-avatar size="75px">
+                <q-btn round size="5px" @click="membToDelete = u.id; cnfrm=true;" icon="close" color="negative" class="absolute-top-right"/>
                 <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
                 </q-avatar>
                 <p class="text-h6 q-ma-none text-grey">{{u.name}}</p>
@@ -156,31 +159,69 @@
                     </div>
                 </div> -->
            </div>
+             <q-btn round icon="add" class="absolute-bottom-left q-ml-sm q-mb-sm" color="primary" style="z-index:10 !important; ">
+              <q-popup-edit v-model="members" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
+                <q-select
+                      ref="clientRef"
+                      :rules="[val => (val !== null) || 'This field is required']"
+                      bg-color="white"
+                      outlined
+                      counter
+                      multiple
+                      use-chips
+                      :loading="isLoading"
+                      v-model="members1" 
+                      :options="options1"
+                      label="Choose members"
+                    >
+                    <template v-slot:option="scope">
+                    <q-item v-bind="scope.itemProps">
+                        <q-item-section class="avatar-list">
+                        <q-avatar class="q-mr-xs" size="30px">
+                            <img :src="scope.opt.avatar ? scope.opt.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+                        </q-avatar>
+                        <q-item-label>{{ scope.opt.label }}</q-item-label>       
+                        </q-item-section>
+                    </q-item>
+                    </template>
+                </q-select>
+               <q-btn @click="addNewMembers" no-caps flat label="submit" color="primary" :disable="members1.length === 0" v-close-popup />
+              </q-popup-edit>
+        </q-btn>
           </q-drawer>
 
       <q-page-container>
           <router-view  />
       </q-page-container>
     </q-layout>
+    <q-dialog v-model="cnfrm">
+    <confirm @confirm="deleteMemeber" />
+    </q-dialog>
   </div>
 </template>
 
 <script>
 const socket = new WebSocket('wss://oneconnect.it:4000');
-import { date } from 'quasar'
-import { mapActions, mapState } from 'vuex'
+import { date } from 'quasar';
+import { mapActions, mapState } from 'vuex';
+import confirm from '../components/DeleteDialogue.vue';
 export default {
   data() {
     return {
       isLoggedIn: localStorage.getItem('accessToken'),
       isExpanded: true,
       isExpanded2: true,
+      membToDelete: null,
       members: [],
       options: [],
+      members1: [],
+      options1: [],
       rooms: [],
       roomInfo: null,
       isLoading: false,
-      drawer: false
+      drawer: false,
+      drawer1: false,
+      cnfrm: false
     }
   },
   computed : {
@@ -188,10 +229,29 @@ export default {
     ...mapState('userStore', ['users']),
     ...mapState('chatStore', ['chat'])
   },
+  components : {
+    confirm
+  },
   methods: {
     ...mapActions('userStore',['getUsers']),
     ...mapActions('example', ['getUser']),
     ...mapActions('chatStore', ['getChat']),
+    addNewMembers() {
+      let self = this;
+      let membsToAdd = [];
+      for(let i = 0; i<this.members1.length; i++) {
+        membsToAdd.push(this.members1[i].id)
+      }
+      socket.send(JSON.stringify({addRoomUsers: {id: self.chat.id, users: membsToAdd}}));
+      membsToAdd = [];
+      this.members1 = []
+    },
+    deleteMemeber() {
+      let self = this;
+      socket.send(JSON.stringify({deleteRoomUsers: {id: self.chat.id, users: [self.membToDelete]}}));
+      this.membToDelete = null;
+      this.cnfrm = false;
+    },
    async getMessages(room, i) {
      if(document.body.offsetWidth <= 1185) this.drawer = false;
      localStorage.setItem('roomIndex', i);
@@ -208,6 +268,8 @@ export default {
           membsToAdd.push(Number(this.members[i].id));
       }
       socket.send(JSON.stringify({createRoom: {users: membsToAdd } } ) );
+      membsToAdd = [];
+      this.members = [];
     },
     logout() {
       localStorage.removeItem('accessToken');
@@ -223,8 +285,27 @@ export default {
           optionsB.push({id:this.users[i].id, label: this.users[i].name, avatar: this.users[i].avatar});
       }
       }, 100);
-      this.options = optionsB
+      this.options = optionsB;
+      this.options1 = optionsB
     },
+    //   getMemberOptions() {
+    //   let optionsB = [];
+    //   let optionsA = [];
+    //   this.options1 = [];
+    //   console.log(this.chat)
+    //   setTimeout(() => {
+    //   for(let i = 0; i<this.users.length; i++) {
+    //   for(let j = 0; j<this.chat.users.length; j++) {
+    //     if(Number(this.chat.users[j].id) === Number(this.users[i].id)){
+    //       optionsB.push({id:this.users[i].id, label: this.users[j].name});
+    //     }
+    //   }
+    //       optionsA.push({id:this.users[i].id, label: this.users[i].name, avatar:this.users[i].avatar});
+    //   }
+    //   }, 400);
+      
+    //   this.options1 = optionsA.filter(({ id: id1 }) => !optionsB.some(({ id: id2 }) => id2 === id1));
+    // },
   },
   async beforeMount() {
     this.isLoading = true;
@@ -235,7 +316,9 @@ export default {
 
       socket.addEventListener('message', async function (event) {
       const result = JSON.parse(event.data);
+      console.log(result)
       if(result.messagesByRoomId) {
+        console.log(result)
         await self.getChat({id: self.roomInfo.id, users: self.roomInfo.users, messages : result.messagesByRoomId});
       }
       if(result.messagePerRoom) {
@@ -273,6 +356,7 @@ export default {
     await this.getUser();
     await this.getUsers();
     this.getUserOptions();
+    // this.getMemberOptions();
     this.isLoading = false;
 
   }
