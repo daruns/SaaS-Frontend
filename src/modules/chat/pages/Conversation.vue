@@ -1,5 +1,5 @@
 <template>
-    <q-page class="q-pa-md">
+    <q-page class="q-pt-md q-pb-md">
     <q-toolbar class="text-primary bg-white absolute-top" style="height:54px !important;">
       <q-toolbar-title>
            <div v-if="chat" class="flex">
@@ -7,31 +7,29 @@
             <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
               <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
             </q-avatar>
-            <div class="q-mt-sm q-ml-xs" v-if="chat.users.length === 2 && i === 0">
-            </div>
-            </div>
-            <div class="q-mt-md" v-if="chat.users">
-            <p class="text-grey q-ma-none">{{chat.users.length > 2 ? `...+${chat.users.length - 2}` : ''}}</p>
+             <q-avatar class="q-ml-xs bg-grey-3 text-grey" v-show="i === 2 && chat.users.length > 2" size="35px">
+               {{`+${chat.users.length - 2}`}}
+            </q-avatar>
             </div>
           </div>
       </q-toolbar-title>
       <q-btn flat round dense icon="videocam" />
       <q-btn flat round dense icon="call" />
     </q-toolbar>
-    <div class="q-mt-xl">
-    <q-scroll-area ref="scroll" style="height: 80vh" class="scroll-center" >
-    <div v-if="chat" style="width: 100% !important;">
-    <div v-for="(m, i) in chat.messages" :key="m.id">
-      <div>
+    <div style="margin-top: 38px !important;">
+    <!-- <q-scroll-area ref="scroll" style="height: 80vh" class="scroll-center" > -->
+    <div v-if="chat" id="room-container" style="width: 100% !important; height:80vh; overflow-y: scroll !important;">
+    <div  v-for="(m, i) in chat.messages" :key="m.id">
+      <div class="q-pr-xl q-pl-xl">
       <q-chat-message
         :name="m.user.name"
         :avatar="user.id === m.user_id ? user.avatar : m.user.avatar"
+        size="35"
         class="q-pb-sm text-grey"
-        :class="user.id !== m.user_id && 'q-ml-xl'"
         :bg-color="user.id !== m.user_id ? 'primary' : 'grey-4'"
         :text-color="user.id === m.user_id ? 'black' : 'white'"
         :sent="user.id === m.user_id"
-        style="max-width:90% !important; text-overflow: break !important;"
+        style="max-width:100% !important; text-overflow: break !important;"
         :stamp="format(m.created_at)"
       >
        <div @click="m.attachments[0] && download(m.attachments[0])" :class="m.attachments[0] && 'text-grey'" class="flex flex-center column">
@@ -59,7 +57,7 @@
         </div>
         </div>
     </div>
-    </q-scroll-area>
+    <!-- </q-scroll-area> -->
     </div>
     <div style="margin-bottom:.5px !important;" class="absolute-bottom">
         <q-input @input.capture="typing" @keydown.enter="send" outlined square bg-color="white" v-model="message" label="Message">
@@ -138,7 +136,11 @@ export default {
         }
       },
       setScrollPos() {
-        this.$refs.scroll.setScrollPosition('vertical',  10000000000000000000);
+        // this.$refs.scroll.setScrollPosition('vertical',  10000000000000000000);
+      },
+      updateScroll(){
+          var element = document.getElementById("room-container");
+          element.scrollTop = element.scrollHeight;
       },
       send() {
         if(this.message === '')
@@ -148,12 +150,12 @@ export default {
         socket.send(JSON.stringify({createMessage:{room_id: Number(this.chat.id), text: this.message}}));
         self.message = '';
         setTimeout(() => {
-          self.setScrollPos();
+          self.updateScroll();;
         }, 100);
       },
       receive() {
         setTimeout(() => {
-          self.setScrollPos();
+          self.updateScroll();
         }, 100);
       }
     },
@@ -173,7 +175,7 @@ export default {
         else if(JSON.parse(event.data).messagePerRoom){
          if(JSON.parse(event.data).messagePerRoom.messfinal.room_id === Number(self.chat.id)){
          await self.getMessage(JSON.parse(event.data).messagePerRoom.messfinal);
-         self.setScrollPos();
+         self.updateScroll();
          }
         }
         else if(JSON.parse(event.data).userTyping) {
@@ -183,7 +185,12 @@ export default {
             self.isTyping = false;
           }, 2000);
         }
-         self.setScrollPos();
+        
+        if(JSON.parse(event.data).onlineUsers) {
+          return
+        }else{
+          self.updateScroll();
+        }
       });
     },
     setup () {

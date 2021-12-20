@@ -29,7 +29,7 @@
         <q-avatar v-else size="100px" font-size="52px" color="grey" text-color="white" icon="person" />
         </router-link>
         <router-link class="text-black" style="max-width: 200px !important;min-width:80% !important;white-space: nowrap;overflow:hidden !important;text-overflow: ellipsis" :to="`/client/${client.id}`">
-        <p style="max-width: 200px !important;min-width:80% !important;white-space: nowrap;overflow:hidden !important;text-overflow: ellipsis"  class="text-h5 q-mt-sm q-mb-none">{{client.name}}</p></router-link>
+        <p style="max-width: 200px !important;min-width:80% !important;white-space: nowrap;overflow:hidden !important;text-overflow: ellipsis"  class="text-h5 text-center q-mt-sm q-mb-none">{{client.name}}</p></router-link>
         <p class="text-span text-grey">{{client.businessType}}</p>
         </div>
       </q-card-section>

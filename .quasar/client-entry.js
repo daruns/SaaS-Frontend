@@ -21,6 +21,8 @@ import { createApp } from 'vue'
 
 import '@quasar/extras/fontawesome-v5/fontawesome-v5.css'
 
+import '@quasar/extras/line-awesome/line-awesome.css'
+
 import '@quasar/extras/material-icons/material-icons.css'
 
 
@@ -41,6 +43,9 @@ import quasarUserOptions from './quasar-user-options.js'
 
 
 
+
+
+console.info('[Quasar] Running SPA.')
 
 
 
