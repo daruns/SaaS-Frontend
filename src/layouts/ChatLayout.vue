@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <q-layout view="hHh lpR fFf" container style="height: 100vh" class="shadow-2">
+    <q-layout view="lHr LpR lFr" class="shadow-2">
       <q-header class="primary">
         <q-toolbar class="bg-primary text-white shadow-2">
           <q-toolbar-title class="flex">   
@@ -62,10 +61,210 @@
           </template>
           </q-input>
           <div class="q-ml-sm q-mt-xs" style="margin-top:7px;">
-              <q-btn :ripple="false" class="bg-blue-1" flat round color="primary">
-                <i style="font-size: 24px;" class="las la-edit"></i>
-              <q-popup-edit v-model="members" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
-                <q-select
+              <q-btn :ripple="false" class="bg-blue-1" @click="createRoom = true" flat round color="primary">
+               <i style="font-size: 24px;" class="las la-edit"></i>
+             </q-btn>
+          </div>
+        </q-item>
+        <div v-if="rooms.length === 0" class="q-pa-md text-grey">No rooms to show!</div>
+        <div v-else v-for="(room, i) in rooms" :key="i">
+          <div :class="'q-pa-xs'"> 
+        <q-item style="border-radius: 10px;" :class="room.id === chat.id ? 'bg-blue-1' : ''" 
+         @click="getMessages(room, i)" clickable v-ripple>
+        <q-item-section>
+          <q-item-label>
+           <div class="flex">
+            <div class="text-ellipses" v-for="(u, i) in room.users" :key="u.id">
+            <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
+              <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+            </q-avatar>
+             <q-avatar class="q-ml-xs bg-grey-3 text-grey" v-show="i === 2 && room.users.length > 2" size="35px">
+               {{`+${room.users.length - 2}`}}
+            </q-avatar>
+            </div>
+          </div>
+          </q-item-label>
+          <q-item-label caption lines="1">
+            <p class="q-mt-xs">
+            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+            </p>
+            </q-item-label>
+        </q-item-section>
+        <q-item-section side top>
+          <q-item-label caption>{{room.messages.length !== 0 ? format(room.messages[room.messages.length-1].created_at) : ''}}</q-item-label>
+        </q-item-section>
+        </q-item>
+        </div>
+        </div>
+        <!-- <div v-else v-for="(room, i) in rooms" :key="i">
+          <q-item @click="getMessages(room, i)" style="border-radius: 10px;" :class="room.id === chat.id ? 'bg-blue-1' : ''" clickable v-ripple>
+            <q-item-section side>
+           <div class="flex">
+            <div class="text-ellipses" v-for="(u, i) in room.users" :key="u.id">
+            <q-avatar :style="i !== 0 ? 'transform: translateX(-20px) !important;' : 'z-index:1 !important;'" :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
+              <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+            </q-avatar>
+             <q-avatar style='transform: translateX(-20px) !important;' class="q-ml-xs bg-grey-3 text-grey" v-show="i === 2 && room.users.length > 2" size="35px">
+               {{`+${room.users.length - 2}`}}
+            </q-avatar>
+            </div>
+          </div>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label class="flex text-ellipses"><p class="q-ma-none" v-for="u in room.users" :key="u.id">{{u.name}},</p></q-item-label>
+              <q-item-label caption>{{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              {{room.messages.length !== 0 ? format(room.messages[room.messages.length-1].created_at) : ''}}
+            </q-item-section>
+          </q-item>
+        </div> -->
+
+    </q-list>
+    </q-scroll-area>
+
+      </q-drawer>
+          <q-drawer
+           show-if-above 
+           side="right" 
+           bordered
+           v-model="drawer1"
+          :width="300"
+          :breakpoint="1185"
+          class="bg-grey-1"
+          style="overflow-y: scroll !important;"
+           >
+           <div v-if="chat" class="fit flex items-center justify-start column  bg-grey-1">
+             <div class="row full-width">
+               <div v-for="u in allUsers" :key="u.id" class="flex column flex-center q-ma-sm">
+                <q-avatar size="60px">
+                <q-badge rounded :color="u.online ? 'green' : 'grey-5'" class="absolute-bottom-right q-mr-sm"/>
+                <q-btn v-if="roomInfo && user.id === roomInfo.creator_id || u.id === user.id" round size="5px" @click="membToDelete = u.id; cnfrm=true;" icon="close" color="negative" class="absolute-top-right"/>
+                <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+                </q-avatar>
+                <p class="text-h6 q-ma-none text-grey">{{u.name}}</p>
+               </div>
+             </div>
+                <!-- <p class="text-caption text-grey q-ma-none">Web developer</p> -->
+                <!-- <div class="q-mt-xl flex column" style="width:50% !important;">
+                    <div class="flex justify-between">
+                        <p class="text-body1 text-weight-medium">Username:</p>
+                        <p class="text-body1 text-grey text-weight-medium">jane</p>
+                    </div>
+                    <div class="flex justify-between">
+                        <p class="text-body1 text-weight-medium">DOB:</p>
+                        <p class="text-body1 text-grey text-weight-medium">24 July</p>
+                    </div>
+                    <div class="flex justify-between">
+                        <p class="text-body1 text-weight-medium">Email:</p>
+                        <p class="text-body1 text-grey text-weight-medium">jane@gmail.com</p>
+                    </div>
+                    <div class="flex justify-between">
+                        <p class="text-body1 text-weight-medium">Phone:</p>
+                        <p class="text-body1 text-grey text-weight-medium">9647508363828</p>
+                    </div>
+                </div> -->
+            <div class="full-width q-mt-md">
+              <q-list padding>
+               <q-expansion-item
+                  label="Customize chat"
+                >
+                  <q-card class="bg-grey-1">
+                    <q-card-section>
+                      <q-btn align="left" rounded no-caps class="bg-blue-1 full-width" flat icon="edit" label="Change group name" color="primary" />
+                      <q-btn align="left" rounded no-caps class="bg-blue-1 q-mt-sm full-width" flat icon="image" label="Change photo" color="primary" />
+                    </q-card-section>
+                  </q-card>
+                </q-expansion-item>
+                <q-expansion-item
+                  label="Chat members"
+                >
+                  <q-card class="bg-grey-1">
+                    <q-card-section>
+                       <div v-for="(u, i) in allUsers" :key="u.id" class="flex items-center">
+                        <q-avatar :class="i !== 0 && 'q-mt-sm'" size="35px">
+                        <!-- <q-btn v-if="roomInfo && user.id === roomInfo.creator_id || u.id === user.id" round size="5px" @click="membToDelete = u.id; cnfrm=true;" icon="close" color="negative" class="absolute-top-right"/> -->
+                        <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+                        </q-avatar>
+                        <p class="q-mr-none q-mt-none q-mb-none q-ml-sm text-grey">{{u.name}}</p>
+                      </div>
+                      <q-btn @click="addMembers = true" rounded no-caps class="bg-blue-1 q-mt-sm" flat icon="add" label="Add people" color="primary" />
+                    </q-card-section>
+                  </q-card>
+                </q-expansion-item>
+    </q-list>
+        </div>
+           </div>
+          </q-drawer>
+      <q-page-container style="overflow-y:hidden !important;">
+          <router-view  />
+      </q-page-container>
+    </q-layout>
+    <q-dialog v-model="cnfrm">
+    <confirm @confirm="deleteMemeber" />
+    </q-dialog>
+      <q-dialog v-model="addMembers" persistent>
+      <q-card style="width: 400px !important;">
+        <q-card-section class="row items-center">
+          <q-avatar icon="group" color="primary" text-color="white" />
+          <span class="q-ml-sm">Add Members</span>
+        </q-card-section>
+        <q-card-section>
+          <q-select
+              ref="clientRef"
+              :rules="[val => (val !== null) || 'This field is required']"
+              bg-color="white"
+              outlined
+              counter
+              multiple
+              use-chips
+              :loading="isLoading"
+              v-model="members1" 
+              :options="options1"
+              label="Choose members"
+            >
+            <template v-slot:option="scope">
+            <q-item v-bind="scope.itemProps">
+                <q-item-section class="avatar-list">
+                <q-avatar class="q-mr-xs" size="35px">
+                    <img :src="scope.opt.avatar ? scope.opt.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+                </q-avatar>
+                <q-item-label>{{ scope.opt.label }}</q-item-label>       
+                </q-item-section>
+            </q-item>
+            </template>
+            <template v-slot:selected-item="scope">
+              <q-chip
+                removable
+                dense
+                @remove="scope.removeAtIndex(scope.index)"
+                :tabindex="scope.tabindex"
+                color="blue-1"
+                text-color="primary"
+              >
+                <q-avatar color="secondary" text-color="white">
+                    <img :src="scope.opt.avatar ? scope.opt.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+                </q-avatar>
+                {{ scope.opt.label }}
+              </q-chip>
+            </template>
+        </q-select>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn no-caps flat label="Cancel" color="primary" v-close-popup />
+          <q-btn @click="addNewMembers" no-caps flat label="Submit" color="primary" :disable="members1.length === 0" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+    <q-dialog ref="roomDialoge" v-model="createRoom" persistent>
+      <q-card style="width: 400px !important;">
+        <q-card-section class="row items-center">
+          <q-avatar icon="chat" color="primary" text-color="white" />
+          <span class="q-ml-sm">Create a new conversation</span>
+        </q-card-section>
+        <q-card-section>
+            <q-select
                       ref="clientRef"
                       :rules="[val => (val !== null) || 'This field is required']"
                       bg-color="white"
@@ -104,164 +303,14 @@
                       </q-chip>
                     </template>
                 </q-select>
-                  <q-btn @click="addMembs" no-caps flat label="submit" color="primary" :disable="members.length === 0" v-close-popup />
-              </q-popup-edit>
-        </q-btn>
-          </div>
-        </q-item>
-        <div v-if="rooms.length === 0" class="q-pa-md text-grey">No rooms to show!</div>
-        <div v-else v-for="(room, i) in rooms" :key="i">
-          <div :class="'q-pa-xs'"> 
-        <q-item style="border-radius: 10px;" :class="room.id === chat.id ? 'bg-blue-1' : ''" 
-         @click="getMessages(room, i)" clickable v-ripple>
-        <q-item-section>
-          <q-item-label>
-           <div class="flex">
-            <div class="text-ellipses" v-for="(u, i) in room.users" :key="u.id">
-            <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
-              <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
-            </q-avatar>
-             <q-avatar class="q-ml-xs bg-grey-3 text-grey" v-show="i === 2 && room.users.length > 2" size="30px">
-               {{`+${room.users.length - 2}`}}
-            </q-avatar>
-            </div>
-          </div>
-          </q-item-label>
-          <q-item-label caption lines="1">
-            <p class="q-mt-xs">
-            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
-            </p>
-            </q-item-label>
-        </q-item-section>
-        <q-item-section side top>
-          <q-item-label caption>{{room.messages.length !== 0 ? format(room.messages[room.messages.length-1].created_at) : ''}}</q-item-label>
-        </q-item-section>
-        </q-item>
-        </div>
-        </div>
+        </q-card-section>
 
-    </q-list>
-    </q-scroll-area>
-
-      </q-drawer>
-          <q-drawer
-           show-if-above 
-           side="right" 
-           bordered
-           v-model="drawer1"
-          :width="300"
-          :breakpoint="1185"
-          class="bg-grey-1"
-          style="overflow-y: scroll !important;"
-           >
-           <div v-if="chat" class="fit flex items-center justify-start column  bg-grey-1">
-             <div class="row full-width">
-               <div v-for="u in allUsers" :key="u.id" class="flex column flex-center q-ma-sm">
-                <q-avatar size="75px">
-                <q-badge rounded :color="u.online ? 'green' : 'grey-5'" class="absolute-bottom-right q-mr-sm"/>
-                <q-btn v-if="roomInfo && user.id === roomInfo.creator_id || u.id === user.id" round size="5px" @click="membToDelete = u.id; cnfrm=true;" icon="close" color="negative" class="absolute-top-right"/>
-                <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
-                </q-avatar>
-                <p class="text-h6 q-ma-none text-grey">{{u.name}}</p>
-               </div>
-             </div>
-                <!-- <p class="text-caption text-grey q-ma-none">Web developer</p> -->
-                <!-- <div class="q-mt-xl flex column" style="width:50% !important;">
-                    <div class="flex justify-between">
-                        <p class="text-body1 text-weight-medium">Username:</p>
-                        <p class="text-body1 text-grey text-weight-medium">jane</p>
-                    </div>
-                    <div class="flex justify-between">
-                        <p class="text-body1 text-weight-medium">DOB:</p>
-                        <p class="text-body1 text-grey text-weight-medium">24 July</p>
-                    </div>
-                    <div class="flex justify-between">
-                        <p class="text-body1 text-weight-medium">Email:</p>
-                        <p class="text-body1 text-grey text-weight-medium">jane@gmail.com</p>
-                    </div>
-                    <div class="flex justify-between">
-                        <p class="text-body1 text-weight-medium">Phone:</p>
-                        <p class="text-body1 text-grey text-weight-medium">9647508363828</p>
-                    </div>
-                </div> -->
-            <div class="full-width q-mt-md">
-              <q-list padding>
-                <q-expansion-item
-                  icon="perm_identity"
-                  label="Chat members"
-                >
-                  <q-card class="bg-grey-1">
-                    <q-card-section>
-                      <q-btn round icon="add" color="primary">
-                      <q-popup-edit v-model="members" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
-                        <q-select
-                              ref="clientRef"
-                              :rules="[val => (val !== null) || 'This field is required']"
-                              bg-color="white"
-                              outlined
-                              counter
-                              multiple
-                              use-chips
-                              :loading="isLoading"
-                              v-model="members1" 
-                              :options="options1"
-                              label="Choose members"
-                            >
-                            <template v-slot:option="scope">
-                            <q-item v-bind="scope.itemProps">
-                                <q-item-section class="avatar-list">
-                                <q-avatar class="q-mr-xs" size="35px">
-                                    <img :src="scope.opt.avatar ? scope.opt.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
-                                </q-avatar>
-                                <q-item-label>{{ scope.opt.label }}</q-item-label>       
-                                </q-item-section>
-                            </q-item>
-                            </template>
-                            <template v-slot:selected-item="scope">
-                              <q-chip
-                                removable
-                                dense
-                                @remove="scope.removeAtIndex(scope.index)"
-                                :tabindex="scope.tabindex"
-                                color="blue-1"
-                                text-color="primary"
-                              >
-                                <q-avatar color="secondary" text-color="white">
-                                    <img :src="scope.opt.avatar ? scope.opt.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
-                                </q-avatar>
-                                {{ scope.opt.label }}
-                              </q-chip>
-                            </template>
-                        </q-select>
-                      <q-btn @click="addNewMembers" no-caps flat label="submit" color="primary" :disable="members1.length === 0" v-close-popup />
-                      </q-popup-edit>
-                </q-btn>
-                    </q-card-section>
-                  </q-card>
-                </q-expansion-item>
-
-                <q-expansion-item
-                  icon="signal_wifi_off"
-                  label="Wifi settings"
-                >
-                  <q-card class="bg-grey-1">
-                    <q-card-section>
-                      Lorem ipsum dolor sit amet,
-                    </q-card-section>
-                  </q-card>
-                </q-expansion-item>
-    </q-list>
-        </div>
-           </div>
-          </q-drawer>
-      <q-page-container>
-          <router-view  />
-      </q-page-container>
-    </q-layout>
-    <q-dialog v-model="cnfrm">
-    <confirm @confirm="deleteMemeber" />
+        <q-card-actions align="right">
+          <q-btn no-caps flat label="Cancel" color="primary" v-close-popup />
+          <q-btn @click="addMembs" no-caps flat label="Submit" color="primary" :disable="members.length === 0" v-close-popup />
+        </q-card-actions>
+      </q-card>
     </q-dialog>
-  </div>
 </template>
 
 <script>
@@ -277,6 +326,8 @@ export default {
       isExpanded2: true,
       membToDelete: null,
       members: [],
+      addMembers: false,
+      createRoom: false,
       options: [],
       members1: [],
       options1: [],
@@ -310,7 +361,8 @@ export default {
       }
       socket.send(JSON.stringify({addRoomUsers: {id: self.chat.id, users: membsToAdd}}));
       membsToAdd = [];
-      this.members1 = []
+      this.members1 = [];
+      this.addMembers = false;
     },
     deleteMemeber() {
       let self = this;
@@ -340,6 +392,7 @@ export default {
       socket.send(JSON.stringify({createRoom: {users: membsToAdd } } ) );
       membsToAdd = [];
       this.members = [];
+      this.createRoom = false;
     },
     updateScroll() {
       var element = document.getElementById("room-container");
@@ -390,6 +443,7 @@ export default {
 
       socket.addEventListener('message', async function (event) {
       const result = JSON.parse(event.data);
+      console.log(result)
       if(result.onlineUsers) {
         self.onlineUsers = result.onlineUsers
         let ofUsers = self.chat.users.filter(({ id: id1 }) => !result.onlineUsers.some(({ id: id2 }) => id2 === id1));

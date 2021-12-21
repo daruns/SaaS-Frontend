@@ -313,6 +313,10 @@ a.q-btn.q-btn-item.non-selectable.no-outline.q-btn--flat.q-btn--rectangle.q-btn-
     display: none; 
 }
 
+/* div.q-layout-container div div.scroll {
+    height: 100vh;
+} */
+
 .q-item.q-item-type.row.no-wrap.q-item--clickable.q-link.cursor-pointer.q-focusable.q-hoverable.bg-blue-1 {
     max-width: 300px !important;
 }

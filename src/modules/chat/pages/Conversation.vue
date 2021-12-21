@@ -1,6 +1,6 @@
 <template>
-    <q-page class="q-pt-md q-pb-md">
-    <q-toolbar class="text-primary bg-white absolute-top" style="height:54px !important;">
+    <q-page style="height:600px !important;">
+    <q-toolbar class="text-primary bg-white absolute-top" style="height:54px !important;z-index:5;">
       <q-toolbar-title>
            <div v-if="chat" class="flex">
             <div  class="flex q-mt-sm" v-for="(u, i) in chat.users" :key="u.id">
@@ -16,16 +16,17 @@
       <q-btn flat round dense icon="videocam" />
       <q-btn flat round dense icon="call" />
     </q-toolbar>
-    <div style="margin-top: 38px !important;">
+    <div>
     <!-- <q-scroll-area ref="scroll" style="height: 80vh" class="scroll-center" > -->
-    <div v-if="chat" id="room-container" style="width: 100% !important; height:80vh; overflow-y: scroll !important;">
+    <div v-if="chat" id="room-container" style="width: 100% !important; height:100vh; overflow-y: scroll !important;padding-top: 54px !important;">
     <div  v-for="(m, i) in chat.messages" :key="m.id">
       <div class="q-pr-xl q-pl-xl">
       <q-chat-message
         :name="m.user.name"
         :avatar="user.id === m.user_id ? user.avatar : m.user.avatar"
         size="35"
-        class="q-pb-sm text-grey"
+        :class="i !== chat.messages.length-1 && 'q-pb-md'"
+        class="text-grey"
         :bg-color="user.id !== m.user_id ? 'primary' : 'grey-4'"
         :text-color="user.id === m.user_id ? 'black' : 'white'"
         :sent="user.id === m.user_id"
@@ -42,7 +43,7 @@
          </div>
         </div>
       </q-chat-message>
-      <div class="q-mb-xl" v-if="i === chat.messages.length-1">
+      <div class="q-mb-xl" :style="i === chat.messages.length-1 && 'padding-bottom:60px;'" v-if="i === chat.messages.length-1">
         <div class="q-ma-none flex" :class="user.id !== m.user_id ? 'q-ml-xl' : 'q-mr-xl justify-end'">
           <div v-for="msg in m.messageRecipients" :key="msg.user.id">
           <q-avatar v-if="msg.status === 'seen'" class="q-ml-xs" size="15px">
@@ -59,7 +60,7 @@
     </div>
     <!-- </q-scroll-area> -->
     </div>
-    <div style="margin-bottom:.5px !important;" class="absolute-bottom">
+    <div class="absolute-bottom">
         <q-input @input.capture="typing" @keydown.enter="send" outlined square bg-color="white" v-model="message" label="Message">
         <template v-slot:append>
           <q-btn color="primary" @click="send" v-show="message !== ''" round dense flat icon="send" />
