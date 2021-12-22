@@ -46,7 +46,7 @@
       <div class="q-mb-xl" :style="i === chat.messages.length-1 && 'padding-bottom:60px;'" v-if="i === chat.messages.length-1">
         <div class="q-ma-none flex" :class="user.id !== m.user_id ? 'q-ml-xl' : 'q-mr-xl justify-end'">
           <div v-for="msg in m.messageRecipients" :key="msg.user.id">
-          <q-avatar v-if="msg.status === 'seen'" class="q-ml-xs" size="15px">
+          <q-avatar v-if="msg.status === 'seen' && msg.user_id !== user.id && m.user.id !== msg.user_id" class="q-ml-xs" size="15px">
           <img :src="msg.user.avatar ? msg.user.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
         </q-avatar>
           </div>
@@ -86,7 +86,7 @@
 <script>
 import breadcrmps from '../../../components/globalComponents/BreadCrumps.vue';
 import { date } from 'quasar'
-const socket = new WebSocket('wss://oneconnect.it:4000');
+const socket = new WebSocket('wss://584f-212-237-121-126.ngrok.io');
 import { mapState, mapActions } from 'vuex';
 import axios from 'axios';
 export default {

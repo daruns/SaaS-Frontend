@@ -4,7 +4,6 @@
         <q-toolbar class="bg-primary text-white shadow-2">
           <q-toolbar-title class="flex">   
             <q-btn flat round icon="menu" @click="drawer = !drawer"/>
-             <q-btn flat round icon="chevron_left" to="/" />
             <q-btn flat round>
               <img
                   alt="oneconnect logo"
@@ -21,7 +20,6 @@
               <q-badge rounded color="red" floating>2</q-badge>
             </q-btn>
         </div>
-            <q-btn flat round icon="menu_open" @click="drawer1 = !drawer1"/>
             <q-btn flat round>
                  <img
                   alt="User logo"
@@ -42,6 +40,9 @@
               </q-list>
             </q-menu>
           </q-btn>
+              <q-btn flat round @click="drawer1 = !drawer1">
+              <i style="font-size: 24px;" :class="`bi-text-indent-${!drawer1 ? 'right' : 'left'}`"></i>
+            </q-btn>
       </q-toolbar-title>
         </q-toolbar>
       </q-header>
@@ -132,11 +133,12 @@
           :width="300"
           :breakpoint="1185"
           class="bg-grey-1"
-          style="overflow-y: scroll !important;"
            >
            <div v-if="chat" class="fit flex items-center justify-start column  bg-grey-1">
-             <div class="row full-width">
-               <div v-for="u in allUsers" :key="u.id" class="flex column flex-center q-ma-sm">
+
+             <q-scroll-area style="height: 30vh !important; border-bottom: 0.25px solid lightgrey" class="full-width">
+               <div class="q-ma-sm row">
+               <div v-for="u in allUsers" :key="u.id" style="width:33.33% !important;" class="flex column flex-center">
                 <q-avatar size="60px">
                 <q-badge rounded :color="u.online ? 'green' : 'grey-5'" class="absolute-bottom-right q-mr-sm"/>
                 <q-btn v-if="roomInfo && user.id === roomInfo.creator_id || u.id === user.id" round size="5px" @click="membToDelete = u.id; cnfrm=true;" icon="close" color="negative" class="absolute-top-right"/>
@@ -144,7 +146,8 @@
                 </q-avatar>
                 <p class="text-h6 q-ma-none text-grey">{{u.name}}</p>
                </div>
-             </div>
+               </div>
+             </q-scroll-area>
                 <!-- <p class="text-caption text-grey q-ma-none">Web developer</p> -->
                 <!-- <div class="q-mt-xl flex column" style="width:50% !important;">
                     <div class="flex justify-between">
@@ -164,20 +167,20 @@
                         <p class="text-body1 text-grey text-weight-medium">9647508363828</p>
                     </div>
                 </div> -->
-            <div class="full-width q-mt-md">
+            <q-scroll-area style="height: 70vh !important" class="full-width">
               <q-list padding>
                <q-expansion-item
-                  label="Customize chat"
+                  label="Customize channel"
                 >
                   <q-card class="bg-grey-1">
                     <q-card-section>
-                      <q-btn align="left" rounded no-caps class="bg-blue-1 full-width" flat icon="edit" label="Change group name" color="primary" />
-                      <q-btn align="left" rounded no-caps class="bg-blue-1 q-mt-sm full-width" flat icon="image" label="Change photo" color="primary" />
+                      <q-btn align="left" rounded no-caps class="bg-blue-1 full-width" flat icon="edit" label="Change channel name" color="primary" />
+                      <q-btn align="left" rounded no-caps class="bg-blue-1 q-mt-sm full-width" flat icon="image" label="Change channel photo" color="primary" />
                     </q-card-section>
                   </q-card>
                 </q-expansion-item>
                 <q-expansion-item
-                  label="Chat members"
+                  label="Channel members"
                 >
                   <q-card class="bg-grey-1">
                     <q-card-section>
@@ -193,7 +196,7 @@
                   </q-card>
                 </q-expansion-item>
     </q-list>
-        </div>
+        </q-scroll-area>
            </div>
           </q-drawer>
       <q-page-container style="overflow-y:hidden !important;">
@@ -261,7 +264,7 @@
       <q-card style="width: 400px !important;">
         <q-card-section class="row items-center">
           <q-avatar icon="chat" color="primary" text-color="white" />
-          <span class="q-ml-sm">Create a new conversation</span>
+          <span class="q-ml-sm">Create a new channel</span>
         </q-card-section>
         <q-card-section>
             <q-select
@@ -314,7 +317,7 @@
 </template>
 
 <script>
-const socket = new WebSocket('wss://oneconnect.it:4000');
+const socket = new WebSocket('wss://584f-212-237-121-126.ngrok.io');
 import { date } from 'quasar';
 import { mapActions, mapState } from 'vuex';
 import confirm from '../components/DeleteDialogue.vue';
@@ -345,6 +348,9 @@ export default {
     ...mapState('example', ['user']),
     ...mapState('userStore', ['users']),
     ...mapState('chatStore', ['chat']),
+    getHeight() {      
+      return 'height: 50vh !important;'
+    }
   },
   components : {
     confirm
@@ -443,8 +449,8 @@ export default {
 
       socket.addEventListener('message', async function (event) {
       const result = JSON.parse(event.data);
-      console.log(result)
       if(result.onlineUsers) {
+        let i = 1 ;
         self.onlineUsers = result.onlineUsers
         let ofUsers = self.chat.users.filter(({ id: id1 }) => !result.onlineUsers.some(({ id: id2 }) => id2 === id1));
         let onUsers = self.chat.users.filter(({ id: id1 }) => result.onlineUsers.some(({ id: id2 }) => id2 === id1));

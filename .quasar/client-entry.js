@@ -23,6 +23,8 @@ import '@quasar/extras/fontawesome-v5/fontawesome-v5.css'
 
 import '@quasar/extras/line-awesome/line-awesome.css'
 
+import '@quasar/extras/bootstrap-icons/bootstrap-icons.css'
+
 import '@quasar/extras/material-icons/material-icons.css'
 
 
