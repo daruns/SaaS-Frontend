@@ -317,7 +317,7 @@
 </template>
 
 <script>
-const socket = new WebSocket('wss://584f-212-237-121-126.ngrok.io');
+const socket = new WebSocket('wss://oneconnect.it:4000');
 import { date } from 'quasar';
 import { mapActions, mapState } from 'vuex';
 import confirm from '../components/DeleteDialogue.vue';
@@ -449,6 +449,7 @@ export default {
 
       socket.addEventListener('message', async function (event) {
       const result = JSON.parse(event.data);
+      console.log(result);
       if(result.onlineUsers) {
         let i = 1 ;
         self.onlineUsers = result.onlineUsers
@@ -486,6 +487,7 @@ export default {
         
       }
       if (result.rooms) {
+      console.log(result)
       self.rooms = [];
       self.rooms = JSON.parse(event.data).rooms.rooms.reverse();
       if(self.rooms.length === 0) {

@@ -51,12 +51,17 @@
         </q-avatar>
           </div>
         </div>
-      </div>
-      </div>
-        <div class="q-mb-xl" v-if="i === chat.messages.length-1 && isTyping && room_id === this.chat.id" >
-         <q-spinner-dots size="md" />
+          <div class="q-pb-xl" v-if="i === chat.messages.length-1 && isTyping && room_id === this.chat.id">
+          <q-avatar size="22px">
+            <img :src="avatar ? avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" />
+          </q-avatar>
+          <q-spinner-dots class="q-ml-sm" size="xs" />
+          </div>
         </div>
-        </div>
+      </div>       
+
+      </div>
+
     </div>
     <!-- </q-scroll-area> -->
     </div>
@@ -86,7 +91,7 @@
 <script>
 import breadcrmps from '../../../components/globalComponents/BreadCrumps.vue';
 import { date } from 'quasar'
-const socket = new WebSocket('wss://584f-212-237-121-126.ngrok.io');
+const socket = new WebSocket('wss://oneconnect.it:4000');
 import { mapState, mapActions } from 'vuex';
 import axios from 'axios';
 export default {
@@ -96,6 +101,7 @@ export default {
             message: '',
             file: null,
             isTyping: false,
+            avatar: null,
             room_id: null,
             sender:[
               {
@@ -181,9 +187,11 @@ export default {
         }
         else if(JSON.parse(event.data).userTyping) {
           self.room_id = JSON.parse(event.data).userTyping.room_id ;
-          self.isTyping = true;
+          self.isTyping = JSON.parse(event.data).userTyping;
+          self.avatar = JSON.parse(event.data).userTyping.avatar;
           setTimeout(() => {    
-            self.isTyping = false;
+          self.isTyping = false;
+          self.avatar = null;
           }, 2000);
         }
         
