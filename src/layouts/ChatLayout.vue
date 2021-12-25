@@ -321,6 +321,7 @@ const socket = new WebSocket('wss://oneconnect.it:4000');
 import { date } from 'quasar';
 import { mapActions, mapState } from 'vuex';
 import confirm from '../components/DeleteDialogue.vue';
+import { getMessage } from 'src/modules/chat/store/actions';
 export default {
   data() {
     return {
@@ -450,6 +451,9 @@ export default {
       socket.addEventListener('message', async function (event) {
       const result = JSON.parse(event.data);
       console.log(result);
+      if(result.reqType === 'addRoom') {
+        self.getMessages(result.rooms.rooms[result.rooms.rooms.length-1],0)
+      }
       if(result.onlineUsers) {
         let i = 1 ;
         self.onlineUsers = result.onlineUsers
@@ -487,7 +491,6 @@ export default {
         
       }
       if (result.rooms) {
-      console.log(result)
       self.rooms = [];
       self.rooms = JSON.parse(event.data).rooms.rooms.reverse();
       if(self.rooms.length === 0) {
