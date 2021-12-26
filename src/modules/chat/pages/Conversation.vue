@@ -14,7 +14,8 @@
             </div>
              </div>
              <div class="flex" v-else-if="chat.room_type === 'channel' && !chat.avatar && !chat.name">
-              <div class="flex" v-if="u.id !== user.id">
+               <div v-for="(u, i) in chat.users" :key="u.id">
+              <div class="flex">
               <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
                 <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
               </q-avatar>
@@ -22,6 +23,7 @@
                 {{`+${chat.users.length - 2}`}}
               </q-avatar>
               </div>
+               </div>
               </div>
             <div class="flex" v-else-if="chat.room_type === 'channel' && chat.avatar && chat.name">
               <div class="flex items-center">
@@ -36,6 +38,15 @@
                <q-avatar size="35px">
                 <img :src="chat.avatar">
                </q-avatar>
+              <div class="flex">
+              <div class="flex" v-for="(us, i) in chat.users" :key="us.id">
+              <p v-if="i < 2" class="text-black text-subtitle1 q-mr-none q-mt-none q-mb-none q-ml-sm">
+                {{us.name}}
+                </p>
+                <p class="q-ma-none text-black text-subtitle1" v-if="i < 1" >,</p>
+              </div>
+                <p class="q-ma-none text-black text-subtitle1" v-if="chat.users.length > 2">...</p>
+                </div>
               </div>
             </div>
               <div class="flex" v-else-if="chat.room_type === 'channel' && chat.name && !chat.avatar">

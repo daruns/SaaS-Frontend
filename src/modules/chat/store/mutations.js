@@ -5,6 +5,7 @@ export function GET_ROOMS (state, payload) {
 export function GET_CHAT (state, payload) {
     state.chat = []
     state.chat = payload;
+    console.log(state.chat);
 }
 
 export function CLEAR_CHAT (state) {

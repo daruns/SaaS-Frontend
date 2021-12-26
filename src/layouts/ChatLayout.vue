@@ -75,24 +75,23 @@
         <q-item-section>
           <q-item-label>
            <div v-if="room.room_type === 'channel' && !room.name && !room.avatar" class="flex">
-            <div class="text-ellipses" v-for="(u, i) in room.users" :key="u.id">
+            <!-- <div class="text-ellipses" v-for="(u, i) in room.users" :key="u.id">
             <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
               <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
             </q-avatar>
              <q-avatar class="q-ml-xs bg-grey-3 text-grey" v-show="i === 2 && room.users.length > 2" size="35px">
                {{`+${room.users.length - 2}`}}
             </q-avatar>
-            </div>
-          </div>
-          <div v-else-if="!room.avatar && room.name">
-
-            <p >{{room.name}}</p>
-          </div>
-          <div class="flex items-center" v-else-if="room.room_type === 'channel' && room.avatar && !room.name">
-            <q-avatar size="50px">
-              <img :src="room.avatar">
+            </div> -->
+              <div  v-for="(u, i) in room.users" :key="u.id">
+              <div :style="i === 1 ? 'transform: translate(-45px,20px) !important;' : 'transform: translate(10px) !important;'" class="text-ellipses" v-if="i < 2">
+              <q-avatar  :class="i === 1 && 'q-ml-xs'"  size="40px">
+              <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
             </q-avatar>
-            <div>
+            </div>
+            </div>
+           <div style="transform: translateX(-35px) !important;" class="items-center q-mt-md col">
+                        <div class="flex col">
             <div class="flex">
             <div class="flex" v-for="(us, i) in room.users" :key="us.id">
             <p v-if="i < 2" class="q-mr-none q-mt-none q-mb-none q-ml-sm">
@@ -103,27 +102,77 @@
               <p class="q-ma-none" v-if="room.users.length > 2">...</p>
               </div>
             </div>
+             <p class="q-mt-xs q-ml-sm text-grey">
+            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+            </p>
+            </div>
+          </div>
+          <div class="flex" v-else-if="!room.avatar && room.name">
+            <div  v-for="(u, i) in room.users" :key="u.id">
+              <div :style="i === 1 ? 'transform: translate(-45px,20px) !important;' : 'transform: translate(10px) !important;'" class="text-ellipses" v-if="i < 2">
+              <q-avatar  :class="i === 1 && 'q-ml-xs'"  size="40px">
+              <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+            </q-avatar>
+            </div>
+            </div>
+           <div style="transform: translateX(-35px) !important;" class="items-center q-mt-md col">
+            <p class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{room.name}}</p>
+             <p class="q-mt-xs q-ml-sm text-grey">
+            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+            </p>
+            </div>
+          </div>
+          <div class="flex items-center" v-else-if="room.room_type === 'channel' && room.avatar && !room.name">
+            <q-avatar size="50px">
+              <img :src="room.avatar">
+            </q-avatar>
+            <div class="flex col">
+            <div class="flex q-mt-md">
+            <div class="flex" v-for="(us, i) in room.users" :key="us.id">
+            <p v-if="i < 2" class="q-mr-none q-mt-none q-mb-none q-ml-sm">
+              {{us.name}}
+              </p>
+              <p class="q-ma-none" v-if="i < 1" >,</p>
+            </div>
+              <p class="q-ma-none" v-if="room.users.length > 2">...</p>
+              </div>
+              <div>
+               <p class="q-mt-xs q-ml-sm text-grey">
+                {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+                </p>
+              </div>
+            </div>
           </div>
           <div class="flex items-center" v-else-if="room.room_type === 'channel' && room.avatar && room.name">
             <q-avatar size="50px">
               <img :src="room.avatar">
             </q-avatar>
+            <div class="items-center q-mt-md col">
             <p class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{room.name}}</p>
+             <p class="q-mt-xs q-ml-sm text-grey">
+            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+            </p>
+            </div>
           </div>
          <div class="flex" v-else>
            <div v-for="u in room.users" :key="u.id"  class="flex items-center">
             <q-avatar v-if="u.id !== user.id" size="50px">
               <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
             </q-avatar>
+            <div class="items-center q-mt-md col">
             <p v-if="u.id === user.id" class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{u.name}}</p>
+              <p v-if="u.id === user.id"  class="q-mt-xs q-ml-sm text-grey">
+                {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+                </p>
+            </div>
            </div>
           </div>
           </q-item-label>
-          <q-item-label caption lines="1">
+          <!-- <q-item-label v-if="room.room_type === 'channel' && !room.name && !room.avatar" caption lines="1">
             <p class="q-mt-xs">
             {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
             </p>
-            </q-item-label>
+            </q-item-label> -->
         </q-item-section>
         <q-item-section side top>
           <q-item-label caption>{{room.messages.length !== 0 ? format(room.messages[room.messages.length-1].created_at) : ''}}</q-item-label>
@@ -427,7 +476,8 @@ export default {
       drawer: false,
       drawer1: false,
       cnfrm: false,
-      changeName: false
+      changeName: false,
+      chatId: null
     }
   },
   computed : {
@@ -446,7 +496,8 @@ export default {
     ...mapActions('example', ['getUser']),
     ...mapActions('chatStore', ['getChat', 'clearChat']),
     async changeChannelName() {
-      let self = this
+      let self = this;
+      this.chatId =  Number(self.chat.id);
       socket.send(JSON.stringify({editRoom: {id: Number(self.chat.id), avatar: self.roomInfo.avatar, name:self.channelName}}))
     },
      async changeChannelPhoto() {
@@ -456,6 +507,7 @@ export default {
       try{
       let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/chats/addFiles', file, {headers: {Authorization: localStorage.getItem('accessToken')}});
       if(response.data.success){
+      this.chatId =  Number(self.chat.id);
       socket.send(JSON.stringify({editRoom: {id: Number(self.chat.id), name: self.roomInfo.name, avatar:response.data.data[0].url}}));
       }else{
        this.$q.notify({
@@ -501,7 +553,6 @@ export default {
      if(document.body.offsetWidth <= 1185) this.drawer = false;
      localStorage.setItem('roomIndex', i);
      this.roomInfo = room
-     console.log(this.roomInfo)
      socket.send(JSON.stringify({getMessagesByRoomId: {room_id: room.id}}));
     //  await this.getChat(room);
     },
@@ -612,6 +663,18 @@ export default {
         
       }
       if (result.rooms) {
+      // if(result.reqType === 'editRoom') {
+      //     for(let i = 0; i<self.rooms.length; i++) {
+      //     if(Number(self.chatId) === Number(JSON.parse(event.data).rooms.rooms[i].id)) {
+      //       for(let j = 0; j<self.rooms.length; j++) {
+      //         if(Number(self.rooms[j].id) === Number(self.chatId))
+      //         self.rooms[j].name = JSON.parse(event.data).rooms.rooms[i].name;
+      //         self.rooms[j].avatar = JSON.parse(event.data).rooms.rooms[i].avatar;
+      //       }
+      //     }
+      //   }
+      //   return
+      // }
       self.rooms = [];
       self.rooms = JSON.parse(event.data).rooms.rooms.reverse();
       if(self.rooms.length === 0) {
@@ -648,7 +711,6 @@ export default {
     // this.getMemberOptions();
     this.isLoading = false;
 
-    socket.send(JSON.stringify({ping: true}));
 
     setInterval(() => {
       socket.send(JSON.stringify({ping: true}));
