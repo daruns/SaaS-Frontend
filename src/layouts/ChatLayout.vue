@@ -74,7 +74,7 @@
          @click="getMessages(room, i)" clickable v-ripple>
         <q-item-section>
           <q-item-label>
-           <div class="flex">
+           <div v-if="!room.name && !room.avatar" class="flex">
             <div class="text-ellipses" v-for="(u, i) in room.users" :key="u.id">
             <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
               <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
@@ -83,6 +83,32 @@
                {{`+${room.users.length - 2}`}}
             </q-avatar>
             </div>
+          </div>
+          <div v-else-if="!room.avatar && room.name">
+
+            <p >{{room.name}}</p>
+          </div>
+          <div class="flex items-center" v-else-if="room.avatar && !room.name">
+            <q-avatar size="50px">
+              <img :src="room.avatar">
+            </q-avatar>
+            <div>
+            <div class="flex">
+            <div class="flex" v-for="(us, i) in room.users" :key="us.id">
+            <p v-if="i < 2" class="q-mr-none q-mt-none q-mb-none q-ml-sm">
+              {{us.name}}
+              </p>
+              <p class="q-ma-none" v-if="i < 1" >,</p>
+            </div>
+              <p class="q-ma-none" v-if="room.users.length > 2">...</p>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center" v-else-if="room.avatar && room.name">
+            <q-avatar size="50px">
+              <img :src="room.avatar">
+            </q-avatar>
+            <p class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{room.name}}</p>
           </div>
           </q-item-label>
           <q-item-label caption lines="1">
@@ -148,34 +174,15 @@
                </div>
                </div>
              </q-scroll-area>
-                <!-- <p class="text-caption text-grey q-ma-none">Web developer</p> -->
-                <!-- <div class="q-mt-xl flex column" style="width:50% !important;">
-                    <div class="flex justify-between">
-                        <p class="text-body1 text-weight-medium">Username:</p>
-                        <p class="text-body1 text-grey text-weight-medium">jane</p>
-                    </div>
-                    <div class="flex justify-between">
-                        <p class="text-body1 text-weight-medium">DOB:</p>
-                        <p class="text-body1 text-grey text-weight-medium">24 July</p>
-                    </div>
-                    <div class="flex justify-between">
-                        <p class="text-body1 text-weight-medium">Email:</p>
-                        <p class="text-body1 text-grey text-weight-medium">jane@gmail.com</p>
-                    </div>
-                    <div class="flex justify-between">
-                        <p class="text-body1 text-weight-medium">Phone:</p>
-                        <p class="text-body1 text-grey text-weight-medium">9647508363828</p>
-                    </div>
-                </div> -->
             <q-scroll-area style="height: 70vh !important" class="full-width">
-              <q-list padding>
+              <q-list v-if="roomInfo && roomInfo.room_type === 'channel'" padding>
                <q-expansion-item
                   label="Customize channel"
                 >
                   <q-card class="bg-grey-1">
                     <q-card-section>
-                      <q-btn align="left" rounded no-caps class="bg-blue-1 full-width" flat icon="edit" label="Change channel name" color="primary" />
-                      <q-btn align="left" rounded no-caps class="bg-blue-1 q-mt-sm full-width" flat icon="image" label="Change channel photo" color="primary" />
+                      <q-btn align="left" @click="changeName = true" rounded no-caps class="bg-blue-1 full-width" flat icon="edit" label="Change channel name" color="primary" />
+                      <q-btn align="left" @click="changePhoto = true" rounded no-caps class="bg-blue-1 q-mt-sm full-width" flat icon="image" label="Change channel photo" color="primary" />
                     </q-card-section>
                   </q-card>
                 </q-expansion-item>
@@ -195,7 +202,36 @@
                     </q-card-section>
                   </q-card>
                 </q-expansion-item>
-    </q-list>
+           </q-list>
+           <div class="flex flex-center" v-else>
+             <div v-for="u in allUsers" :key="u.id">
+             <div v-if="u.id !== user.id && allUsers.length === 2" class="flex column flex-center q-mt-xl">
+                <q-avatar size="60px">
+                <q-badge rounded :color="u.online ? 'green' : 'grey-5'" class="absolute-bottom-right q-mr-sm"/>
+                <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+                </q-avatar>
+                <p class="text-h6 q-ma-none text-grey">{{u.name}}</p>
+               </div>
+                <div v-if="u.id !== user.id && allUsers.length === 2" class="q-mt-xl flex column" style="width:100% !important;">
+                    <div class="flex justify-between">
+                        <p class="text-body1 text-weight-medium">Username:</p>
+                        <p class="text-body1 text-grey text-weight-medium">{{u.username}}</p>
+                    </div>
+                    <div class="flex justify-between">
+                        <p class="text-body1 text-weight-medium">DOB:</p>
+                        <p class="text-body1 text-grey text-weight-medium">24 July</p>
+                    </div>
+                    <div class="flex justify-between">
+                        <p class="text-body1 text-weight-medium">Email:</p>
+                        <p class="text-body1 text-grey text-weight-medium">jane@gmail.com</p>
+                    </div>
+                    <div class="flex justify-between">
+                        <p class="text-body1 text-weight-medium">Phone:</p>
+                        <p class="text-body1 text-grey text-weight-medium">9647508363828</p>
+                    </div>
+                </div>
+               </div>
+           </div>
         </q-scroll-area>
            </div>
           </q-drawer>
@@ -314,6 +350,40 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+          <q-dialog v-model="changeName" persistent>
+            <q-card style="width: 400px !important;">
+              <q-card-section>
+                <q-avatar icon="edit" color="primary" text-color="white" />
+                  <span class="q-ml-sm">Change channel name</span>
+                </q-card-section>
+                <q-card-section>
+                   <q-input v-model="channelName" outlined label="Channel name" />
+                </q-card-section>
+                <q-card-actions align="right">
+                  <q-btn no-caps flat label="Cancel" color="primary" v-close-popup />
+                  <q-btn @click="changeChannelName" no-caps flat label="Submit" color="primary" :disable="!channelName" v-close-popup />
+                </q-card-actions>
+            </q-card>
+          </q-dialog>
+            <q-dialog v-model="changePhoto" persistent>
+            <q-card style="width: 400px !important;">
+              <q-card-section>
+                <q-avatar icon="edit" color="primary" text-color="white" />
+                  <span class="q-ml-sm">Change channel photo</span>
+                </q-card-section>
+                <q-card-section>
+                  <q-file :filter="checkType" @rejected="onRejectedImage" label="Choose photo" outlined v-model="channelPhoto">
+                    <template v-slot:prepend>
+                      <q-icon name="attach_file" />
+                    </template>
+                  </q-file>
+                </q-card-section>
+                <q-card-actions align="right">
+                  <q-btn no-caps flat label="Cancel" color="primary" v-close-popup />
+                  <q-btn @click="changeChannelPhoto" no-caps flat label="Submit" color="primary" :disable="!channelPhoto" v-close-popup />
+                </q-card-actions>
+            </q-card>
+          </q-dialog>
 </template>
 
 <script>
@@ -321,7 +391,7 @@ const socket = new WebSocket('wss://oneconnect.it:4000');
 import { date } from 'quasar';
 import { mapActions, mapState } from 'vuex';
 import confirm from '../components/DeleteDialogue.vue';
-import { getMessage } from 'src/modules/chat/store/actions';
+import axios from 'axios';
 export default {
   data() {
     return {
@@ -332,6 +402,9 @@ export default {
       members: [],
       addMembers: false,
       createRoom: false,
+      channelName: '',
+      channelPhoto: null,
+      changePhoto: false,
       options: [],
       members1: [],
       options1: [],
@@ -339,10 +412,12 @@ export default {
       allUsers: [],
       rooms: [],
       roomInfo: null,
+      loading: false,
       isLoading: false,
       drawer: false,
       drawer1: false,
-      cnfrm: false
+      cnfrm: false,
+      changeName: false
     }
   },
   computed : {
@@ -360,6 +435,32 @@ export default {
     ...mapActions('userStore',['getUsers']),
     ...mapActions('example', ['getUser']),
     ...mapActions('chatStore', ['getChat', 'clearChat']),
+    async changeChannelName() {
+      let self = this
+      socket.send(JSON.stringify({editRoom: {id: Number(self.chat.id), avatar: self.roomInfo.avatar, name:self.channelName}}))
+    },
+     async changeChannelPhoto() {
+      let self = this;
+      let file = new FormData();
+      file.append('files', this.channelPhoto);
+      try{
+      let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/chats/addFiles', file, {headers: {Authorization: localStorage.getItem('accessToken')}});
+      if(response.data.success){
+      socket.send(JSON.stringify({editRoom: {id: Number(self.chat.id), name: self.roomInfo.name, avatar:response.data.data[0].url}}));
+      }else{
+       this.$q.notify({
+          type: 'negative',
+          message: 'Something went wrong!'
+      })
+      }
+      }catch(e) {
+        console.log(e)
+        this.$q.notify({
+          type: 'negative',
+          message: 'Something went wrong!'
+      }) 
+      }
+    },
     addNewMembers() {
       let self = this;
       let membsToAdd = [];
@@ -377,6 +478,15 @@ export default {
       this.membToDelete = null;
       this.cnfrm = false;
     },
+    checkType (files) {
+        return files.filter(file => file.type.includes('image'))
+    },
+    onRejectedImage() {
+        this.$q.notify({
+          type: 'negative',
+          message: 'Only images are allowed!'
+      })
+      },
    async getMessages(room, i) {
      if(document.body.offsetWidth <= 1185) this.drawer = false;
      localStorage.setItem('roomIndex', i);
@@ -450,7 +560,6 @@ export default {
 
       socket.addEventListener('message', async function (event) {
       const result = JSON.parse(event.data);
-      console.log(result);
       if(result.reqType === 'addRoom') {
         self.getMessages(result.rooms.rooms[result.rooms.rooms.length-1],0)
       }
@@ -474,6 +583,7 @@ export default {
 
       if(result.messagesByRoomId) {
         if(self.roomInfo.id === result.messagesByRoomId.room_id){
+
           await self.getChat({id: self.roomInfo.id, users: self.roomInfo.users, messages : result.messagesByRoomId.roomMessages});
           self.updateScroll();
           socket.send(JSON.stringify({ping: true}));
