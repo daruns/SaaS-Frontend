@@ -74,7 +74,7 @@
          @click="getMessages(room, i)" clickable v-ripple>
         <q-item-section>
           <q-item-label>
-           <div v-if="!room.name && !room.avatar" class="flex">
+           <div v-if="room.room_type === 'channel' && !room.name && !room.avatar" class="flex">
             <div class="text-ellipses" v-for="(u, i) in room.users" :key="u.id">
             <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
               <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
@@ -88,7 +88,7 @@
 
             <p >{{room.name}}</p>
           </div>
-          <div class="flex items-center" v-else-if="room.avatar && !room.name">
+          <div class="flex items-center" v-else-if="room.room_type === 'channel' && room.avatar && !room.name">
             <q-avatar size="50px">
               <img :src="room.avatar">
             </q-avatar>
@@ -104,11 +104,19 @@
               </div>
             </div>
           </div>
-          <div class="flex items-center" v-else-if="room.avatar && room.name">
+          <div class="flex items-center" v-else-if="room.room_type === 'channel' && room.avatar && room.name">
             <q-avatar size="50px">
               <img :src="room.avatar">
             </q-avatar>
             <p class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{room.name}}</p>
+          </div>
+         <div class="flex" v-else>
+           <div v-for="u in room.users" :key="u.id"  class="flex items-center">
+            <q-avatar v-if="u.id !== user.id" size="50px">
+              <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+            </q-avatar>
+            <p v-if="u.id === user.id" class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{u.name}}</p>
+           </div>
           </div>
           </q-item-label>
           <q-item-label caption lines="1">
@@ -163,15 +171,17 @@
            <div v-if="chat" class="fit flex items-center justify-start column  bg-grey-1">
 
              <q-scroll-area style="height: 30vh !important; border-bottom: 0.25px solid lightgrey" class="full-width">
-               <div class="q-ma-sm row">
-               <div v-for="u in allUsers" :key="u.id" style="width:33.33% !important;" class="flex column flex-center">
+               <div class="q-mt-sm row">
+                <div v-for="u in allUsers" :key="u.id">
+               <div style="width:33.33% !important;" class="flex column flex-center q-pr-md q-pl-md q-pb-md q-pt-xs">
                 <q-avatar size="60px">
                 <q-badge rounded :color="u.online ? 'green' : 'grey-5'" class="absolute-bottom-right q-mr-sm"/>
                 <q-btn v-if="roomInfo && user.id === roomInfo.creator_id || u.id === user.id" round size="5px" @click="membToDelete = u.id; cnfrm=true;" icon="close" color="negative" class="absolute-top-right"/>
                 <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
                 </q-avatar>
-                <p class="text-h6 q-ma-none text-grey">{{u.name}}</p>
+                <p class="q-ma-none text-grey">{{u.name}}</p>
                </div>
+                 </div>
                </div>
              </q-scroll-area>
             <q-scroll-area style="height: 70vh !important" class="full-width">
@@ -491,6 +501,7 @@ export default {
      if(document.body.offsetWidth <= 1185) this.drawer = false;
      localStorage.setItem('roomIndex', i);
      this.roomInfo = room
+     console.log(this.roomInfo)
      socket.send(JSON.stringify({getMessagesByRoomId: {room_id: room.id}}));
     //  await this.getChat(room);
     },
@@ -584,7 +595,7 @@ export default {
       if(result.messagesByRoomId) {
         if(self.roomInfo.id === result.messagesByRoomId.room_id){
 
-          await self.getChat({id: self.roomInfo.id, users: self.roomInfo.users, messages : result.messagesByRoomId.roomMessages});
+          await self.getChat({id: self.roomInfo.id, name: self.roomInfo.name, avatar: self.roomInfo.avatar, room_type: self.roomInfo.room_type, users: self.roomInfo.users, messages : result.messagesByRoomId.roomMessages});
           self.updateScroll();
           socket.send(JSON.stringify({ping: true}));
         }

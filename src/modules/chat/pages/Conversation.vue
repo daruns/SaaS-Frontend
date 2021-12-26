@@ -3,13 +3,45 @@
     <q-toolbar class="text-primary bg-white absolute-top" style="height:54px !important;z-index:5;">
       <q-toolbar-title>
            <div v-if="chat" class="flex">
-            <div  class="flex q-mt-sm" v-for="(u, i) in chat.users" :key="u.id">
+            <div class="flex" v-if="chat.room_type === 'chat'">
+            <div v-for="(u, i) in chat.users" :key="u.id">
+            <div class="flex items-center" v-if="u.id !== user.id">
             <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
               <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
             </q-avatar>
-             <q-avatar class="q-ml-xs bg-grey-3 text-grey" v-show="i === 2 && chat.users.length > 2" size="35px">
-               {{`+${chat.users.length - 2}`}}
-            </q-avatar>
+              <p class="q-ma-none q-pb-none text-subtitle1 q-ml-sm text-black">{{u.name}}</p>
+            </div>
+            </div>
+             </div>
+             <div class="flex" v-else-if="chat.room_type === 'channel' && !chat.avatar && !chat.name">
+              <div class="flex" v-if="u.id !== user.id">
+              <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
+                <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+              </q-avatar>
+              <q-avatar class="q-ml-xs bg-grey-3 text-grey" v-show="i === 2 && chat.users.length > 2" size="35px">
+                {{`+${chat.users.length - 2}`}}
+              </q-avatar>
+              </div>
+              </div>
+            <div class="flex" v-else-if="chat.room_type === 'channel' && chat.avatar && chat.name">
+              <div class="flex items-center">
+               <q-avatar size="35px">
+                <img :src="chat.avatar">
+               </q-avatar>
+               <p class="q-ma-none text-subtitle1 q-ml-sm text-black">{{chat.name}}</p>
+              </div>
+            </div>
+            <div class="flex" v-else-if="chat.room_type === 'channel' && chat.avatar && !chat.name">
+              <div class="flex items-center">
+               <q-avatar size="35px">
+                <img :src="chat.avatar">
+               </q-avatar>
+              </div>
+            </div>
+              <div class="flex" v-else-if="chat.room_type === 'channel' && chat.name && !chat.avatar">
+              <div class="flex items-center">
+               <p class="q-ma-none q-pa-none text-subtitle1 q-ml-sm text-grey">{{chat.name}}</p>
+              </div>
             </div>
           </div>
       </q-toolbar-title>
