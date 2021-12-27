@@ -74,7 +74,7 @@
          @click="getMessages(room, i)" clickable v-ripple>
         <q-item-section>
           <q-item-label>
-           <div v-if="room.room_type === 'channel' && !room.name && !room.avatar" class="flex">
+           <div v-if="room.room_type === 'channel' && !room.name && !room.avatar && room.users.length > 1" class="flex">
             <!-- <div class="text-ellipses" v-for="(u, i) in room.users" :key="u.id">
             <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
               <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
@@ -155,16 +155,20 @@
             </div>
           </div>
          <div class="flex" v-else>
-           <div v-for="u in room.users" :key="u.id"  class="flex items-center">
-            <q-avatar v-if="u.id !== user.id" size="50px">
+           <div class="flex items-center">
+             <div v-for="u in room.users" :key="u.id">
+              <div class="flex" v-if="u.id !== user.id">
+            <q-avatar size="50px">
               <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
             </q-avatar>
-            <div class="items-center q-mt-md col">
-            <p v-if="u.id === user.id" class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{u.name}}</p>
-              <p v-if="u.id === user.id"  class="q-mt-xs q-ml-sm text-grey">
+            <div class="items-center q-mt-sm col">
+            <p class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{u.name}}</p>
+              <p  class="q-mt-xs q-ml-sm text-grey">
                 {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
                 </p>
             </div>
+             </div>
+           </div>
            </div>
           </div>
           </q-item-label>
@@ -262,8 +266,8 @@
                   </q-card>
                 </q-expansion-item>
            </q-list>
-           <div class="flex flex-center" v-else>
-             <div v-for="u in allUsers" :key="u.id">
+           <div class="flex flex-center q-pa-lg" v-else>
+             <div class="full-width" v-for="u in allUsers" :key="u.id">
              <div v-if="u.id !== user.id && allUsers.length === 2" class="flex column flex-center q-mt-xl">
                 <q-avatar size="60px">
                 <q-badge rounded :color="u.online ? 'green' : 'grey-5'" class="absolute-bottom-right q-mr-sm"/>
@@ -277,16 +281,12 @@
                         <p class="text-body1 text-grey text-weight-medium">{{u.username}}</p>
                     </div>
                     <div class="flex justify-between">
-                        <p class="text-body1 text-weight-medium">DOB:</p>
-                        <p class="text-body1 text-grey text-weight-medium">24 July</p>
-                    </div>
-                    <div class="flex justify-between">
                         <p class="text-body1 text-weight-medium">Email:</p>
-                        <p class="text-body1 text-grey text-weight-medium">jane@gmail.com</p>
+                        <p class="text-body1 text-grey text-weight-medium">{{u.email}}</p>
                     </div>
                     <div class="flex justify-between">
                         <p class="text-body1 text-weight-medium">Phone:</p>
-                        <p class="text-body1 text-grey text-weight-medium">9647508363828</p>
+                        <p class="text-body1 text-grey text-weight-medium">{{u.phoneNumber}}</p>
                     </div>
                 </div>
                </div>
@@ -622,6 +622,7 @@ export default {
 
       socket.addEventListener('message', async function (event) {
       const result = JSON.parse(event.data);
+      console.log(result)
       if(result.reqType === 'addRoom') {
         self.getMessages(result.rooms.rooms[result.rooms.rooms.length-1],0)
       }
