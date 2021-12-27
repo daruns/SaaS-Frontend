@@ -1,9 +1,10 @@
 <template>
-    <q-page style="height:600px !important;">
+    <q-page :style="hght ? hght : 'height:600px !important;'">
     <q-toolbar class="text-primary bg-white absolute-top" style="height:54px !important;z-index:5;">
       <q-toolbar-title>
            <div v-if="chat" class="flex">
-            <div class="flex" v-if="chat.room_type === 'chat'">
+            <q-btn @click="$emit('hideChat')" icon="chevron_left" v-if="popup" :ripple="false" color="primary" flat round />
+            <div class="flex" v-if="chat.room_type === 'chat'"> 
             <div v-for="(u, i) in chat.users" :key="u.id">
             <div class="flex items-center" v-if="u.id !== user.id">
             <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
@@ -12,6 +13,7 @@
               <p class="q-ma-none q-pb-none text-subtitle1 q-ml-sm text-black">{{u.name}}</p>
             </div>
             </div>
+          
              </div>
              <div class="flex" v-else-if="chat.room_type === 'channel' && !chat.avatar && !chat.name">
                <div v-for="(u, i) in chat.users" :key="u.id">
@@ -61,8 +63,8 @@
     </q-toolbar>
     <div>
     <!-- <q-scroll-area ref="scroll" style="height: 80vh" class="scroll-center" > -->
-    <div v-if="chat" id="room-container" style="width: 100% !important; height:100vh; overflow-y: scroll !important;padding-top: 54px !important;">
-    <div  v-for="(m, i) in chat.messages" :key="m.id">
+    <div :class="popup && 'bg-blue-1'" v-if="chat" id="room-container" :style="hght ? hght : 'height:100vh;'" style="width: 100% !important;overflow-y: scroll !important;padding-top: 54px !important;position:relative !important;">
+    <div v-for="(m, i) in chat.messages" :key="m.id">
       <div class="q-pr-xl q-pl-xl">
       <q-chat-message
         :name="m.user.name"
@@ -86,7 +88,7 @@
          </div>
         </div>
       </q-chat-message>
-      <div class="q-mb-xl" :style="i === chat.messages.length-1 && 'padding-bottom:60px;'" v-if="i === chat.messages.length-1">
+      <div :class="!popup && 'q-mb-xl'" :style="i === chat.messages.length-1 && !popup ? 'padding-bottom:60px;' : 'padding-bottom:20px;'" v-if="i === chat.messages.length-1">
         <div class="q-ma-none flex" :class="user.id !== m.user_id ? 'q-ml-xl' : 'q-mr-xl justify-end'">
           <div v-for="msg in m.messageRecipients" :key="msg.user.id">
           <q-avatar v-if="msg.status === 'seen' && msg.user_id !== user.id && m.user.id !== msg.user_id" class="q-ml-xs" size="15px">
@@ -94,7 +96,7 @@
         </q-avatar>
           </div>
         </div>
-          <div class="q-pb-xl" v-if="i === chat.messages.length-1 && isTyping && room_id === this.chat.id">
+          <div :class="!popup && 'q-pb-xl'" v-if="i === chat.messages.length-1 && isTyping && room_id === this.chat.id">
           <q-avatar size="22px">
             <img :src="avatar ? avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" />
           </q-avatar>
@@ -104,11 +106,11 @@
       </div>       
 
       </div>
-
     </div>
     <!-- </q-scroll-area> -->
     </div>
-    <div class="absolute-bottom">
+    
+    <div :class="!popup && 'absolute-bottom'">
         <q-input @input.capture="typing" @keydown.enter="send" outlined square bg-color="white" v-model="message" label="Message">
         <template v-slot:append>
           <q-btn color="primary" @click="send" v-show="message !== ''" round dense flat icon="send" />
@@ -138,6 +140,7 @@ const socket = new WebSocket('wss://oneconnect.it:4000');
 import { mapState, mapActions } from 'vuex';
 import axios from 'axios';
 export default {
+  props: ['hght','popup'],
     data() {
         return {
             init: 1,

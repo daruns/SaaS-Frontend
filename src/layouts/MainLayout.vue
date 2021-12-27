@@ -266,25 +266,41 @@
       <q-page-container class="bg-silk">
          <router-view />
       </q-page-container>
+          <q-page-sticky position="bottom-right" :offset="[18, 18]">
+                  <chat :props="showChat" @morph="show" />
+          </q-page-sticky>
     </q-layout>
 </template>
 
 <script>
-import { ref } from 'vue'
-import { mapActions, mapState } from 'vuex'
+import { ref } from 'vue';
+import { mapActions, mapState } from 'vuex';
+import chat from '../components/PopupChat.vue' 
 export default {
   data() {
     return {
       isLoggedIn: localStorage.getItem('accessToken'),
       isExpanded: true,
-      isExpanded2: true
+      isExpanded2: true,
+      showChat: false
     }
   },
   computed : {
     ...mapState('example', ['user']),
   },
   methods: {
+    show(payload) {
+      if(payload === 'card1') {
+        setTimeout(() => {
+          this.updateScroll();
+        }, 600);
+      }
+    },
     ...mapActions('example', ['getUser']),
+      updateScroll() {
+      var element = document.getElementById("room-container");
+      element.scrollTop = element.scrollHeight;
+    },
     openChat() {
       window.open('https://www.oneconnect.it/oc_front_end/dist/spa/#/chat')
     },
@@ -294,6 +310,9 @@ export default {
       localStorage.removeItem('isLoggedIn');
       this.$router.push('/login')
     }
+  },
+  components : {
+    chat
   },
   setup () {
     const miniState = ref(false)

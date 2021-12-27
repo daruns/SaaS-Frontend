@@ -53,7 +53,7 @@
         :width="300"
         :breakpoint="1185"
       >
-        <q-scroll-area ref="scrollAreaRef" style="height: 100%; border-right: 1px solid #ddd">
+        <!-- <q-scroll-area ref="scrollAreaRef" style="height: 100%; border-right: 1px solid #ddd"> -->
         <q-list>   
         <q-item class="flex justify-around" style="position: sticky;top:0;z-index:5;background-color: white;">
           <q-input class="full-width q-mt-xs" outlined rounded label="Search">
@@ -74,23 +74,15 @@
          @click="getMessages(room, i)" clickable v-ripple>
         <q-item-section>
           <q-item-label>
-           <div v-if="room.room_type === 'channel' && !room.name && !room.avatar && room.users.length > 1" class="flex">
-            <!-- <div class="text-ellipses" v-for="(u, i) in room.users" :key="u.id">
-            <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
-              <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
-            </q-avatar>
-             <q-avatar class="q-ml-xs bg-grey-3 text-grey" v-show="i === 2 && room.users.length > 2" size="35px">
-               {{`+${room.users.length - 2}`}}
-            </q-avatar>
-            </div> -->
+           <div v-if="room.room_type === 'channel' && !room.name && !room.avatar" class="flex">
               <div  v-for="(u, i) in room.users" :key="u.id">
-              <div :style="i === 1 ? 'transform: translate(-45px,20px) !important;' : 'transform: translate(10px) !important;'" class="text-ellipses" v-if="i < 2">
-              <q-avatar  :class="i === 1 && 'q-ml-xs'"  size="40px">
+              <div :style="i === 1 && room.users.length > 1 ? 'transform: translate(-45px,20px) !important;' : `transform: translate(${room.users.length > 1 ? '10' : '0'}px) !important;`" class="text-ellipses" v-if="i < 2">
+              <q-avatar  :class="i === 1 && 'q-ml-xs'"  :size="room.users.length > 1 ? '40px' : '50px'">
               <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
             </q-avatar>
             </div>
             </div>
-           <div style="transform: translateX(-35px) !important;" class="items-center q-mt-md col">
+           <div :class="room.users.length > 1 ? 'q-mt-md' : 'q-mt-sm'" :style=" room.users.length > 1 && 'transform: translateX(-35px) !important;'" class="items-center col">
                         <div class="flex col">
             <div class="flex">
             <div class="flex" v-for="(us, i) in room.users" :key="us.id">
@@ -209,7 +201,7 @@
         </div> -->
 
     </q-list>
-    </q-scroll-area>
+    <!-- </q-scroll-area> -->
 
       </q-drawer>
           <q-drawer
@@ -294,7 +286,7 @@
         </q-scroll-area>
            </div>
           </q-drawer>
-      <q-page-container style="overflow-y:hidden !important;">
+      <q-page-container v-if="path === '/chat'" style="overflow-y:hidden !important;">
           <router-view  />
       </q-page-container>
     </q-layout>
@@ -477,7 +469,8 @@ export default {
       drawer1: false,
       cnfrm: false,
       changeName: false,
-      chatId: null
+      chatId: null,
+      path: ''
     }
   },
   computed : {
@@ -613,7 +606,11 @@ export default {
     //   this.options1 = optionsA.filter(({ id: id1 }) => !optionsB.some(({ id: id2 }) => id2 === id1));
     // },
   },
+  mounted() {
+        this.path = this.$route.path 
+  },
   async beforeMount() {
+
     this.isLoading = true;
     let self = this
     socket.addEventListener('open', async function (event) {
@@ -622,7 +619,6 @@ export default {
 
       socket.addEventListener('message', async function (event) {
       const result = JSON.parse(event.data);
-      console.log(result)
       if(result.reqType === 'addRoom') {
         self.getMessages(result.rooms.rooms[result.rooms.rooms.length-1],0)
       }
