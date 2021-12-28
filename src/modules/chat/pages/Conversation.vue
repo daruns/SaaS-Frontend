@@ -136,7 +136,7 @@
 <script>
 import breadcrmps from '../../../components/globalComponents/BreadCrumps.vue';
 import { date } from 'quasar'
-const socket = new WebSocket('wss://oneconnect.it:4000');
+var socket = new WebSocket('wss://oneconnect.it:4000');
 import { mapState, mapActions } from 'vuex';
 import axios from 'axios';
 export default {
@@ -174,7 +174,7 @@ export default {
       format(dt) {
         return date.formatDate(dt, 'HH:mm');
       },
-      typing() {
+     async typing() {
         socket.send(JSON.stringify({typing:{room_id: Number(this.chat.id)}}));
       },
       download(file) {
