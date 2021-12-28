@@ -98,15 +98,32 @@
             </p>
             </div>
           </div>
-         <div class="flex" v-else>
+         <div class="flex" v-else-if="room.users.length === 1">
            <div class="flex items-center">
              <div v-for="u in room.users" :key="u.id">
-              <div class="flex" v-if="u.id !== user.id">
+              <div class="flex">
             <q-avatar size="50px">
               <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
             </q-avatar>
             <div class="items-center q-mt-sm col">
-            <p class="q-mr-none q-mt-none q-mb-none text-black q-ml-sm">{{u.name}}</p>
+            <p class="q-mr-none q-mt-none text-black q-mb-none q-ml-sm">{{u.name}}</p>
+              <p  class="q-mt-xs q-ml-sm text-grey">
+                {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+                </p>
+            </div>
+             </div>
+           </div>
+           </div>
+          </div>
+            <div class="flex" v-else>
+           <div class="flex items-center">
+             <div v-for="u in room.users" :key="u.id">
+              <div class="flex" v-if="user.id !== u.id">
+            <q-avatar size="50px">
+              <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+            </q-avatar>
+            <div class="items-center q-mt-sm col">
+            <p class="q-mr-none q-mt-none text-black q-mb-none q-ml-sm">{{u.name}}</p>
               <p  class="q-mt-xs q-ml-sm text-grey">
                 {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
                 </p>
