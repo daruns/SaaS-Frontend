@@ -54,7 +54,7 @@
         :breakpoint="1185"
       >
         <!-- <q-scroll-area ref="scrollAreaRef" style="height: 100%; border-right: 1px solid #ddd"> -->
-        <q-list>   
+        <q-list style="overflow-y:scroll !important; overflow-x:hidden !important;">   
         <q-item class="flex justify-around" style="position: sticky;top:0;z-index:5;background-color: white;">
           <q-input class="full-width q-mt-xs" outlined rounded label="Search">
           <template v-slot:prepend>
@@ -94,7 +94,7 @@
               <p class="q-ma-none" v-if="room.users.length > 2">...</p>
               </div>
             </div>
-             <p class="q-mt-xs q-ml-sm text-grey">
+             <p class="q-mt-xs q-ml-sm text-grey" style="width: 80% !important;">
             {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
             </p>
             </div>
@@ -109,7 +109,7 @@
             </div>
            <div style="transform: translateX(-35px) !important;" class="items-center q-mt-md col">
             <p class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{room.name}}</p>
-             <p class="q-mt-xs q-ml-sm text-grey">
+             <p class="q-mt-xs q-ml-sm text-grey" style="width: 80% !important;">
             {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
             </p>
             </div>
@@ -129,7 +129,7 @@
               <p class="q-ma-none" v-if="room.users.length > 2">...</p>
               </div>
               <div>
-               <p class="q-mt-xs q-ml-sm text-grey">
+               <p class="q-mt-xs q-ml-sm text-grey" style="width: 80% !important;">
                 {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
                 </p>
               </div>
@@ -141,7 +141,7 @@
             </q-avatar>
             <div class="items-center q-mt-md col">
             <p class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{room.name}}</p>
-             <p class="q-mt-xs q-ml-sm text-grey">
+             <p class="q-mt-xs q-ml-sm text-grey" style="width: 80% !important;">
             {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
             </p>
             </div>
@@ -155,7 +155,7 @@
             </q-avatar>
             <div class="items-center q-mt-sm col">
             <p class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{u.name}}</p>
-              <p  class="q-mt-xs q-ml-sm text-grey">
+              <p  class="q-mt-xs q-ml-sm text-ellipses text-grey" style="width: 80% !important;">
                 {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
                 </p>
             </div>
@@ -172,7 +172,7 @@
             </q-avatar>
             <div class="items-center q-mt-sm col">
             <p class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{u.name}}</p>
-              <p  class="q-mt-xs q-ml-sm text-grey">
+              <p  class="q-mt-xs text-ellipses q-ml-sm text-grey" style="width: 60% !important;">
                 {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
                 </p>
             </div>
@@ -639,6 +639,7 @@ export default {
 
       socket.addEventListener('message', async function (event) {
       const result = JSON.parse(event.data);
+      console.log(result)
       if(result.reqType === 'addRoom') {
         self.getMessages(result.rooms.rooms[result.rooms.rooms.length-1],0)
       }
