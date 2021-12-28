@@ -304,7 +304,7 @@
            </div>
           </q-drawer>
       <q-page-container v-if="path === '/chat'" style="overflow-y:hidden !important;">
-          <router-view  />
+          <conversation :sckt="sckt" />
       </q-page-container>
     </q-layout>
     <q-dialog v-model="cnfrm">
@@ -459,6 +459,7 @@ const socket = new WebSocket('wss://oneconnect.it:4000');
 import { date } from 'quasar';
 import { mapActions, mapState } from 'vuex';
 import confirm from '../components/DeleteDialogue.vue';
+import conversation from '../modules/chat/pages/Conversation.vue'
 import axios from 'axios';
 export default {
   data() {
@@ -474,6 +475,7 @@ export default {
       channelPhoto: null,
       changePhoto: false,
       options: [],
+      sckt: socket,
       members1: [],
       options1: [],
       onlineUsers: [],
@@ -499,7 +501,8 @@ export default {
     }
   },
   components : {
-    confirm
+    confirm,
+    conversation
   },
   methods: {
     ...mapActions('userStore',['getUsers']),

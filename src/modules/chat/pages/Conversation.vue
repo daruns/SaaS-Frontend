@@ -136,11 +136,10 @@
 <script>
 import breadcrmps from '../../../components/globalComponents/BreadCrumps.vue';
 import { date } from 'quasar'
-var socket = new WebSocket('wss://oneconnect.it:4000');
 import { mapState, mapActions } from 'vuex';
 import axios from 'axios';
 export default {
-  props: ['hght','popup'],
+  props: ['hght','popup','sckt'],
     data() {
         return {
             init: 1,
@@ -149,16 +148,7 @@ export default {
             isTyping: false,
             avatar: null,
             room_id: null,
-            sender:[
-              {
-              type: 'sender',
-              message:'hey, how are you?'
-              },
-             {
-              type: 'receiver',
-              message:'doing fine, how r you?'
-              }
-              ],
+            socket: this.sckt
         }
     },
     components : {
@@ -175,7 +165,7 @@ export default {
         return date.formatDate(dt, 'HH:mm');
       },
      async typing() {
-        socket.send(JSON.stringify({typing:{room_id: Number(this.chat.id)}}));
+        this.socket.send(JSON.stringify({typing:{room_id: Number(this.chat.id)}}));
       },
       download(file) {
         window.open(file.url);
@@ -185,7 +175,7 @@ export default {
         data.append('files', this.file)
         let res = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/chats/addFiles/',data , {headers: {Authorization: localStorage.getItem('accessToken')}});
         if(res.data.success) {
-          socket.send(JSON.stringify({createMessage:{room_id: Number(this.chat.id), text: this.file.name, files: [res.data.data[0].id]}}));
+          this.socket.send(JSON.stringify({createMessage:{room_id: Number(this.chat.id), text: this.file.name, files: [res.data.data[0].id]}}));
         }
       },
       setScrollPos() {
@@ -193,6 +183,7 @@ export default {
       },
       updateScroll(){
           var element = document.getElementById("room-container");
+          if(element)
           element.scrollTop = element.scrollHeight;
       },
       send() {
@@ -200,7 +191,7 @@ export default {
         return
 
         let self = this;
-        socket.send(JSON.stringify({createMessage:{room_id: Number(this.chat.id), text: this.message}}));
+        this.socket.send(JSON.stringify({createMessage:{room_id: Number(this.chat.id), text: this.message}}));
         self.message = '';
         setTimeout(() => {
           self.updateScroll();;
@@ -218,10 +209,11 @@ export default {
    async mounted() {
       let i = 1
       let self = this
-      socket.addEventListener('open', async function (event) {
-      socket.send(JSON.stringify({accessToken: localStorage.getItem('accessToken').substring(7, localStorage.getItem('accessToken').length)}));
+      this.socket.addEventListener('open', async function (event) {
+      this.socket.send(JSON.stringify({accessToken: localStorage.getItem('accessToken').substring(7, localStorage.getItem('accessToken').length)}));
       });
-      socket.addEventListener('message', async function (event) {
+
+      this.socket.addEventListener('message', async function (event) {
         if(self.init === 1){
           self.init = 2;
         }

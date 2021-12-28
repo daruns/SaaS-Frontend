@@ -170,7 +170,7 @@
         </div> -->
     </q-list>
     <!-- </q-scroll-area> -->
-    <conversation @hideChat="showList = true" :popup="true" bg="white" hght="height:400px !important;" v-else />
+    <conversation :sckt="sckt" @hideChat="showList = true" :popup="true" bg="white" hght="height:400px !important;" v-else />
     </div>
 
         <q-btn color="black" class="absolute-top-right" style="z-index:20 !important;" icon="close" round flat @click="nextMorph();$emit('morph',morphGroupModel)" />
@@ -207,6 +207,7 @@ export default {
       isExpanded2: true,
       membToDelete: null,
       members: [],
+      sckt:socket,
       addMembers: false,
       createRoom: false,
       channelName: '',
@@ -326,6 +327,7 @@ export default {
     },
     updateScroll() {
       var element = document.getElementById("room-container");
+      if(element)
       element.scrollTop = element.scrollHeight;
     },
     logout() {

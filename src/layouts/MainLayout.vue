@@ -299,6 +299,7 @@ export default {
     ...mapActions('example', ['getUser']),
       updateScroll() {
       var element = document.getElementById("room-container");
+      if(element)
       element.scrollTop = element.scrollHeight;
     },
     openChat() {
