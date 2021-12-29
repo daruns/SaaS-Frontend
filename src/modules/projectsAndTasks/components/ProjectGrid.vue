@@ -3,7 +3,7 @@
     <div class="row row1">
       <div v-for="(project, i) in projects" :key="i" class="col-lg-3 col-md-4 col-sm-6 col-xs-12 q-pr-sm">
     <q-card flat class="q-mt-sm" bordered style="position: relative !important;">
-         <q-btn class="absolute-top-right" style="z-index:10;" dense round flat icon="more_vert">
+         <q-btn class="absolute-top-right" dense round flat icon="more_vert">
         <q-menu
           transition-show="scale"
           transition-hide="scale"

@@ -95,7 +95,7 @@
               </div>
             </div>
              <p class="q-mt-xs q-ml-sm text-grey" style="width: 80% !important;">
-            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text.slice(0,30) : 'No messages!'}}
             </p>
             </div>
           </div>
@@ -110,7 +110,7 @@
            <div style="transform: translateX(-35px) !important;" class="items-center q-mt-md col">
             <p class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{room.name}}</p>
              <p class="q-mt-xs q-ml-sm text-grey" style="width: 80% !important;">
-            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text.slice(0,30) : 'No messages!'}}
             </p>
             </div>
           </div>
@@ -130,7 +130,7 @@
               </div>
               <div>
                <p class="q-mt-xs q-ml-sm text-grey" style="width: 80% !important;">
-                {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+                {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text.slice(0,30) : 'No messages!'}}
                 </p>
               </div>
             </div>
@@ -142,7 +142,7 @@
             <div class="items-center q-mt-md col">
             <p class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{room.name}}</p>
              <p class="q-mt-xs q-ml-sm text-grey" style="width: 80% !important;">
-            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text.slice(0,30) : 'No messages!'}}
             </p>
             </div>
           </div>
@@ -156,7 +156,7 @@
             <div class="items-center q-mt-sm col">
             <p class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{u.name}}</p>
               <p  class="q-mt-xs q-ml-sm text-ellipses text-grey" style="width: 80% !important;">
-                {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+                {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text.slice(0,30) : 'No messages!'}}
                 </p>
             </div>
              </div>
@@ -173,7 +173,7 @@
             <div class="items-center q-mt-sm col">
             <p class="q-mr-none q-mt-none q-mb-none q-ml-sm">{{u.name}}</p>
               <p  class="q-mt-xs text-ellipses q-ml-sm text-grey" style="width: 60% !important;">
-                {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+                {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text.slice(0,30) : 'No messages!'}}
                 </p>
             </div>
              </div>
@@ -232,7 +232,7 @@
            >
            <div v-if="chat" class="fit flex items-center justify-start column  bg-grey-1">
 
-             <q-scroll-area style="height: 30vh !important; border-bottom: 0.25px solid lightgrey" class="full-width">
+             <q-scroll-area v-if="chat.room_type === 'channel'" style="height: 30vh !important; border-bottom: 0.25px solid lightgrey" class="full-width">
                <div class="q-mt-sm row">
                 <div v-for="u in allUsers" :key="u.id">
                <div style="width:33.33% !important;" class="flex column flex-center q-pr-md q-pl-md q-pb-md q-pt-xs">
@@ -284,18 +284,39 @@
                 </q-avatar>
                 <p class="text-h6 q-ma-none text-grey">{{u.name}}</p>
                </div>
+                <div v-if="allUsers.length === 1" class="flex column flex-center q-mt-xl">
+                <q-avatar size="60px">
+                <q-badge rounded :color="u.online ? 'green' : 'grey-5'" class="absolute-bottom-right q-mr-sm"/>
+                <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+                </q-avatar>
+                <p class="text-h6 q-ma-none text-grey">{{u.name}}</p>
+               </div>
                 <div v-if="u.id !== user.id && allUsers.length === 2" class="q-mt-xl flex column" style="width:100% !important;">
                     <div class="flex justify-between">
                         <p class="text-body1 text-weight-medium">Username:</p>
-                        <p class="text-body1 text-grey text-weight-medium">{{u.username}}</p>
+                        <p class="text-body1 text-grey text-weight-medium">{{u.username ? u.username : '...'}}</p>
                     </div>
                     <div class="flex justify-between">
                         <p class="text-body1 text-weight-medium">Email:</p>
-                        <p class="text-body1 text-grey text-weight-medium">{{u.email}}</p>
+                        <p class="text-body1 text-grey text-weight-medium">{{u.email ? u.email : '...'}}</p>
                     </div>
                     <div class="flex justify-between">
                         <p class="text-body1 text-weight-medium">Phone:</p>
-                        <p class="text-body1 text-grey text-weight-medium">{{u.phoneNumber}}</p>
+                        <p class="text-body1 text-grey text-weight-medium">{{u.phoneNumber ? u.phoneNumber : '...'}}</p>
+                    </div>
+                </div>
+                   <div v-if="allUsers.length === 1" class="q-mt-xl flex column" style="width:100% !important;">
+                    <div class="flex justify-between">
+                        <p class="text-body1 text-weight-medium">Username:</p>
+                        <p class="text-body1 text-grey text-weight-medium">{{u.username ? u.username : '...'}}</p>
+                    </div>
+                    <div class="flex justify-between">
+                        <p class="text-body1 text-weight-medium">Email:</p>
+                        <p class="text-body1 text-grey text-weight-medium">{{u.email ? u.email : '...'}}</p>
+                    </div>
+                    <div class="flex justify-between">
+                        <p class="text-body1 text-weight-medium">Phone:</p>
+                        <p class="text-body1 text-grey text-weight-medium">{{u.phoneNumber ? u.phoneNumber : '...'}}</p>
                     </div>
                 </div>
                </div>

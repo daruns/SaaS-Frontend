@@ -28,7 +28,7 @@
               {{ dateConversion(props.row.nextMeetingDate) }}
           </q-td>
          <q-td key="actions" :props="props">
-          <q-btn style="z-index:10;" dense round flat icon="more_vert">
+          <q-btn dense round flat icon="more_vert">
             <q-menu
               transition-show="scale"
               transition-hide="scale"

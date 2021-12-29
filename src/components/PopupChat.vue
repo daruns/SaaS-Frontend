@@ -13,8 +13,8 @@
 
     <div
       v-morph:card1:mygroup:500.resize="morphGroupModel"
-      class="bg-white text-white absolute-bottom-right"
-      style="width: 300px; border-bottom-right-radius: 2em;height: 500px !important;z-index:20 !important;"
+      class="bg-white text-primary absolute-bottom-right"
+      style="width: 300px; height: 500px !important;z-index:20 !important;"
     >
     <div  class="q-mt-xl">
       <!-- <q-scroll-area v-if="showList" ref="scrollAreaRef" style="border-bottom-right-radius: 2em;height: 350px !important;"> -->
@@ -47,7 +47,7 @@
               </div>
             </div>
              <p class="q-mt-xs q-ml-sm text-grey" style="width: 80% !important;">
-            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text.slice(0,30) : 'No messages!'}}
             </p>
             </div>
           </div>
@@ -62,7 +62,7 @@
            <div style="transform: translateX(-35px) !important;" class="items-center q-mt-md col">
             <p class="q-mr-none q-mt-none q-mb-none q-ml-sm text-black">{{room.name}}</p>
              <p class="q-mt-xs q-ml-sm text-grey" style="width: 80% !important;">
-            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text.slice(0,30) : 'No messages!'}}
             </p>
             </div>
           </div>
@@ -82,7 +82,7 @@
               </div>
               <div>
                <p class="q-mt-xs q-ml-sm text-grey" style="width: 80% !important;">
-                {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+                {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text.slice(0,30) : 'No messages!'}}
                 </p>
               </div>
             </div>
@@ -94,7 +94,7 @@
             <div class="items-center q-mt-md col">
             <p class="q-mr-none q-mt-none q-mb-none text-black q-ml-sm">{{room.name}}</p>
              <p class="q-mt-xs q-ml-sm text-grey" style="width: 80% !important;">
-            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+            {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text.slice(0,30) : 'No messages!'}}
             </p>
             </div>
           </div>
@@ -108,7 +108,7 @@
             <div class="items-center q-mt-sm col">
             <p class="q-mr-none q-mt-none text-black q-mb-none q-ml-sm">{{u.name}}</p>
               <p  class="q-mt-xs q-ml-sm text-grey" style="width: 80% !important;">
-                {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+                {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text.slice(0,30) : 'No messages!'}}
                 </p>
             </div>
              </div>
@@ -124,8 +124,8 @@
             </q-avatar>
             <div class="items-center q-mt-sm col">
             <p class="q-mr-none q-mt-none text-black q-mb-none q-ml-sm">{{u.name}}</p>
-              <p  class="q-mt-xs q-ml-sm text-grey bb" style="width: 50% !important;">
-                {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text : 'No messages!'}}
+              <p  class="q-mt-xs q-ml-sm text-grey" style="width: 80% !important;">
+                {{room.messages.length !== 0 ? room.messages[room.messages.length-1].text.slice(0,30) : 'No messages!'}}
                 </p>
             </div>
              </div>

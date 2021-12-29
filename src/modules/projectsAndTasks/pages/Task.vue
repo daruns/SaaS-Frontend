@@ -17,7 +17,7 @@
               >
                <div class="flex items-center justify-between">
               <p class="q-mb-none text-white">{{column.name}}</p>
-              <q-btn color="white" style="z-index:10;" dense round flat icon="more_vert">
+              <q-btn color="white" dense round flat icon="more_vert">
               <q-menu
                 transition-show="scale"
                 transition-hide="scale"
@@ -58,7 +58,7 @@
                 <div class="bg-white relative-position q-pa-sm q-mb-xs q-ml-xs q-mr-xs rounded-borders" style="border: 0.25px solid lightgrey;max-width: 14.5rem !important;">
                   <div class="flex items-center justify-between">
                     <p @click="taskBody = element;taskDialogue = true" class="q-mb-none cursor-pointer" style="width:50% !important;overflow:hidden !important;text-overflow: ellipsis !important;">{{element.name}}</p>
-                    <q-btn style="z-index:10;border: 0.25px solid lightgrey;" dense round flat icon="more_vert">
+                    <q-btn style="border: 0.25px solid lightgrey;" dense round flat icon="more_vert">
                     <q-menu
                       transition-show="scale"
                       transition-hide="scale"

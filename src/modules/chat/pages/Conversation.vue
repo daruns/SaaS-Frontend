@@ -4,7 +4,7 @@
       <q-toolbar-title>
            <div v-if="chat" class="flex">
             <q-btn @click="$emit('hideChat')" icon="chevron_left" v-if="popup" :ripple="false" color="primary" flat round />
-            <div class="flex" v-if="chat.room_type === 'chat'"> 
+            <div class="flex" v-if="chat.room_type === 'chat' && chat.users.length === 2"> 
             <div v-for="(u, i) in chat.users" :key="u.id">
             <div class="flex items-center" v-if="u.id !== user.id">
             <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
@@ -13,7 +13,16 @@
               <p class="q-ma-none q-pb-none text-subtitle1 q-ml-sm text-black">{{u.name}}</p>
             </div>
             </div>
-          
+             </div>
+            <div class="flex" v-if="chat.room_type === 'chat' && chat.users.length === 1"> 
+            <div v-for="(u, i) in chat.users" :key="u.id">
+            <div class="flex items-center" v-if="u.id !== user.id">
+            <q-avatar :class="i === 1 && 'q-ml-xs'" v-show="i < 2" size="35px">
+              <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+            </q-avatar>
+              <p class="q-ma-none q-pb-none text-subtitle1 q-ml-sm text-black">{{u.name}}</p>
+            </div>
+            </div>
              </div>
              <div class="flex" v-else-if="chat.room_type === 'channel' && !chat.avatar && !chat.name">
                <div v-for="(u, i) in chat.users" :key="u.id">
@@ -100,7 +109,16 @@
           <q-avatar size="22px">
             <img :src="avatar ? avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" />
           </q-avatar>
-          <q-spinner-dots class="q-ml-sm" size="xs" />
+          <q-chat-message
+            :name="m.user.name"
+            :avatar="avatar ? avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'"
+            size="35"
+            class="text-grey"
+            :bg-color="'primary'"
+            style="max-width:100% !important; text-overflow: break !important;"
+          >
+            <q-spinner-dots class="text-white" size="2rem" />
+          </q-chat-message>
           </div>
         </div>
       </div>       

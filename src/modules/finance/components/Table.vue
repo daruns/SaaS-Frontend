@@ -31,7 +31,7 @@
               {{ total(props.row) }}
           </q-td>
          <q-td key="actions" :props="props">
-          <q-btn  :disable="props.row.status === 'Paid'" style="z-index:10;" dense round flat icon="more_vert">
+          <q-btn  :disable="props.row.status === 'Paid'" dense round flat icon="more_vert">
             <q-menu
               transition-show="scale"
               transition-hide="scale"
