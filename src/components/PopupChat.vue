@@ -142,6 +142,9 @@
         <q-item-section side top>
           <q-item-label caption>{{room.messages.length !== 0 ? format(room.messages[room.messages.length-1].created_at) : ''}}</q-item-label>
         </q-item-section>
+         <div class="flex flex-center q-mr-sm absolute-right">
+         <q-icon v-if="room.messages[room.messages.length-1] && room.messages[room.messages.length-1].msg_recepeint_status !== 'seen' && room.messages.msg_recepeint_user_id !== user.id" color="primary" rounded name="circle" size="12px" />         
+         </div>
         </q-item>
         </div>
         </div>

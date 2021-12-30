@@ -105,10 +105,7 @@
         </q-avatar>
           </div>
         </div>
-          <div :class="!popup && 'q-pb-xl'" v-if="i === chat.messages.length-1 && isTyping && room_id === this.chat.id">
-          <q-avatar size="22px">
-            <img :src="avatar ? avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'" />
-          </q-avatar>
+          <div :class="!popup && 'q-pb-xl'" v-if="isTyping && room_id === this.chat.id">
           <q-chat-message
             :name="m.user.name"
             :avatar="avatar ? avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'"
