@@ -21,7 +21,7 @@ const mutations = {
 const actions = {
  async logIn ({commit}, payload) {
    try{
-    let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/auth/signin', payload);
+    let response = await axios.post(process.env.OC_BACKEND_API + 'auth/signin', payload);
     if(response.data.success){
         commit('LOG_IN', response.data.data.accessToken);
         return true
@@ -32,7 +32,7 @@ const actions = {
   }
 },
 async signUp ({commit}, payload) {
-  let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/auth/signup', payload);
+  let response = await axios.post(process.env.OC_BACKEND_API + 'auth/signup', payload);
   if(response.data.success){
     return true
   }else{
@@ -41,7 +41,7 @@ async signUp ({commit}, payload) {
 },
 
 async editProfile({commit}, payload) {
-   let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/auth/editProfile', payload, {headers: {Authorization: localStorage.getItem('accessToken')}});
+   let response = await axios.post(process.env.OC_BACKEND_API + 'auth/editProfile', payload, {headers: {Authorization: localStorage.getItem('accessToken')}});
     if(response.data.success){
       return true
     }else{
@@ -50,7 +50,7 @@ async editProfile({commit}, payload) {
   },
 
 async getUser({commit}) {
-  let res = await axios.get('https://onconnect-backend-api.herokuapp.com/api/v1/auth/me', {headers: {Authorization: localStorage.getItem('accessToken')}});
+  let res = await axios.get(process.env.OC_BACKEND_API + 'auth/me', {headers: {Authorization: localStorage.getItem('accessToken')}});
    commit('GET_USER',res.data);
 }
 };
