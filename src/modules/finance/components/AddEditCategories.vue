@@ -134,7 +134,7 @@ export default {
 
     },
     async create() {
-      let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/expenseCategories/create', 
+      let response = await axios.post(process.env.OC_BACKEND_API + 'expenseCategories/create', 
       this.expenseCategory, 
       {headers: {Authorization: localStorage.getItem('accessToken')}})
       this.loading = false
@@ -147,7 +147,7 @@ export default {
             })
     },
       async update() {
-      let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/expenseCategories/update', 
+      let response = await axios.post(process.env.OC_BACKEND_API + 'expenseCategories/update', 
       {...this.expenseCategory, id:this.body.id },  
       {headers: {Authorization: localStorage.getItem('accessToken')}})
       this.loading = false

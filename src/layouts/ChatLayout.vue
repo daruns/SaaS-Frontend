@@ -479,7 +479,7 @@
 </template>
 
 <script>
-const socket = new WebSocket('wss://oneconnect.it:4000');
+const socket = new WebSocket(process.env.CHAT_END_SOCKET);
 import { date } from 'quasar';
 import { mapActions, mapState } from 'vuex';
 import confirm from '../components/DeleteDialogue.vue';
@@ -542,7 +542,7 @@ export default {
       let file = new FormData();
       file.append('files', this.channelPhoto);
       try{
-      let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/chats/addFiles', file, {headers: {Authorization: localStorage.getItem('accessToken')}});
+      let response = await axios.post(process.env.OC_BACKEND_API + 'chats/addFiles', file, {headers: {Authorization: localStorage.getItem('accessToken')}});
       if(response.data.success){
       this.chatId =  Number(self.chat.id);
       socket.send(JSON.stringify({editRoom: {id: Number(self.chat.id), name: self.roomInfo.name, avatar:response.data.data[0].url}}));

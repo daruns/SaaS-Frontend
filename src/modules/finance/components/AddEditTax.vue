@@ -163,7 +163,7 @@ export default {
     async create() {
       let tax = this.tax
       tax.rate = Number(tax.rate) / 100
-      let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/taxes/create', 
+      let response = await axios.post(process.env.OC_BACKEND_API + 'taxes/create', 
       tax, 
       {headers: {Authorization: localStorage.getItem('accessToken')}})
       this.loading = false
@@ -179,7 +179,7 @@ export default {
       let tax = this.tax
       tax.rate = Number(tax.rate) / 100;
       tax.rate = Number(tax.rate)
-      let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/taxes/update', 
+      let response = await axios.post(process.env.OC_BACKEND_API + 'taxes/update', 
       {...tax, id: Number(this.body.id)}, 
       {headers: {Authorization: localStorage.getItem('accessToken')}})
       this.loading = false

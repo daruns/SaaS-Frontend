@@ -188,7 +188,6 @@ export default {
         bottom: '2px',
         borderRadius: '7px',
         backgroundColor: '#027be3',
-        width: '100%',
         height: '4px',
         opacity: 0.75
       },
@@ -319,7 +318,7 @@ export default {
              for(let i = 0; i<this.columns.length; i++) {
                for(let j = 0; j<this.columns[i].tasks.length; j++) {
                    if(Number(this.columns[i].tasks[j].id) === Number(evt.added.element.id)){
-                      let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/tasks/changeBoard',  
+                      let response = await axios.post(process.env.OC_BACKEND_API + 'tasks/changeBoard',  
                       {id:Number(evt.added.element.id), boardId:Number(this.columns[i].id)  }, 
                       {headers: {Authorization: localStorage.getItem('accessToken')}})
                    }
@@ -328,7 +327,7 @@ export default {
       }
     },
      async getAll() {
-    let res = await axios.get('https://onconnect-backend-api.herokuapp.com/api/v1/boards', {headers: {Authorization: localStorage.getItem('accessToken')}});
+    let res = await axios.get(process.env.OC_BACKEND_API + 'boards', {headers: {Authorization: localStorage.getItem('accessToken')}});
     this.columns = res.data.data;
     for(let i = 0; i<this.columns.length; i++) {
       this.columns[i].boardAttribute = {

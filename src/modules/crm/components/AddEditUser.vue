@@ -1,6 +1,6 @@
 <template>
 <q-layout style="width: 550px !important; overflow-y: hidden !important;">
-     <q-card style="max-width: 550px; min-height:100vh;" flat square>
+     <q-card style="max-width: 550px; height:56px;" flat square>
      <q-toolbar class="bg-grey-3" style="position:sticky !important; top:0;z-index:15;">
             <q-toolbar-title>
                 {{action  + ' '}} User
@@ -23,7 +23,7 @@
       <q-input v-if="action === 'Add'" ref="passRef" v-model="user.password" type="password" outlined label="Password" :rules="[val => (val && val.length > 7) || 'Password must be at least 8 characters!']" />
     </q-card-section>
     </q-card>
-          <q-toolbar class="bg-grey-3" style="position:sticky !important; bottom:0;z-index:5;">
+          <q-toolbar class="bg-grey-3 submitBtnClass" style="position:relative !important; bottom:0;z-index:5;">
             <q-btn :loading="loading" @click="submit" label="Submit" no-caps type="reset" color="primary" unelevated class="full-width" />
     </q-toolbar>
 </q-layout>
@@ -66,7 +66,7 @@ export default {
         }
         try{
         this.loading = true;
-        let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/clients/addUser',
+        let response = await axios.post(process.env.OC_BACKEND_API + 'clients/addUser',
         {...this.user, id:this.$route.params.id},
         {headers: {Authorization: localStorage.getItem('accessToken')}}
          );
@@ -84,7 +84,7 @@ export default {
         }
         let password = this.user.password
         this.loading = true;
-        let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/clients/editUser',
+        let response = await axios.post(process.env.OC_BACKEND_API + 'clients/editUser',
         {name: this.user.name, 
         username: this.user.username, 
         email:this.user.email, 

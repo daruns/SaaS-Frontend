@@ -8,6 +8,7 @@ import financeStore from '../modules/finance/store'
 import projectStore from '../modules/projectsAndTasks/store'
 import userStore from '../modules/Users/store'
 import chatStore from '../modules/chat/store'
+import socialMediaManagementStore from '../modules/socialMedia/store'
 /*
  * If not building with SSR mode, you can
  * directly export the Store instantiation;
@@ -26,7 +27,8 @@ export default store(function (/* { ssrContext } */) {
       financeStore,
       userStore,
       projectStore,
-      chatStore
+      chatStore,
+      socialMediaManagementStore,
     },
 
     // enable strict mode (adds overhead!)

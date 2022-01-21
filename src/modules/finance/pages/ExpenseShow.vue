@@ -223,7 +223,7 @@ export default {
     methods : {
         ...mapActions('financeStore',['getExpense','addExpenseFile']),
        async deleteExpenseFile() {
-          let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/expenses/removeFile',
+          let response = await axios.post(process.env.OC_BACKEND_API + 'expenses/removeFile',
           {id: this.oneExpense.id, attachId:this.fileId}, 
           {headers: {Authorization: localStorage.getItem('accessToken')}});
           await this.getExpense(this.$route.params.id);

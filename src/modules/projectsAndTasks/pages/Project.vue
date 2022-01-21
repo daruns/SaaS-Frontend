@@ -226,7 +226,7 @@ components :{
    ...mapActions('projectStore',['addFiles','addProjectMember','deleteProjectMember','addProjectLeader','deleteProjectLeader']),
    ...mapActions('userStore',['getUsers']),
    async deleteProjectFile() {
-    let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/projects/removeFile',
+    let response = await axios.post(process.env.OC_BACKEND_API + 'projects/removeFile',
      {id: this.project.id, attachId:this.fileId}, 
      {headers: {Authorization: localStorage.getItem('accessToken')}});
      this.getProject();
@@ -323,7 +323,7 @@ components :{
      this.getProject();
    },
    async getProject() {
-      let response = await axios.get(`https://onconnect-backend-api.herokuapp.com/api/v1/projects/${this.$route.params.id}`, {headers: {Authorization: localStorage.getItem('accessToken')}});
+      let response = await axios.get(process.env.OC_BACKEND_API + `projects/${this.$route.params.id}`, {headers: {Authorization: localStorage.getItem('accessToken')}});
       this.project = response.data.data;
       this.crumps[1].name = response.data.data.name;
       this.fileAndImages()

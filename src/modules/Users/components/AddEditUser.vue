@@ -102,7 +102,7 @@ export default {
             }
             try{
             this.loading = true;
-            let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/users/create',
+            let response = await axios.post(process.env.OC_BACKEND_API + 'users/create',
             {...this.user, phoneNumber: this.dialCode+this.phone},
             {headers: {Authorization: localStorage.getItem('accessToken')}}
             );
@@ -123,7 +123,7 @@ export default {
             }
             this.loading = true;
             try{
-            let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/users/update',
+            let response = await axios.post(process.env.OC_BACKEND_API + 'users/update',
             {name: this.user.name, 
             username: this.user.username, 
             email:this.user.email, 

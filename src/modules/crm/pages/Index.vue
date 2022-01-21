@@ -1,10 +1,7 @@
 <template>
     <q-page>
-        <div class="flex justify-between items-center q-pa-md">
-       <div>
-        <p class="text-h4">CRM</p>
-        <breadcrmps :map="crumps" />
-        </div>
+        <div class="full-width flex justify-between items-center q-px-md q-py-md" style="border-bottom: 1px solid lightgrey;">
+        <div class="text-h4">CRM</div>
         <div class="flex items-center">
         <div class="flex flex-center bg-secondary q-mr-sm">
             <q-btn class="q-mr-xs" @click="table=true" outline style="color: goldenrod;" :color="table ? 'primary' : 'grey'" icon="view_headline" />
@@ -13,6 +10,7 @@
         <q-btn @click="dialogue = true" color="primary" :label="'Add '+tab[0].toUpperCase()+tab.substr(1, tab.length)" unelevated rounded no-caps />
         </div>
         </div>
+        <breadcrmps class="q-pa-md full-width" :map="crumps" />
         <div class="q-pr-md q-pl-md">
         <q-tabs
         bordered
@@ -68,7 +66,7 @@ export default {
             table: false,
             crumps: [
                 {id:1,name:'OneConnect',icon: 'home',path: '/'},
-                {id:2,name:'CRM',icon: 'speed',path: '/crm'}
+                {id:2,name:'CRM',icon: 'groups',path: '/crm'}
                 ],
                 dialogue: false
         }
@@ -80,3 +78,7 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+
+</style>

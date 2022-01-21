@@ -1,6 +1,6 @@
 <template>
 <q-layout style="width: 550px !important;">
-     <q-card style="max-width: 550px; min-height:93vh !important;" flat square>
+     <q-card style="max-width: 550px; height:56px;" flat square>
      <q-toolbar class="bg-grey-3" style="position:sticky !important; top:0;z-index:15;">
             <q-toolbar-title>
                 {{this.actionType+' '}}Meeting
@@ -122,7 +122,7 @@
     />
     </q-card-section>
     </q-card>
-          <q-toolbar class="bg-grey-3" style="position:sticky !important; bottom:0;z-index:5;">
+          <q-toolbar class="bg-grey-3 submitBtnClass" style="position:sticky !important; bottom:0;z-index:5;">
             <q-btn :loading="loading" @click="submit" label="Submit" no-caps type="reset" color="primary" unelevated class="full-width" />
     </q-toolbar>
 </q-layout>
@@ -171,7 +171,7 @@ export default {
     async create() {
       this.loading = true
       this.meeting.duration = Number(this.meeting.duration)
-      let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/meetings/create', 
+      let response = await axios.post(process.env.OC_BACKEND_API + 'meetings/create', 
       {...this.meeting, clientId: this.clientId}, 
       {headers: {Authorization: localStorage.getItem('accessToken')}})
       this.loading = false
@@ -180,7 +180,7 @@ export default {
       console.log(this.meeting.date)
       this.loading = true
       this.meeting.duration = Number(this.meeting.duration)
-      let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/meetings/update', 
+      let response = await axios.post(process.env.OC_BACKEND_API + 'meetings/update', 
       {...this.meeting, id: this.id}, 
       {headers: {Authorization: localStorage.getItem('accessToken')}});
       this.loading = false
@@ -188,7 +188,7 @@ export default {
   },
  async mounted() {
    if(this.actionType === 'Edit'){
-    let { data } = await axios.get(`https://onconnect-backend-api.herokuapp.com/api/v1/meetings/${this.cmid}`,{headers: {Authorization: localStorage.getItem('accessToken')}});
+    let { data } = await axios.get(process.env.OC_BACKEND_API + `meetings/${this.cmid}`,{headers: {Authorization: localStorage.getItem('accessToken')}});
     let body = data.data
     this.meeting.duration = body.duration
     let dt = new Date(body.date)

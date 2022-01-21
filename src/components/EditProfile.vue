@@ -138,7 +138,7 @@ export default {
             data.append('avatar', this.credentials.avatar);
             data.append('phoneNumber', this.dialCode+this.phone);
          try{
-          let res = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/auth/editProfile', data, {headers: {Authorization: localStorage.getItem('accessToken')}});
+          let res = await axios.post(process.env.OC_BACKEND_API + 'auth/editProfile', data, {headers: {Authorization: localStorage.getItem('accessToken')}});
           }catch(e) {
                 console.log(e)
             }

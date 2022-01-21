@@ -10,7 +10,7 @@
     <q-card-section class="q-gutter-md scroll">
           <q-input :rules="[val => (val && val.length !== 0) || 'This field is required']" ref="nameRef" outlined v-model="paymentMethod.name" label="Name" />
             <q-editor             
-      v-model="paymentMethod.description" :dense="$q.screen.lt.md" :toolbar="[
+      v-model="paymentMethod.description" :dense="true" :toolbar="[
       [
           {
             label: $q.lang.editor.align,

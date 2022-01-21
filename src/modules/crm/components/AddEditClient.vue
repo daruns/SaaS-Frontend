@@ -1,6 +1,6 @@
 <template>
 <q-layout style="width: 500px !important;">
-     <q-card style="max-width: 500px; min-height:100vh;" flat square>
+     <q-card style="max-width: 500px; height:56px;" flat square>
        <q-toolbar class="bg-grey-3" style="position:sticky !important; top:0;z-index:15 !important;">
       <q-toolbar-title>
         {{actionType}} {{type[0].toUpperCase()+type.substr(1, type.length)}}
@@ -97,7 +97,7 @@
           />
         </q-card-section>
       </q-card>
-      <q-toolbar class="bg-grey-3" style="position:sticky !important; bottom:0;z-index:5;">
+      <q-toolbar class="bg-grey-3 submitBtnClass" style="position:sticky !important; bottom:0;z-index:5;">
         <q-btn :loading="loading" @click="submit" class="full-width" color="primary" label="Submit" no-caps />
     </q-toolbar>
 </q-layout>

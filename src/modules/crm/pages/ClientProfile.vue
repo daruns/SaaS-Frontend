@@ -1,5 +1,10 @@
 <template>
-<q-page class="q-pa-md">
+<q-page class="">
+  <div class="full-width flex justify-between items-center q-px-md q-py-md" style="hright: 56px !important;border-bottom: 1px solid lightgrey;">
+  <div class="text-h4">CRM</div>
+  </div>
+  <breadcrmps class="q-pa-md full-width" :map="crumps" />
+  <div class="q-px-md">
   <q-skeleton v-if="!currentClient.name" class="custom-skeleton-border" height="250px" />
      <q-card v-else class="row items-center q-pa-md">
        <q-btn @click="dialogue = true" class="absolute-top-right q-mt-xs q-mr-xs" flat text-color="grey" size="sm" round unelevated icon="edit" color="primary" />
@@ -78,9 +83,12 @@
           <modal @closeDialogue="dialogue = false" :body="currentClient" :type="currentClient.clientType" actionType="Edit" :id="$route.params.id" />
       </q-dialog>
     </div>
+  </div>
+
 </q-page>
 </template>
 <script>
+import breadcrumps from '../../../components/globalComponents/BreadCrumps.vue';
 import contacts from '../components/Contacts.vue'
 import { ref } from 'vue'
 import { mapActions, mapState } from 'vuex'
@@ -92,6 +100,7 @@ import axios from 'axios'
 export default {
     components: {
         meetings,
+        breadcrmps: breadcrumps,
         sociallinks,
         contacts,
         modal: AddEditClient,
@@ -101,6 +110,10 @@ export default {
         return {
           dialogue: false,
           close: false,
+          crumps: [
+            {id:1,name:'OneConnect',icon: 'home',path: '/'},
+            {id:2,name:'CRM',icon: 'groups',path: '/crm'},
+            ],
           user: {
             name: '',
             username: '',
@@ -128,7 +141,7 @@ export default {
         this.close = true;
         if(!this.currentClient.user){
           try{
-        let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/clients/addUser',
+        let response = await axios.post(process.env.OC_BACKEND_API + 'clients/addUser',
         {...this.user, id:this.$route.params.id},
         {headers: {Authorization: localStorage.getItem('accessToken')}}
          );
@@ -136,7 +149,7 @@ export default {
             console.log(e.response)
           }
         }else{
-        let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/clients/editUser',
+        let response = await axios.post(process.env.OC_BACKEND_API + 'clients/editUser',
         {...this.user, id:this.$route.params.id},
         {headers: {Authorization: localStorage.getItem('accessToken')}}
          );

@@ -1,6 +1,6 @@
 <template>
 <q-layout style="width: 550px !important;">
-     <q-card style="max-width: 550px; min-height:100vh;" flat square>
+     <q-card style="max-width: 550px; height:56px;" flat square>
      <q-toolbar class="bg-grey-3" style="position:sticky !important; top:0;z-index:15;">
             <q-toolbar-title>
                 {{actionType  + ' '}}Contact
@@ -137,7 +137,7 @@
             />
     </q-card-section>
     </q-card>
-          <q-toolbar class="bg-grey-3" style="position:sticky !important; bottom:0;z-index:5;">
+          <q-toolbar class="bg-grey-3 submitBtnClass" style="position:sticky !important; bottom:0;z-index:5;">
             <q-btn :loading="loading" @click="submit" label="Submit" no-caps type="reset" color="primary" unelevated class="full-width" />
     </q-toolbar>
 </q-layout>
@@ -252,7 +252,7 @@ export default {
 
     },
     async create() {
-      let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/clientContacts/create', 
+      let response = await axios.post(process.env.OC_BACKEND_API + 'clientContacts/create', 
       {...this.contact, clientId: Number(this.clientId)}, 
       {headers: {Authorization: localStorage.getItem('accessToken')}})
       this.loading = false
@@ -266,7 +266,7 @@ export default {
             })
     },
       async update() {
-      let response = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/clientContacts/update', 
+      let response = await axios.post(process.env.OC_BACKEND_API + 'clientContacts/update', 
       {...this.contact, id: this.id}, 
       {headers: {Authorization: localStorage.getItem('accessToken')}})
       this.loading = false

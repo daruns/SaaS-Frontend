@@ -1,6 +1,6 @@
 <template>
 <q-layout style="width: 550px !important; overflow-y: hidden !important;">
-     <q-card style="max-width: 550px; min-height:100vh;" flat square>
+     <q-card style="max-width: 550px; height:56px;" flat square>
      <q-toolbar class="bg-grey-3" style="position:sticky !important; top:0;z-index:15;">
             <q-toolbar-title>
                 {{action  + ' '}} Social Link
@@ -15,7 +15,7 @@
     </q-card-section>
 
     </q-card>
-          <q-toolbar class="bg-grey-3" style="position:sticky !important; bottom:0;z-index:5;">
+          <q-toolbar class="bg-grey-3 submitBtnClass" style="position:sticky !important; bottom:0;z-index:5;">
             <q-btn :loading="loading" @click="submit" label="Submit" no-caps type="reset" color="primary" unelevated class="full-width" />
     </q-toolbar>
 </q-layout>

@@ -1,13 +1,12 @@
 <template>
 <q-page class="q-pt-sm">
     <div class="row items-center q-pa-sm" >
-    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pa-sm" v-for="(client, i) in data" :key="i">
+    <div class="col-xl-2 col-lg-2 col-md-3 col-sm-6 col-xs-12 q-pa-sm" v-for="(client, i) in data" :key="i">
     <q-card flat bordered style="position: relative !important;" class="my-card">
-         <q-btn class="absolute-top-right" dense round flat icon="more_vert">
+         <q-btn style="z-index:2;" class="absolute-top-right" dense round flat icon="more_vert">
         <q-menu
           transition-show="scale"
           transition-hide="scale"
-          
         >
           <q-list style="min-width: 75px">
             <q-item @click="deleteClient({id: client.id})" style="padding 0 !important" clickable v-close-popup>

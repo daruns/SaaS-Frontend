@@ -188,7 +188,7 @@ export default {
      async addMsgFile() {
        let data = new FormData();
         data.append('files', this.file)
-        let res = await axios.post('https://onconnect-backend-api.herokuapp.com/api/v1/chats/addFiles/',data , {headers: {Authorization: localStorage.getItem('accessToken')}});
+        let res = await axios.post(process.env.OC_BACKEND_API + 'chats/addFiles/',data , {headers: {Authorization: localStorage.getItem('accessToken')}});
         if(res.data.success) {
           this.socket.send(JSON.stringify({createMessage:{room_id: Number(this.chat.id), text: this.file.name, files: [res.data.data[0].id]}}));
         }
