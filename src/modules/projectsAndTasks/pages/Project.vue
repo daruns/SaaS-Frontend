@@ -217,6 +217,7 @@ components :{
       ],
       file: null,
       image: null
+      
    }
  },
  computed: {
