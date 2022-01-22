@@ -1,7 +1,7 @@
 <template>
-<q-layout style="width: 550px !important;">
-     <q-card style="max-width: 550px; height:56px;" flat square>
-     <q-toolbar class="bg-grey-3" style="position:sticky !important; top:0;z-index:15;">
+<q-layout style="width: 500px !important;">
+     <q-card style="max-width: 500px; height:56px;" flat square>
+       <q-toolbar class="bg-grey-3" style="position:sticky !important; top:0;z-index:15 !important;">
             <q-toolbar-title>
                 {{this.actionType+' '}}Meeting
             </q-toolbar-title>

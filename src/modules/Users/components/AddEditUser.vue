@@ -1,5 +1,5 @@
 <template>
-<q-layout style="width: 550px !important; overflow-y: hidden !important;">
+<q-layout style="width: 550px !important;">
      <q-card style="max-width: 550px; min-height:100vh;" flat square>
      <q-toolbar class="bg-grey-3" style="position:sticky !important; top:0;z-index:15;">
             <q-toolbar-title>

@@ -535,7 +535,8 @@ export default {
         //   this.options1.push({label: this.serviceItems[i].name, itemId: this.serviceItems[i].id, category: 'serviceItem', description:this.serviceItems[i].description, qty: 0, unitPrice: 0, amount:0});
         //   this.itemOptions.push({label: this.serviceItems[i].name, itemId: this.serviceItems[i].id, category: 'serviceItem', description:this.serviceItems[i].description, qty: 0, unitPrice: 0, amount:0});
         // }
-
+        this.options1 = [];
+        this.itemOptions =[];
         for(let i  = 0; i<this.joinedItems.length; i++) {
             this.options1.push({label: this.joinedItems[i].name, itemId: this.joinedItems[i].id, category: this.joinedItems[i].category, description:this.joinedItems[i].description, qty: 0, unitPrice: 0, amount:0});
             this.itemOptions.push({label: this.joinedItems[i].name, itemId: this.joinedItems[i].id, category: this.joinedItems[i].category, description:this.joinedItems[i].description, qty: 0, unitPrice: 0, amount:0});
