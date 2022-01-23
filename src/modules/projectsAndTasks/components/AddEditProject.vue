@@ -271,37 +271,36 @@ export default {
     }
   },
  async mounted() {
-      this.isLoaded = true;
-      await this.getClients();
-      await this.getUsers();
-      for(let i  = 0; i<this.allClients.length; i++) {
-            if(this.allClients[i].clientType !== 'Blacklist')
-            this.clientOptions.push({label: this.allClients[i].name, id: this.allClients[i].id})
-      }
-     for(let i  = 0; i<this.users.length; i++) {
-            this.memberOptions.push({label: this.users[i].name, id: this.users[i].id})
-            this.leaderOptions.push({label: this.users[i].name, id: this.users[i].id})
-
-      }
-   this.isLoaded = false;
-   if(this.actionType === 'Edit'){
-     this.project.name = this.body.name
-     this.project.description = this.body.description
-     this.project.priority = this.body.priority
-     this.project.rate = this.body.rate
-     this.project.plannedStartDate = this.dateConversion(this.body.plannedStartDate)
-     this.project.plannedEndDate = this.dateConversion(this.body.plannedEndDate)
-     this.client = {label: this.body.client.name, id: this.body.client.id};
-     for(let i  = 0; i<this.body.memberUsers.length; i++) {
-            this.members.push({label: this.body.memberUsers[i].name, id: this.body.memberUsers[i].userId})
+    this.isLoaded = true;
+    await this.getClients();
+    await this.getUsers();
+    for(let i  = 0; i<this.allClients.length; i++) {
+      if(this.allClients[i].clientType !== 'Blacklist')
+      this.clientOptions.push({label: this.allClients[i].name, id: this.allClients[i].id})
+    }
+    for(let i  = 0; i<this.users.length; i++) {
+      this.memberOptions.push({label: this.users[i].name, id: this.users[i].id})
+      this.leaderOptions.push({label: this.users[i].name, id: this.users[i].id})
+    }
+    this.isLoaded = false;
+    if(this.actionType === 'Edit'){
+      this.project.name = this.body.name
+      this.project.description = this.body.description
+      this.project.priority = this.body.priority
+      this.project.rate = this.body.rate
+      this.project.plannedStartDate = this.dateConversion(this.body.plannedStartDate)
+      this.project.plannedEndDate = this.dateConversion(this.body.plannedEndDate)
+      this.client = {label: this.body.client.name, id: this.body.client.id};
+      for(let i  = 0; i<this.body.memberUsers.length; i++) {
+        this.members.push({label: this.body.memberUsers[i].name, id: this.body.memberUsers[i].userId})
       }
       for(let i  = 0; i<this.body.leaderUsers.length; i++) {
-            this.leaders.push({label: this.body.leaderUsers[i].name, id: this.body.leaderUsers[i].userId})
+        this.leaders.push({label: this.body.leaderUsers[i].name, id: this.body.leaderUsers[i].userId})
       }
-   }else{
-     this.project.plannedStartDate = date.formatDate(new Date(), 'YYYY-MM-DD HH:mm');
-     this.project.plannedEndDate = date.formatDate(new Date(), 'YYYY-MM-DD HH:mm');
-   }
+    }else{
+      this.project.plannedStartDate = date.formatDate(new Date(), 'YYYY-MM-DD HH:mm');
+      this.project.plannedEndDate = date.formatDate(new Date(), 'YYYY-MM-DD HH:mm');
+    }
   }
   }
 </script>

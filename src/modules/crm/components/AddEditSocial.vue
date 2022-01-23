@@ -11,7 +11,6 @@
           <q-input ref="nameRef" :rules="[val => (val && val.length === 0) || 'This field is required']" outlined v-model="socialMediaLink.name" label="Name" />
           <q-input ref="socialARef" :rules="[val => (val && val.length === 0) || 'This field is required']" outlined v-model="socialMediaLink.addressDomain" label="Domain" />
           <q-input ref="socialLRef" :rules="[val => (val && val.length === 0) || 'This field is required']" outlined v-model="socialMediaLink.linkAddress" label="Link address" />
-          <q-input ref="statusRef" :rules="[val => (val && val.length === 0) || 'This field is required']" outlined v-model="socialMediaLink.status" label="Status" />
     </q-card-section>
 
     </q-card>
@@ -33,7 +32,6 @@ export default {
                 name: '',
                 addressDomain: '',
                 linkAddress: '',
-                status: ''
             }
         }
     },
@@ -43,12 +41,10 @@ export default {
             this.$refs.nameRef.validate();
             this.$refs.socialARef.validate();
             this.$refs.socialLRef.validate();
-            this.$refs.statusRef.validate();
             if(
             this.$refs.nameRef.hasError ||
             this.$refs.socialARef.hasError ||
-            this.$refs.socialLRef.hasError ||
-            this.$refs.statusRef.hasError
+            this.$refs.socialLRef.hasError
             )
             return
             this.loading = true
@@ -66,7 +62,6 @@ export default {
             this.socialMediaLink.name = this.body.name
             this.socialMediaLink.addressDomain = this.body.addressDomain
             this.socialMediaLink.linkAddress = this.body.linkAddress
-            this.socialMediaLink.status = this.body.status
             this.id = this.body.id
         }
     }

@@ -1,5 +1,5 @@
 <template>
-<q-page class="full-width justify-stretch column inline">
+<q-page v-if="!loading" class="full-width justify-stretch column inline">
 
   <q-scroll-area
     class="col-12 items-start flex column"
@@ -7,6 +7,10 @@
     <div v-for="(post, i) in data" :key="i" class="fit col-12 flex row justify-center" >
       <div class="row flex col-8 bg-white my-card q-my-md" flat bordered>
           <!-- medias -->
+        <q-item
+          clickable
+          :to="'/social-media-management/post/' + post.id"
+        >
           <q-card-section class="row flex justify-between col-6">
             <q-card flat bordered class="col-6">
               <q-item>
@@ -151,7 +155,7 @@
             <div class="col-12 flex row">
               <div class="col-12 text-h5 q-mt-sm q-mb-xs">{{post.name}}</div>
               <div class="col-12 text-h5 q-mt-sm q-mb-xs">{{post.title}}</div>
-              <div class="col-12 text-caption text-grey col-12">{{post.description}}</div>
+              <div class="col-12 text-caption text-grey col-12" v-html="post.description"></div>
               <div class="col-6 text-overline text-orange-9">
                 <b>Author</b> 
                     <q-chip>
@@ -173,41 +177,10 @@
                   </q-chip>
               </div>
             </div>
-
             <hr>
             <q-card class="col-12 q-pa-md q-my-lg">
-              <p v-if="post.socialMediaStudioUsers.length !== 0" class="text-h6">Assigned members</p>
-              <p v-if="post.socialMediaStudioUsers.length === 0" class="text-subtitle1 text-grey-5">No members assigned.</p>
-              <q-btn @click="getUserOptions(post)" class="absolute-bottom-right q-mr-sm q-mb-sm" size="10px" color="primary" round icon="add" unelevated rounded no-caps>
-                <q-popup-edit v-model="members" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
-                  <q-select
-                      ref="clientRef"
-                      :rules="[val => (val !== null) || 'This field is required']"
-                      bg-color="white"
-                      outlined
-                      counter
-                      multiple
-                      use-chips
-                      v-model="members" 
-                      :options="options"
-                      label="Choose members"
-                      :disable="options.length === 0"
-                      :hint="options.length === 0 ? 'All users has been added' : ''"
-                    >
-                      <template v-slot:option="scope">
-                      <q-item v-bind="scope.itemProps">
-                          <q-item-section class="avatar-list">
-                          <q-avatar class="q-mr-xs" size="30px">
-                              <q-icon name="person" class="text-grey"/>
-                          </q-avatar>
-                          <q-item-label>{{ scope.opt.label }}</q-item-label>       
-                          </q-item-section>
-                      </q-item>
-                      </template>
-                  </q-select>
-                  <q-btn @click="addProjectMembers(post.id)" no-caps flat label="submit" color="primary" :disable="members.length === 0" v-close-popup />
-                </q-popup-edit>
-              </q-btn>
+              <p v-if="post.socialMediaStudioUsers.length !== 0" class="text-h6">Assigned users</p>
+              <p v-if="post.socialMediaStudioUsers.length === 0" class="text-subtitle1 text-grey-5">No users assigned.</p>
                 <div v-if="post.socialMediaStudioUsers.length !== 0" class="row">
                     <q-chip @remove="memberId = member.userId; deleteMemberConfirm = true;" v-for="(member,i) in post.socialMediaStudioUsers" :key="member.userId">
                     <q-avatar>
@@ -239,6 +212,7 @@
               <div class="col-md-6 col-md-6 text-overline text-grey-9">createdBy {{post.createdBy}}</div>
             </div>
           </q-card-section>
+        </q-item>
 
           <q-card-actions class="col-12 justify-start">
             <q-btn flat color="primary" label="Move to Production" />
@@ -304,9 +278,11 @@
     <!-- <q-dialog seamless position="right" v-model="dialogue">
         <modal @closeDialogue="dialogue = false" :stage="stage" :inProfile="false" :body="body" />
     </q-dialog> -->
-    </q-page>
+</q-page>
+<q-page v-else class="flex flex-center text-h4"><q-spinner /></q-page>
 </template>
 <script>
+import { ref } from 'vue'
 import { mapActions, mapState } from 'vuex'
 // import AddEditClient from './AddEditClient.vue'
 export default {
@@ -315,26 +291,44 @@ export default {
   },
   props: ['stage'],
   computed: {
-    ...mapState('socialMediaManagementStore', ['drafts']),
+    ...mapState('socialMediaManagementStore', [stage]),
+    ...mapState('userStore', ['users']),
     data() {
-      console.log("stage: ",this.stage," drafts: ", this.drafts)
-      if(this.stage === 'draft'){
+      if(this.stage === 'allPosts') {
+        return this.allPosts
+      }
+      if(this.stage === 'drafts') {
         return this.drafts
+      }
+      if(this.stage === 'productions') {
+        return this.productions
+      }
+      if(this.stage === 'reviews') {
+        return this.reviews
+      }
+      if(this.stage === 'completeds') {
+        return this.completeds
+      }
+      if(this.stage === 'rejecteds') {
+        return this.rejecteds
       }
     }
   },
   setup() {
     return {
-      loading: false,
+      stageUpCase: '',
+      loading: ref(false),
       dialogue: false,
       id: '',
+      stage: '',
       body: null,
       options: [],
    }
   },
   methods: {
-    ...mapActions('socialMediaManagementStore',['getPosts', 'deletePost']),
-    editClient(post) {
+    ...mapActions('socialMediaManagementStore',['get'+stageUpCase , 'deletePost']),
+    ...mapActions('userStore',['getUsers']),
+      editClient(post) {
         if(this.dialogue === true){
           this.dialogue = false;
           setTimeout(() => {
@@ -346,29 +340,29 @@ export default {
          this.body = post
         this.dialogue = true
     },
-      getUserOptions(payload) {
-      let optionsA = [];
-      let optionsB = [];
-      this.options = [];
-      setTimeout(() => {
-      if(!payload) return
-      for(let i = 0; i<this.users.length; i++) {
-      for(let j = 0; j<payload.members.length; j++) {
-        if(Number(payload.members[j].memberId) === Number(this.users[i].id)){
-          optionsB.push({id:this.users[i].id, label: this.users[j].name});
-        }
-      }
-          optionsA.push({id:this.users[i].id, label: this.users[i].name});
-      }
-      this.options = optionsA.filter(({ id: id1 }) => !optionsB.some(({ id: id2 }) => id2 === id1));
-      }, 200);
-    },
   },
- async mounted() {
-   this.loading = true
-   await this.getPosts(this.stage);
-   this.loading = false
-
+  async mounted() {
+    this.loading = true
+    if(this.stage === 'allPosts') {
+      await this.getPosts(this.stage);
+    }
+    if(this.stage === 'drafts') {
+      await this.getDrafts(this.stage);
+    }
+    if(this.stage === 'productions') {
+      await this.getProductions(this.stage);
+    }
+    if(this.stage === 'reviews') {
+      await this.getReviews(this.stage);
+    }
+    if(this.stage === 'completeds') {
+      await this.getCompleteds(this.stage);
+    }
+    if(this.stage === 'rejecteds') {
+      await this.getRejecteds(this.stage);
+    }
+    this.loading = false
+    this.stageUpCase = stage[0].toUpperCase()+stage.substr(1, stage.length)
   }
 }
 </script>

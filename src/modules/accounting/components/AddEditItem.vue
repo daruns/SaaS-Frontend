@@ -18,7 +18,7 @@
             <Datepicker class="q-mt-sm" v-model="inventoryItem.expireDate" showNowButton></Datepicker>
             </div>
                <q-editor             
-      v-model="inventoryItem.description" :dense="$q.screen.lt.md" :toolbar="[
+      v-model="inventoryItem.description" :dense="true" :toolbar="[
       [
           {
             label: $q.lang.editor.align,
@@ -128,7 +128,6 @@ export default {
                 expireDate: '',
                 qty: 0,
                 supplier: '',
-                status: '',
                 purchasedAt: ''
             }
         }
@@ -172,8 +171,7 @@ export default {
                 edt.setHours(edt.getHours() - 3);
                 this.inventoryItem.expireDate = date.formatDate(edt, 'YYYY-MM-DD HH:mm');
                 this.inventoryItem.qty = this.body.qty,
-                this.inventoryItem.supplier = this.body.supplier,
-                this.inventoryItem.status = this.body.status;
+                this.inventoryItem.supplier = this.body.supplier;
                 let pdt = new Date(this.body.purchasedAt)
                 pdt.setHours(pdt.getHours() - 3);
                 this.inventoryItem.purchasedAt = date.formatDate(pdt, 'YYYY-MM-DD HH:mm');

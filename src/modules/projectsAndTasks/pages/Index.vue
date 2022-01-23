@@ -25,14 +25,14 @@ components : {
 },
 data() {
   return {
-      dialogue: false,
+    dialogue: false,
   }
 },
   setup () {
     return {
       crumps: [
         {id:1,name:'OneConnect',icon: 'home',path: '/'},
-        {id:2,name:'Projects',icon: 'work',path: '/users'}
+        {id:2,name:'Projects',icon: 'work',path: '/projects'}
         ],
     }
   }

@@ -1,5 +1,5 @@
 <template>
-    <q-layout view="lFf LpF fFf">
+    <q-layout view="lFr LpR fFf">
       <q-drawer
         v-model="drawer"
         show-if-above
@@ -31,8 +31,8 @@
         </div>
 
         <q-scroll-area
-          @mouseover="miniState = false"
-          @mouseout="miniState = true"
+          @mouseover="miniState = fixedState === false ? false : miniState"
+          @mouseout="miniState = fixedState === false ? true : miniState"
           class="" style="height: calc(100% - 73px); border-right: 1px solid #ddd;"
         >
         <q-list class="rounded-borders text-black">
@@ -72,8 +72,8 @@
       <q-drawer
         :v-model="true"
         show-if-above
-        @mouseover="miniState = false"
-        @mouseout="miniState = true"
+        @mouseover="miniState = fixedState === false ? false : miniState"
+        @mouseout="miniState = fixedState === false ? true : miniState"
         :width="256"
         :breakpoint="500"
         style=""
@@ -148,8 +148,9 @@
           <q-item-section>Projects</q-item-section>
         </q-item>
         <q-item
-          :to="$route.path.split('/')[1] === 'social-media-management' ? $route.path : '/social-media-management/drafts'"
+          :to="$route.path.split('/')[1] === 'social-media-management' ? $route.path : undefined"
           exact
+          @click="sendSubSideBardData('social-media-management')"
           clickable
           class="text-grey"
           active-class="my-menu-link"
@@ -357,6 +358,8 @@ export default {
   methods: {
     openedSideBar() {
       this.toggledM = this.miniState = !this.miniState
+      if (this.miniState === false) { this.fixedState = true }
+      if (this.miniState === true) { this.fixedState = false }
     },
     drawerState(evnt) {
       // console.log(evnt,this.toggledM,this.routePath)
@@ -384,8 +387,7 @@ export default {
     },
     defaultValueSubSide() {
       let path = this.routePath
-      // console.log("path: ",path)
-      if (false && path == 'social-media-managemenet') {
+      if (path == 'social-media-managemenet') {
         this.sendSubSideBardData("social-media-managemenet")
       }
       if (path == 'finance') {
@@ -397,16 +399,16 @@ export default {
       this.drawerState("mount")
     },
     sendSubSideBardData(payload) {
-      if (false && payload === "socialMediaManagement") {
+      if (payload === "social-media-management") {
         this.subSideBar.title = "Social Management"
         this.subSideBar.itemsArray = [
           {name: "Drafts", icon: "mode_edit", url: "/social-media-management/drafts"},
           {name: "Calendar", icon: "far fa-calendar-alt", url: "/social-media-management/calendar"},
           {name: "Posts", icon: "send", url: "/social-media-management/posts"},
-          {name: "productions", icon: "productions", url: "/social-media-management/productions"},
-          {name: "Reviews", icon: "reviews", url: "/social-media-management/reviews"},
-          {name: "Rejecteds", icon: "retrieve", url: "/social-media-management/rejecteds"},
-          {name: "Completeds", icon: "completeds", url: "/social-media-management/completeds"},
+          {name: "productions", icon: "precision_manufacturing", url: "/social-media-management/productions"},
+          {name: "Reviews", icon: "remove_red_eye", url: "/social-media-management/reviews"},
+          {name: "Rejecteds", icon: "youtube_searched_for", url: "/social-media-management/rejecteds"},
+          {name: "Completeds", icon: "assignment_turned_in", url: "/social-media-management/completeds"},
           {name: "Connect Profile", icon: "fas fa-plus-square", url: "/social-media-management/accounts"},
         ]
         this.$router.push(this.subSideBar.itemsArray[0].url)
@@ -431,7 +433,7 @@ export default {
       } else if (payload === "projects") {
         this.subSideBar.title = "projects"
         this.subSideBar.itemsArray = [
-          {name: "Projects", icon: "work", url: "/projects"},
+          {name: "Projects", icon: "work", url: "/projects/dashboard"},
           {name: "Tasks", icon: "task", url: "/projects/tasks"}
         ]
         this.$router.push(this.subSideBar.itemsArray[0].url)
@@ -472,9 +474,11 @@ export default {
     chat
   },
   setup () {
+    const fixedState = ref(false)
     const miniState = ref(false)
     const drawer = ref(false)
     return {
+      fixedState,
       miniState,
       drawer,
     }

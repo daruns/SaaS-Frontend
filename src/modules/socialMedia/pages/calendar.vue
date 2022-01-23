@@ -7,9 +7,9 @@
         </div>
       </div>
       <breadcrmps class="q-pa-md full-width" :map="crumps" />
-      <grid class="q-my-none q-py-none" stage="drafts" style="max-height:auto !important;min-height:auto !important;height: calc(100vh - 131px);"/>
+      <grid class="q-my-none qpy-none" stage="draft" style="max-height:auto !important;min-height:auto !important;height: calc(100vh - 131px);"/>
       <q-dialog seamless position="right" v-model="dialogue">
-          <modal @closeDialogue="dialogue = false" stage="drafts" actionType="Add" :id="{}" />
+          <modal @closeDialogue="dialogue = false" :stage="tab" actionType="Add" :id="{}" />
       </q-dialog>
   </q-page>
 </template>

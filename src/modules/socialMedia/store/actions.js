@@ -30,6 +30,9 @@ export async function getCompleteds({commit, dispatch}, id) {
   let response = await axios.get(apiUrl + `socialMediaStudios/completeds`, {headers: {Authorization: localStorage.getItem('accessToken')}})
   await commit('GET_COMPLETEDS', response.data.data);
 }
+export async function getRejecteds({commit, dispatch}, id) {
+  await dispatch('getPosts');
+}
 
 export async function getOnePost({commit, dispatch}, id) {
   let response = await axios.get(apiUrl + `socialMediaStudios/${id}`, {headers: {Authorization: localStorage.getItem('accessToken')}})
@@ -49,11 +52,11 @@ export async function addUsersToPost({commit, dispatch}, body) {
   let response = await axios.post(apiUrl + 'socialMediaStudios/addUsers', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
   console.log("response creating post: ", response)
   await dispatch('getPosts');
-  await dispatch('getPosts');
+  return response
 }
 
 export async function removeUserFromPost({commit, dispatch}, body) {
-  let response = await axios.post(apiUrl + 'socialMediaStudios/create', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
+  let response = await axios.post(apiUrl + 'socialMediaStudios/removeUsers', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
   console.log("response creating post: ", response)
   await dispatch('getPosts');
 }

@@ -255,15 +255,14 @@ export default {
      this.task.name = this.body.name
      this.task.description = this.body.description
      this.task.priority = this.body.priority
-     this.task.status = this.body.status
      this.task.plannedStartDate =  this.dateConversion(this.body.plannedStartDate)
      this.task.plannedEndDate = this.dateConversion(this.body.plannedEndDate)
-     if(this.body.project){
+     if (this.body.project) {
      this.project = {label: this.body.project.name, id: this.body.project.id};
      }
-     for(let i  = 0; i<this.body.memberUsers.length; i++) {
-            this.members.push({label: this.body.memberUsers[i].name, id: this.body.memberUsers[i].userId})
-      }
+    for (let i  = 0; i<this.body.memberUsers.length; i++) {
+      this.members.push({label: this.body.memberUsers[i].name, id: this.body.memberUsers[i].userId})
+    }
    }else{
         this.task.plannedStartDate = date.formatDate(new Date, 'YYYY-MM-DD HH:mm');
         this.task.plannedEndDate = date.formatDate(new Date, 'YYYY-MM-DD HH:mm');

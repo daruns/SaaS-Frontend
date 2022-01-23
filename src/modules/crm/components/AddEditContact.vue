@@ -127,14 +127,6 @@
             lazy-rules
             :rules="[val => (val && val.length > 0) || 'Please write the department']"
             />
-        <q-input
-            ref="statusRef"
-            outlined
-            v-model="contact.status"
-            label="Status"
-            lazy-rules
-            :rules="[val => (val && val.length > 0) || 'Please write status']"
-            />
     </q-card-section>
     </q-card>
           <q-toolbar class="bg-grey-3 submitBtnClass" style="position:sticky !important; bottom:0;z-index:5;">
@@ -165,7 +157,6 @@ export default {
          position: '',
          email: '',
          department: '',
-         status: '',
      },
      clientId: Number(this.clId),
      id: Number(this.ccid),
@@ -226,13 +217,11 @@ export default {
             this.$refs.emailRef.validate();
             this.$refs.posRef.validate();
             this.$refs.deptRef.validate();
-            this.$refs.statusRef.validate();
             if(
             this.$refs.nameRef.hasError ||
             this.$refs.emailRef.hasError ||
             this.$refs.posRef.hasError ||
-            this.$refs.deptRef.hasError ||
-            this.$refs.statusRef.hasError
+            this.$refs.deptRef.hasError
             ){
             return
             }
@@ -288,7 +277,6 @@ export default {
     this.contact.position = this.body.position;
     this.contact.email = this.body.email;
     this.contact.department = this.body.department;
-    this.contact.status = this.body.status;
    }else {
          this.phone1 = '1';
          this.phone2 = '1';

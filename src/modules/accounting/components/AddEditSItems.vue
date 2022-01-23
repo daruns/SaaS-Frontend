@@ -117,7 +117,6 @@ export default {
                 description: 'Description',
                 unitPrice: 0,
                 supplier: '',
-                status: '',
             }
         }
     },
@@ -152,8 +151,7 @@ export default {
                 this.serviceItem.name = this.body.name,
                 this.serviceItem.description = this.body.description,
                 this.serviceItem.unitPrice = this.body.unitPrice;
-                this.serviceItem.supplier = this.body.supplier,
-                this.serviceItem.status = this.body.status;
+                this.serviceItem.supplier = this.body.supplier
         }
     }
 }

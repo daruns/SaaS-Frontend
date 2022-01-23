@@ -3,7 +3,7 @@
   <q-card style="max-width: 80vw; min-height:100vh;" flat square>
     <q-toolbar class="q-pa-md bg-grey-3" style="position:sticky !important; top:0;z-index:15;height: 72px !important">
       <q-toolbar-title>
-        Add Project
+        Add {{ stage[0].toUpperCase()+stage.substr(1, stage.length) }}
       </q-toolbar-title>
       <q-btn icon="close" flat round dense v-close-popup />
     </q-toolbar>
@@ -20,7 +20,7 @@
           />
         </div>
       </div>
-      <q-card class="col-lg-5 col-md-5 col-sm-12 col-xs-12 justify-center flex flex-center q-pa-lg">
+      <q-card class="col-lg-6 col-md-6 col-sm-12 col-xs-12 justify-center flex flex-center q-pa-lg">
         <q-card v-for="(medi) in mediasView" :key="medi" class=" flex bordered column justify-center flex flex-center">
           <q-btn
             clickable
@@ -52,14 +52,33 @@
 
         </q-card>
       </q-card>
-      <q-card class="col-lg-7 col-md-7 col-sm-12 col-xs-12 flex row items-start inline q-pa-lg ">
+      <q-card class="bg-secondary col-lg-6 col-md-6 col-sm-12 col-xs-12 flex row items-start inline q-pa-lg ">
+        <div  class="col-lg-12 col-md-12 col-sm-12 col-xs-12 flex justify-strech row q-pb-md">
+          <q-checkbox
+            use-chips
+            class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
+            v-model="post.mineApproved"
+            label="My Approval"
+          />
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 q-py-md column q-pr-md">
+            <q-select
+              ref="priorityRef"
+              v-model="post.priority"
+              :options="priorityOptions"
+              label="Priority"
+              :loading="UsersIsLoading"
+            />
+          </div>
+        </div>
         <!-- CLIENTS -->
-        <div  class="col-lg-12 col-md-12 col-sm-12 col-xs-12 flex justify-strech row  q-mb-md">
+        <div  class="col-lg-12 col-md-12 col-sm-12 col-xs-12 flex justify-strech row q-pb-md">
           <q-select
             class="col-lg-8 col-md-6 col-sm-12 col-xs-12"
             v-model="client" 
             emit-value
+            :rules="[val => (val !== null) || 'This field is required']"
             map-options
+            lazy-rules
             use-input
             label="Choose client"
             :options="clientOptions"
@@ -68,12 +87,13 @@
             behavior="menu"
             ref="clientRef"
             use-chips
-            clearable
           >
             <template v-slot:selected-item="scope">
                 <!-- @remove="scope.removeAtIndex(scope.indexOf(scope.opt))" -->
                 <!-- removable -->
               <q-chip
+                @remove="removeclientFromclients(scope.opt.id)"
+                removable
                 :tabindex="scope.tabindex"
                 dense
                 color="white"
@@ -107,18 +127,14 @@
           </q-select>
           <q-checkbox
             :disable="!client?.id"
-            :rules="[val => (val !== null) || 'This field is required']"
             use-chips
             class="col-lg-4 col-md-6 col-sm-12 col-xs-12"
             v-model="post.clientApproval"
             label="Need Approval"
           />
         </div>
-          <!-- {{client}}
-          <br /> -->
-          {{usersSelect}}
         <!-- USERS -->
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 flex justify-strech column  q-my-md">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 flex justify-strech column  q-py-md">
           <q-select
             class="col-lg-6 col-md-6 col-sm-12 col-xs-12"
             emit-value
@@ -128,7 +144,6 @@
             use-chips
             clearable
             ref="userRef"
-            :rules="[val => (val && val.length > 0) || 'This field is required']"
             v-model="usersSelect"
             multiple
             :options="userOptions"
@@ -137,6 +152,8 @@
           >
             <template v-slot:selected-item="scope">
               <q-chip
+                @remove="removeUserFromUserSelect(scope.opt.id)"
+                removable
                 :tabindex="scope.tabindex"
                 dense
                 color="white"
@@ -146,7 +163,9 @@
                 <q-avatar v-if="scope.opt.avatar" color="grey" text-color="white"><q-img :src="scope.opt.avatar"/> </q-avatar>
                 <q-avatar v-else color="grey" icon="person" text-color="white" />
                 <q-item-label class="q-mx-sm">{{ scope.opt.label }}</q-item-label>
-                <q-badge v-if="scope.opt.canEdit" color="success" label="Can Edit"/>
+                <q-item-section side>
+                <q-badge class="q-pa-xs" v-if="scope.opt.canEdit" color="success" label="Can Edit"/>
+                </q-item-section>
               </q-chip>
             </template>
 
@@ -160,13 +179,13 @@
                 </q-item-section>
                 <q-item-section side>
                   <q-checkbox
-                    :rules="[val => (val !== null) || 'This field is required']"
                     use-chips
+                    v-model="scope.opt.canEdit"
+                    dense
                     class="col-lg-4 col-md-6 col-sm-12 col-xs-12"
-                    :v-model="scope.opt.canEdit"
                     label="Can Edit"
                   />
-                </q-item-section>
+              </q-item-section>
               </q-item>
             </template>
 
@@ -178,38 +197,10 @@
               </q-item>
             </template>
           </q-select>
-          <!-- <q-list class="col-lg-6 col-md-6 col-sm-12 col-xs-12" v-if="post.users.length">
-            <q-item  :key="index" v-for="(item,index) in post.users">
-              <q-avatar rounded :src="item.avatar"/>
-                {{item.label}}
-                {{item.avatar}}
-                {{item.id}}
-              <q-checkbox
-                v-if="this.client?.id"
-                :rules="[val => (val !== null) || 'This field is required']"
-                use-chips
-                class="col-12"
-                v-model="post.users[index]"
-                label="Can Approve"
-              />
-            </q-item>
-          </q-list> -->
         </div>
-        <q-card flat class="col-12 row items-start inline">
-          <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 column">
-            <q-select
-              ref="priorityRef"
-              :rules="[val => (val && val.length > 0) || 'This field is required']"
-              
-              v-model="post.priority"
-              :options="priorityOptions"
-              label="Priority"
-              :loading="UsersIsLoading"
-            />
-          </div>
-          <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 column">
-            <div class="q-ma-none absolute q-ml-sm text-grey-7" style="z-index:10;font-size:12px;line-height:20px;font-weight:400;">Planned Start Date</div>
-            <q-input showNowButton v-model="post.plannedStartDate" mask="date" :rules="['date']">
+        <q-card flat class="col-12 row items-start bg-secondary q-py-md inline">
+          <div class="bg-secondary col-lg-6 col-md-6 col-sm-12 col-xs-12 column q-py-md q-px-md">
+            <q-input ref="post.plannedStartDate" label="Plan Start At" v-model="post.plannedStartDate" mask="date" :rules="['date']">
               <template v-slot:append>
                 <q-icon name="event" class="cursor-pointer">
                   <q-popup-proxy ref="qDateProxy" cover transition-show="scale" transition-hide="scale">
@@ -223,9 +214,8 @@
               </template>
             </q-input>
           </div>
-          <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 column">
-            <div class="q-ma-none absolute q-ml-sm text-grey-7" style="z-index:10;font-size:12px;line-height:20px;font-weight:400;">Deadline</div>
-            <q-input showNowButton v-model="post.plannedEndDate" mask="date" :rules="['date']">
+          <div class="bg-secondary col-lg-6 col-md-6 col-sm-12 col-xs-12 column q-py-md q-px-md">
+            <q-input ref="plannedEndDateRef" label="Deadline" v-model="post.plannedEndDate" mask="date" :rules="['date']">
               <template v-slot:append>
                 <q-icon name="event" class="cursor-pointer">
                   <q-popup-proxy ref="qDateProxy" cover transition-show="scale" transition-hide="scale">
@@ -240,97 +230,102 @@
             </q-input>
           </div>
         </q-card>
-        <q-card bordered class="col-12">
-        <q-editor
-          :dense="true"
-          :toolbar="[
-            [
-              {
-                label: $q.lang.editor.align,
-                icon: $q.iconSet.editor.align,
-                fixedLabel: true,
-                list: 'only-icons',
-                options: ['left', 'center', 'right', 'justify']
-              },
-            ],
-            ['bold', 'italic', 'strike', 'underline', 'subscript', 'superscript'],
-            ['token', 'hr', 'link', 'custom_btn'],
-            ['print', 'fullscreen'],
-            [
-              {
-                label: $q.lang.editor.formatting,
-                icon: $q.iconSet.editor.formatting,
-                list: 'no-icons',
-                options: [
-                  'p',
-                  'h1',
-                  'h2',
-                  'h3',
-                  'h4',
-                  'h5',
-                  'h6',
-                  'code'
-                ]
-              },
-              {
-                label: $q.lang.editor.fontSize,
-                icon: $q.iconSet.editor.fontSize,
-                fixedLabel: true,
-                fixedIcon: true,
-                list: 'no-icons',
-                options: [
-                  'size-1',
-                  'size-2',
-                  'size-3',
-                  'size-4',
-                  'size-5',
-                  'size-6',
-                  'size-7'
-                ]
-              },
-              {
-                label: $q.lang.editor.defaultFont,
-                icon: $q.iconSet.editor.font,
-                fixedIcon: true,
-                list: 'no-icons',
-                options: [
-                  'default_font',
-                  'arial',
-                  'arial_black',
-                  'comic_sans',
-                  'courier_new',
-                  'impact',
-                  'lucida_grande',
-                  'times_new_roman',
-                  'verdana'
-                ]
-              },
-              'removeFormat'
-            ],
-            ['quote', 'unordered', 'ordered', 'outdent', 'indent'],
+        <q-card bordered class="col-12 q-my-md">
+          <q-editor
+            :dense="true"
+            :toolbar="[
+              [
+                {
+                  label: $q.lang.editor.align,
+                  icon: $q.iconSet.editor.align,
+                  fixedLabel: true,
+                  list: 'only-icons',
+                  options: ['left', 'center', 'right', 'justify']
+                },
+              ],
+              ['bold', 'italic', 'strike', 'underline', 'subscript', 'superscript'],
+              ['token', 'hr', 'link', 'custom_btn'],
+              ['print', 'fullscreen'],
+              [
+                {
+                  label: $q.lang.editor.formatting,
+                  icon: $q.iconSet.editor.formatting,
+                  list: 'no-icons',
+                  options: [
+                    'p',
+                    'h1',
+                    'h2',
+                    'h3',
+                    'h4',
+                    'h5',
+                    'h6',
+                    'code'
+                  ]
+                },
+                {
+                  label: $q.lang.editor.fontSize,
+                  icon: $q.iconSet.editor.fontSize,
+                  fixedLabel: true,
+                  fixedIcon: true,
+                  list: 'no-icons',
+                  options: [
+                    'size-1',
+                    'size-2',
+                    'size-3',
+                    'size-4',
+                    'size-5',
+                    'size-6',
+                    'size-7'
+                  ]
+                },
+                {
+                  label: $q.lang.editor.defaultFont,
+                  icon: $q.iconSet.editor.font,
+                  fixedIcon: true,
+                  list: 'no-icons',
+                  options: [
+                    'default_font',
+                    'arial',
+                    'arial_black',
+                    'comic_sans',
+                    'courier_new',
+                    'impact',
+                    'lucida_grande',
+                    'times_new_roman',
+                    'verdana'
+                  ]
+                },
+                'removeFormat'
+              ],
+              ['quote', 'unordered', 'ordered', 'outdent', 'indent'],
 
-            ['undo', 'redo'],
-          ]"
-          :fonts="{
-            arial: 'Arial',
-            arial_black: 'Arial Black',
-            comic_sans: 'Comic Sans MS',
-            courier_new: 'Courier New',
-            impact: 'Impact',
-            lucida_grande: 'Lucida Grande',
-            times_new_roman: 'Times New Roman',
-            verdana: 'Verdana'
-          }"
-          v-model="post.description"
-          max-height="40px"
-          class="col-12"
-        />
+              ['undo', 'redo'],
+            ]"
+            :fonts="{
+              arial: 'Arial',
+              arial_black: 'Arial Black',
+              comic_sans: 'Comic Sans MS',
+              courier_new: 'Courier New',
+              impact: 'Impact',
+              lucida_grande: 'Lucida Grande',
+              times_new_roman: 'Times New Roman',
+              verdana: 'Verdana'
+            }"
+            v-model="post.description"
+            max-height="40px"
+            class="col-12"
+          />
         </q-card>
       </q-card>
     </q-card-section>
   </q-card>
-  <q-toolbar class="bg-grey-3" style="position:sticky !important; bottom:0;z-index:5;">
-    <q-btn :loading="submitIsLoading" @click="submit" label="Submit" no-caps type="reset" color="primary" unelevated class="full-width" />
+  <q-toolbar class="bg-grey-3 col q-px-0 q-mx-0" style="position:sticky !important; bottom:0;z-index:5;">
+    <div class="row full-width">
+      <q-btn :disable="DraftSubmitIsDisabled" :loading="submitDraftIsLoading" @click="submit('Draft')" label="Save As Draft" no-caps type="reset" color="primary" unelevated class="bg-warning text-white col-lg-6 col-md-6 col-sm-12 col-xs-12" />
+      <!-- <q-btn :disable="DraftSubmitIsDisabled" :loading="submitProductionIsLoading" @click="submit('Production')" label="To Production" no-caps type="reset" color="primary" unelevated class="bg-danger text-white col-lg-6 col-md-6 col-sm-12 col-xs-12" />
+      <q-btn :disable="DraftSubmitIsDisabled" :loading="submitReviewIsLoading" @click="submit('Review')" label="To Review" no-caps type="reset" color="primary" unelevated class="bg-warning text-white col-lg-6 col-md-6 col-sm-12 col-xs-12" /> -->
+      <q-btn :disable="DraftSubmitIsDisabled" :loading="submitCompleteIsLoading" @click="submit('Complete')" label="Complete" no-caps type="reset" color="primary" unelevated class="bg-primary text-white col-lg-6 col-md-6 col-sm-12 col-xs-12" />
+    </div>
   </q-toolbar>
 </q-layout>
 </template>
@@ -345,27 +340,34 @@ export default {
     Datepicker,
     CreateMedia,
   },
-  props: ['id', 'submited'],
+
+  props: ['submited'],
   data()  {
     return {
+      DraftSubmitIsDisabled: ref(false),
+      ProductionSubmitIsDisabled: ref(false),
+      ReviewSubmitIsDisabled: ref(false),
+      CompleteSubmitIsDisabled: ref(false),
       mediasView: ref(['addNewMediaComponent']),
-      submitIsLoading: false,
+      submitDraftIsLoading: ref(false),
+      submitProductionIsLoading: ref(false),
+      submitReviewIsLoading: ref(false),
+      submitCompleteIsLoading: ref(false),
       clientIsLoading: false,
       UsersIsLoading: false,
       // typeOptions: ['1024x990','298x630','300x590','124x390','203x400','other'],
       priorityOptions: ['High','Middle','Low'],
       clientOptions: ref([]),
-      client: null,
+      client: ref(null),
       usersSelect: ref([]),
       userOptions: ref([]),
       files: null,
       post: {
         name: '',
-        plannedStartDate: '',
-        plannedEndDate: '',
-        schedule: '',
+        plannedStartDate: ref(''),
+        plannedEndDate: ref(''),
         clientApproval: false,
-        mineApproved: false,
+        mineApproved: true,
         stage: this.stage,
         priority: '',
         description: 'Description...',
@@ -385,11 +387,17 @@ export default {
   methods : {
     ...mapActions('userStore',['getUsers']),
     ...mapActions('crmStore',['getClients']),
-    ...mapActions('socialMediaManagementStore',['addProject','editProject', 'getProjects','addFiles']),
+    ...mapActions('socialMediaManagementStore',['createPost','getPosts']),
     dateConversion(d) {
       let newDt = new Date(d)
       newDt.setHours(newDt.getHours() - 3);
       return date.formatDate(newDt, 'YYYY-MM-DD HH:mm');
+    },
+    removeUserFromUserSelect(id) {
+      this.usersSelect = this.usersSelect.filter(ee => {return ee.id !== id})
+    },
+    removeclientFromclients(id) {
+      this.client = null
     },
     addNewMediaComponent() {
       this.mediasView.push()
@@ -415,15 +423,17 @@ export default {
 
       update(() => {
         const needle = val.toLowerCase()
+        console.log(this.clientOptions[0]);
         this.clientOptions = this.clientOptions
         .filter(v => {
-          v.label
-          .toLowerCase()
-          .split(' ')
-          .filter(tr => {
-            return tr.indexOf(needle) > -1
-          })
-          .length > 0
+          return (
+            v.label
+            .toLowerCase()
+            .split(' ')
+            .find(tr => {
+              return tr.indexOf(needle) > -1
+            })
+          )
         })
       })
     },
@@ -442,50 +452,95 @@ export default {
         const needle = val.toLowerCase()
         this.userOptions = this.userOptions
         .filter(v => {
-          v.label
-          .toLowerCase()
-          .split(' ')
-          .find(tr => {
-            return tr.indexOf(needle) > -1
-          })
-          .length > 0
+          return (
+            v.label
+            .toLowerCase()
+            .split(' ')
+            .find(tr => {
+              return tr.indexOf(needle) > -1
+            })
+          )
         })
         console.log(this.userOptions)
       })
     },
-    async submit() {
+    async submit(submittedStage) {
       this.$refs.nameRef.validate();
-      this.$refs.plannedEndDate.validate();
       this.$refs.clientRef.validate();
-      if(
+      this.$refs.plannedEndDateRef.validate();
+      if (
         this.$refs.nameRef.hasError ||
-        this.$refs.plannedEndDate.hasError ||
-        this.$refs.clientRef.hasError
+        this.$refs.clientRef.hasError ||
+        this.$refs.plannedEndDateRef.hasError
       )
       return
-
-      for(let i = 0; i<this.users.length; i++) {
-        this.post.users.push({userId: Number(this.users[i].id), canEdit: this.users[i].canEdit});
+      console.log(submittedStage)
+      if (submittedStage === "Draft") {
+        this.submitDraftIsLoading = true
+        this.ProductionSubmitIsDisabled = true
+        this.ReviewSubmitIsDisabled = true
+        this.CompleteSubmitIsDisabled = true
+      } else if (submittedStage === 'Production') {
+        this.submitProductionIsLoading = true
+        this.DraftSubmitIsDisabled = true
+        this.ReviewSubmitIsDisabled = true
+        this.CompleteSubmitIsDisabled = true
+      } else if (submittedStage === 'Review') {
+        this.submitReviewIsLoading = true
+        this.DraftSubmitIsDisabled = true
+        this.ProductionSubmitIsDisabled = true
+        this.CompleteSubmitIsDisabled = true
+      } else if (submittedStage === 'Complete') {
+        this.submitCompleteIsLoading = true
+        this.DraftSubmitIsDisabled = true
+        this.ProductionSubmitIsDisabled = true
+        this.ReviewSubmitIsDisabled = true
       }
-      this.post.mineApproved = this.mineApproved
+
+      this.post.mineApproved = this.post.mineApproved
       this.post.clientApproval = this.clientApproval
-      this.post.users = this.usersSelect.map(id,cEdit => { return {userId: id, canEdit: cEdit } })
+      if (this.usersSelect.length > 0 ) {
+        console.log("useselect: ", this.usersSelect)
+        this.post.users = this.usersSelect.map(id,cEdit => { return {userId: id, canEdit: cEdit } })
+      }
       this.post.clientId = Number(this.client.id)
-      this.post.schedule = date.formatDate(this.post.schedule, 'YYYY-MM-DD HH:mm');
       this.post.plannedStartDate = date.formatDate(this.post.plannedStartDate, 'YYYY-MM-DD HH:mm');
       this.post.plannedEndDate = date.formatDate(this.post.plannedEndDate, 'YYYY-MM-DD HH:mm');
-      this.submitIsLoading = true
-      await this.create()
-      this.submitIsLoading = false;
+      if (submittedStage === "Draft") {
+        this.post.stage = "draft"
+        await this.create()
+        this.submitDraftIsLoading = false
+        this.ProductionSubmitIsDisabled = false
+        this.ReviewSubmitIsDisabled = false
+        this.CompleteSubmitIsDisabled = false
+      } else if (submittedStage === 'Production') {
+        this.post.stage = "production"
+        await this.create()
+        this.submitProductionIsLoading = false
+        this.DraftSubmitIsDisabled = false
+        this.ReviewSubmitIsDisabled = false
+        this.CompleteSubmitIsDisabled = false
+      } else if (submittedStage === 'Review') {
+        this.post.stage = "review"
+        await this.create()
+        this.submitReviewIsLoading = false
+        this.DraftSubmitIsDisabled = false
+        this.ProductionSubmitIsDisabled = false
+        this.CompleteSubmitIsDisabled = false
+      } else if (submittedStage === 'Complete') {
+        this.post.stage = "complete"
+        await this.create()
+        this.submitCompleteIsLoading = false
+        this.DraftSubmitIsDisabled = false
+        this.ProductionSubmitIsDisabled = false
+        this.ReviewSubmitIsDisabled = false
+      }
       this.$emit('closeDialogue')
-
     },
     async create() {
-      await this.addProject({data: this.post, files: this.files});
+      const finishedCreate = await this.createPost(this.post);
+      console.log("Create finished: ",finishedCreate)
     },
-    async update() {
-      await this.editProject({data: {...this.post, id:Number(this.body.id)}}) 
-    }
   },
   async mounted() {
     this.clientIsLoading = true;

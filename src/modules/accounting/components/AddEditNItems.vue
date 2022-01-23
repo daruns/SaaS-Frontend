@@ -118,7 +118,6 @@ export default {
                 description: 'Description',
                 unitPrice: 0,
                 supplier: '',
-                status: '',
             }
         }
     },
@@ -152,8 +151,7 @@ export default {
                 this.nonInventoryItem.name = this.body.name,
                 this.nonInventoryItem.description = this.body.description,
                 this.nonInventoryItem.unitPrice = this.body.unitPrice;
-                this.nonInventoryItem.supplier = this.body.supplier,
-                this.nonInventoryItem.status = this.body.status;
+                this.nonInventoryItem.supplier = this.body.supplier;
         }
     }
 }
