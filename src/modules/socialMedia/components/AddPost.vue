@@ -341,7 +341,7 @@ export default {
     CreateMedia,
   },
 
-  props: ['submited'],
+  props: ['stage', 'submited'],
   data()  {
     return {
       DraftSubmitIsDisabled: ref(false),

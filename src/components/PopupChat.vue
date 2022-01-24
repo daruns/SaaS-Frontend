@@ -210,7 +210,7 @@ export default {
       isExpanded2: true,
       membToDelete: null,
       members: [],
-      sckt:socket,
+      sckt:ref(socket),
       addMembers: false,
       createRoom: false,
       channelName: '',

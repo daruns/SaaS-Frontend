@@ -3,7 +3,7 @@ const routes = [
       path: '/accounting',
       component: () => import('layouts/MainLayout.vue'),
       children: [
-        { path: '', component: () => import('../pages/Index.vue') }
+        { path: '/finance/accounting', component: () => import('../pages/Index.vue') }
       ],
       meta: {needsAuth: true}
     },

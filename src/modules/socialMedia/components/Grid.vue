@@ -1,9 +1,9 @@
 <template>
 <q-page v-if="!loading" class="full-width justify-stretch column inline">
-
   <q-scroll-area
     class="col-12 items-start flex column"
   >
+  {{data}}
     <div v-for="(post, i) in data" :key="i" class="fit col-12 flex row justify-center" >
       <div class="row flex col-8 bg-white my-card q-my-md" flat bordered>
           <!-- medias -->
@@ -184,13 +184,13 @@
                 <div v-if="post.socialMediaStudioUsers.length !== 0" class="row">
                     <q-chip @remove="memberId = member.userId; deleteMemberConfirm = true;" v-for="(member,i) in post.socialMediaStudioUsers" :key="member.userId">
                     <q-avatar>
-                      <img round v-if="member.user.avatar" :src="member.user.avatar" icon="person" color="grey"/>
+                      <img round v-if="member.user.avatar" :src="member?.user?.avatar" icon="person" color="grey"/>
                       <img round v-else src="~/assets/one_logo_neat.png" color="grey"/>
                     </q-avatar>
                     <q-badge class="q-mr-sm" v-if="member.approved" color="green">Approved</q-badge>
                     <q-badge class="q-mr-sm" v-else color="red"> busy</q-badge>
                     <q-badge class="q-mr-sm" v-if="!member.canEdit" disabled color="warning">view-only</q-badge>
-                    {{member.user.name}}
+                    {{member?.user?.name}}
                   </q-chip>
                 </div>
             </q-card>
@@ -276,7 +276,7 @@
     </div>
     -->
     <!-- <q-dialog seamless position="right" v-model="dialogue">
-        <modal @closeDialogue="dialogue = false" :stage="stage" :inProfile="false" :body="body" />
+      <modal @closeDialogue="dialogue = false" :stage="stage" :inProfile="false" :body="body" />
     </q-dialog> -->
 </q-page>
 <q-page v-else class="flex flex-center text-h4"><q-spinner /></q-page>
@@ -286,83 +286,72 @@ import { ref } from 'vue'
 import { mapActions, mapState } from 'vuex'
 // import AddEditClient from './AddEditClient.vue'
 export default {
+  data() {
+    return {
+      loading: ref(false),
+      dialogue: false,
+      id: '',
+      stageUpCase: this.stage[0].toUpperCase()+this.stage.substr(1, this.stage.length),
+      body: null,
+      options: [],
+      data: []
+   }
+  },
   components: {
       // modal: AddEditClient
   },
   props: ['stage'],
   computed: {
-    ...mapState('socialMediaManagementStore', [stage]),
+    ...mapState('socialMediaManagementStore', ['allPosts','drafts','productions','reviews','completeds','rejecteds']),
     ...mapState('userStore', ['users']),
-    data() {
-      if(this.stage === 'allPosts') {
-        return this.allPosts
-      }
-      if(this.stage === 'drafts') {
-        return this.drafts
-      }
-      if(this.stage === 'productions') {
-        return this.productions
-      }
-      if(this.stage === 'reviews') {
-        return this.reviews
-      }
-      if(this.stage === 'completeds') {
-        return this.completeds
-      }
-      if(this.stage === 'rejecteds') {
-        return this.rejecteds
-      }
-    }
-  },
-  setup() {
-    return {
-      stageUpCase: '',
-      loading: ref(false),
-      dialogue: false,
-      id: '',
-      stage: '',
-      body: null,
-      options: [],
-   }
   },
   methods: {
-    ...mapActions('socialMediaManagementStore',['get'+stageUpCase , 'deletePost']),
+    ...mapActions('socialMediaManagementStore',['getPosts','getDrafts','getProductions','getReviews','getCompleteds','getRejecteds', 'deletePost']),
     ...mapActions('userStore',['getUsers']),
-      editClient(post) {
-        if(this.dialogue === true){
-          this.dialogue = false;
-          setTimeout(() => {
-             this.body = post
-            this.dialogue = true
-          }, 200);
-          return
-        }
-         this.body = post
-        this.dialogue = true
-    },
+    initiateData(dat) {
+      this.data = dat
+    }
   },
   async mounted() {
+    let stageName = this.stage
     this.loading = true
-    if(this.stage === 'allPosts') {
-      await this.getPosts(this.stage);
+      await this.getPosts();
+      await this.initiateData(this.allPosts)
+      this.loading =false
+    return 
+    console.log("stagename: ",stageName)
+    if(stageName === 'allPosts') {
+      await this.getPosts();
+      await this.initiateData(this.allPosts)
+      console.log("state fetched from posts:", this.posts)
+      }
+    if(stageName === 'drafts') {
+      await this.getDrafts();
+      await this.initiateData(this.drafts)
+      console.log("state fetched from drafts:", this.drafts)
+      }
+    if(stageName === 'productions') {
+      await this.getProductions();
+      await this.initiateData(this.productions)
+      console.log("state fetched from productions:", this.productions)
+      }
+    if(stageName === 'reviews') {
+      await this.getReviews();
+      await this.initiateData(this.reviews)
+      console.log("state fetched from reviews:", this.reviews)
+      }
+    if(stageName === 'completeds') {
+      await this.getCompleteds();
+      await this.initiateData(this.completeds)
+      console.log("state fetched from completeds:", this.completeds)
+      }
+    if(stageName === 'rejecteds') {
+      await this.getRejecteds();
+      await this.initiateData(this.rejecteds)
+      console.log("state fetched from rejecteds:", this.rejecteds)
     }
-    if(this.stage === 'drafts') {
-      await this.getDrafts(this.stage);
-    }
-    if(this.stage === 'productions') {
-      await this.getProductions(this.stage);
-    }
-    if(this.stage === 'reviews') {
-      await this.getReviews(this.stage);
-    }
-    if(this.stage === 'completeds') {
-      await this.getCompleteds(this.stage);
-    }
-    if(this.stage === 'rejecteds') {
-      await this.getRejecteds(this.stage);
-    }
+
     this.loading = false
-    this.stageUpCase = stage[0].toUpperCase()+stage.substr(1, stage.length)
   }
 }
 </script>

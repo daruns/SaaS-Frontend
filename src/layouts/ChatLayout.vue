@@ -220,38 +220,36 @@
           </q-item>
         </div> -->
 
-    </q-list>
+            </q-list>
     <!-- </q-scroll-area> -->
-
-      </q-drawer>
+          </q-drawer>
           <q-drawer
-           show-if-above 
-           side="right" 
-           bordered
-           v-model="drawer1"
-          :width="300"
-          :breakpoint="1185"
-          class="bg-grey-1"
-           >
-           <div v-if="chat" class="fit flex items-center justify-start column  bg-grey-1">
-
-             <q-scroll-area v-if="chat.room_type === 'channel'" style="height: 30vh !important; border-bottom: 0.25px solid lightgrey" class="full-width">
-               <div class="q-mt-sm row">
+            show-if-above 
+            side="right" 
+            bordered
+            v-model="drawer1"
+            :width="300"
+            :breakpoint="1185"
+            class="bg-grey-1"
+          >
+          <div v-if="chat" class="fit flex items-center justify-start column  bg-grey-1">
+            <q-scroll-area v-if="chat.room_type === 'channel'" style="height: 30vh !important; border-bottom: 0.25px solid lightgrey" class="full-width">
+              <div class="q-mt-sm row">
                 <div v-for="u in allUsers" :key="u.id">
-               <div style="width:33.33% !important;" class="flex column flex-center q-pr-md q-pl-md q-pb-md q-pt-xs">
-                <q-avatar size="60px">
-                <q-badge rounded :color="u.online ? 'green' : 'grey-5'" class="absolute-bottom-right q-mr-sm"/>
-                <q-btn v-if="roomInfo && user.id === roomInfo.creator_id || u.id === user.id" round size="5px" @click="membToDelete = u.id; cnfrm=true;" icon="close" color="negative" class="absolute-top-right"/>
-                <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
-                </q-avatar>
-                <p class="q-ma-none text-grey">{{u.name}}</p>
-               </div>
-                 </div>
-               </div>
-             </q-scroll-area>
+                  <div style="width:33.33% !important;" class="flex column flex-center q-pr-md q-pl-md q-pb-md q-pt-xs">
+                    <q-avatar size="60px">
+                      <q-badge rounded :color="u.online ? 'green' : 'grey-5'" class="absolute-bottom-right q-mr-sm"/>
+                      <q-btn v-if="roomInfo && user.id === roomInfo.creator_id || u.id === user.id" round size="5px" @click="membToDelete = u.id; cnfrm=true;" icon="close" color="negative" class="absolute-top-right"/>
+                      <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+                    </q-avatar>
+                    <p class="q-ma-none text-grey">{{u.name}}</p>
+                  </div>
+                </div>
+              </div>
+            </q-scroll-area>
             <q-scroll-area style="height: 70vh !important" class="full-width">
               <q-list v-if="roomInfo && roomInfo.room_type === 'channel'" padding>
-               <q-expansion-item
+                <q-expansion-item
                   label="Customize channel"
                 >
                   <q-card class="bg-grey-1">
@@ -277,24 +275,38 @@
                     </q-card-section>
                   </q-card>
                 </q-expansion-item>
-           </q-list>
-           <div class="flex flex-center q-pa-lg" v-else>
-             <div class="full-width" v-for="u in allUsers" :key="u.id">
-             <div v-if="u.id !== user.id && allUsers.length === 2" class="flex column flex-center q-mt-xl">
-                <q-avatar size="60px">
-                <q-badge rounded :color="u.online ? 'green' : 'grey-5'" class="absolute-bottom-right q-mr-sm"/>
-                <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
-                </q-avatar>
-                <p class="text-h6 q-ma-none text-grey">{{u.name}}</p>
-               </div>
-                <div v-if="allUsers.length === 1" class="flex column flex-center q-mt-xl">
-                <q-avatar size="60px">
-                <q-badge rounded :color="u.online ? 'green' : 'grey-5'" class="absolute-bottom-right q-mr-sm"/>
-                <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
-                </q-avatar>
-                <p class="text-h6 q-ma-none text-grey">{{u.name}}</p>
-               </div>
-                <div v-if="u.id !== user.id && allUsers.length === 2" class="q-mt-xl flex column" style="width:100% !important;">
+              </q-list>
+              <div class="flex flex-center q-pa-lg" v-else>
+                <div class="full-width" v-for="u in allUsers" :key="u.id">
+                  <div v-if="u.id !== user.id && allUsers.length === 2" class="flex column flex-center q-mt-xl">
+                    <q-avatar size="60px">
+                      <q-badge rounded :color="u.online ? 'green' : 'grey-5'" class="absolute-bottom-right q-mr-sm"/>
+                      <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+                    </q-avatar>
+                    <p class="text-h6 q-ma-none text-grey">{{u.name}}</p>
+                  </div>
+                  <div v-if="allUsers.length === 1" class="flex column flex-center q-mt-xl">
+                    <q-avatar size="60px">
+                      <q-badge rounded :color="u.online ? 'green' : 'grey-5'" class="absolute-bottom-right q-mr-sm"/>
+                      <img :src="u.avatar ? u.avatar : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'">
+                    </q-avatar>
+                    <p class="text-h6 q-ma-none text-grey">{{u.name}}</p>
+                  </div>
+                  <div v-if="u.id !== user.id && allUsers.length === 2" class="q-mt-xl flex column" style="width:100% !important;">
+                    <div class="flex justify-between">
+                      <p class="text-body1 text-weight-medium">Username:</p>
+                      <p class="text-body1 text-grey text-weight-medium">{{u.username ? u.username : '...'}}</p>
+                    </div>
+                    <div class="flex justify-between">
+                      <p class="text-body1 text-weight-medium">Email:</p>
+                      <p class="text-body1 text-grey text-weight-medium">{{u.email ? u.email : '...'}}</p>
+                    </div>
+                    <div class="flex justify-between">
+                      <p class="text-body1 text-weight-medium">Phone:</p>
+                      <p class="text-body1 text-grey text-weight-medium">{{u.phoneNumber ? u.phoneNumber : '...'}}</p>
+                    </div>
+                  </div>
+                  <div v-if="allUsers.length === 1" class="q-mt-xl flex column" style="width:100% !important;">
                     <div class="flex justify-between">
                         <p class="text-body1 text-weight-medium">Username:</p>
                         <p class="text-body1 text-grey text-weight-medium">{{u.username ? u.username : '...'}}</p>
@@ -307,34 +319,20 @@
                         <p class="text-body1 text-weight-medium">Phone:</p>
                         <p class="text-body1 text-grey text-weight-medium">{{u.phoneNumber ? u.phoneNumber : '...'}}</p>
                     </div>
+                  </div>
                 </div>
-                   <div v-if="allUsers.length === 1" class="q-mt-xl flex column" style="width:100% !important;">
-                    <div class="flex justify-between">
-                        <p class="text-body1 text-weight-medium">Username:</p>
-                        <p class="text-body1 text-grey text-weight-medium">{{u.username ? u.username : '...'}}</p>
-                    </div>
-                    <div class="flex justify-between">
-                        <p class="text-body1 text-weight-medium">Email:</p>
-                        <p class="text-body1 text-grey text-weight-medium">{{u.email ? u.email : '...'}}</p>
-                    </div>
-                    <div class="flex justify-between">
-                        <p class="text-body1 text-weight-medium">Phone:</p>
-                        <p class="text-body1 text-grey text-weight-medium">{{u.phoneNumber ? u.phoneNumber : '...'}}</p>
-                    </div>
-                </div>
-               </div>
-           </div>
-        </q-scroll-area>
-           </div>
-          </q-drawer>
+              </div>
+            </q-scroll-area>
+          </div>
+        </q-drawer>
       <q-page-container v-if="path === '/chat'" style="overflow-y:hidden !important;">
           <conversation :sckt="sckt" />
       </q-page-container>
     </q-layout>
     <q-dialog v-model="cnfrm">
-    <confirm @confirm="deleteMemeber" />
+      <confirm @confirm="deleteMemeber" />
     </q-dialog>
-      <q-dialog v-model="addMembers" persistent>
+    <q-dialog v-model="addMembers" persistent>
       <q-card style="width: 400px !important;">
         <q-card-section class="row items-center">
           <q-avatar icon="group" color="primary" text-color="white" />
@@ -442,40 +440,40 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-          <q-dialog v-model="changeName" persistent>
-            <q-card style="width: 400px !important;">
-              <q-card-section>
-                <q-avatar icon="edit" color="primary" text-color="white" />
-                  <span class="q-ml-sm">Change channel name</span>
-                </q-card-section>
-                <q-card-section>
-                   <q-input v-model="channelName" outlined label="Channel name" />
-                </q-card-section>
-                <q-card-actions align="right">
-                  <q-btn no-caps flat label="Cancel" color="primary" v-close-popup />
-                  <q-btn @click="changeChannelName" no-caps flat label="Submit" color="primary" :disable="!channelName" v-close-popup />
-                </q-card-actions>
-            </q-card>
-          </q-dialog>
-            <q-dialog v-model="changePhoto" persistent>
-            <q-card style="width: 400px !important;">
-              <q-card-section>
-                <q-avatar icon="edit" color="primary" text-color="white" />
-                  <span class="q-ml-sm">Change channel photo</span>
-                </q-card-section>
-                <q-card-section>
-                  <q-file :filter="checkType" @rejected="onRejectedImage" label="Choose photo" outlined v-model="channelPhoto">
-                    <template v-slot:prepend>
-                      <q-icon name="attach_file" />
-                    </template>
-                  </q-file>
-                </q-card-section>
-                <q-card-actions align="right">
-                  <q-btn no-caps flat label="Cancel" color="primary" v-close-popup />
-                  <q-btn @click="changeChannelPhoto" no-caps flat label="Submit" color="primary" :disable="!channelPhoto" v-close-popup />
-                </q-card-actions>
-            </q-card>
-          </q-dialog>
+    <q-dialog v-model="changeName" persistent>
+      <q-card style="width: 400px !important;">
+        <q-card-section>
+          <q-avatar icon="edit" color="primary" text-color="white" />
+            <span class="q-ml-sm">Change channel name</span>
+          </q-card-section>
+          <q-card-section>
+              <q-input v-model="channelName" outlined label="Channel name" />
+          </q-card-section>
+          <q-card-actions align="right">
+            <q-btn no-caps flat label="Cancel" color="primary" v-close-popup />
+            <q-btn @click="changeChannelName" no-caps flat label="Submit" color="primary" :disable="!channelName" v-close-popup />
+          </q-card-actions>
+      </q-card>
+    </q-dialog>
+      <q-dialog v-model="changePhoto" persistent>
+      <q-card style="width: 400px !important;">
+        <q-card-section>
+          <q-avatar icon="edit" color="primary" text-color="white" />
+            <span class="q-ml-sm">Change channel photo</span>
+          </q-card-section>
+          <q-card-section>
+            <q-file :filter="checkType" @rejected="onRejectedImage" label="Choose photo" outlined v-model="channelPhoto">
+              <template v-slot:prepend>
+                <q-icon name="attach_file" />
+              </template>
+            </q-file>
+          </q-card-section>
+          <q-card-actions align="right">
+            <q-btn no-caps flat label="Cancel" color="primary" v-close-popup />
+            <q-btn @click="changeChannelPhoto" no-caps flat label="Submit" color="primary" :disable="!channelPhoto" v-close-popup />
+          </q-card-actions>
+      </q-card>
+    </q-dialog>
 </template>
 
 <script>

@@ -8,6 +8,14 @@
             <q-btn icon="close" flat round dense v-close-popup />
     </q-toolbar>
     <q-card-section class="q-gutter-md scroll">
+        <q-input
+          ref="nameRef"
+          :rules="[val => (val && val.length > 0) || 'This field is required']"
+          outlined
+          v-model="project.name"
+          label="Name"
+          lazy-rules
+        />
        <q-select
         bg-color="white"
         outlined
@@ -50,10 +58,9 @@
             <q-file
               v-model="files"
               label="Pick file"
-              filled
               append
               v-show="actionType !== 'Edit'"
-              
+              outlined              
               use-chips
               clearable
             > 
@@ -69,16 +76,8 @@
             <div class="q-ma-none absolute q-ml-sm text-grey-7" style="z-index:10;font-size:12px;line-height:20px;font-weight:400;">Project deadline</div>
             <Datepicker class="q-mt-sm" v-model="project.plannedEndDate" showNowButton></Datepicker>
             </div>
-        <q-input
-            ref="nameRef"
-            :rules="[val => (val && val.length > 0) || 'This field is required']"
-            outlined
-            v-model="project.name"
-            label="Name"
-            lazy-rules
-        />
         <q-editor             
-      v-model="project.description" :dense="$q.screen.lt.md" :toolbar="[
+      v-model="project.description" :dense="true" :toolbar="[
       [
           {
             label: $q.lang.editor.align,

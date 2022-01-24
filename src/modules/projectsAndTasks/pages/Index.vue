@@ -1,12 +1,12 @@
 <template>
-    <q-page class="q-pa-md">
-     <div class="flex justify-between items-center">
-       <div>
+  <q-page class="q-pa-md">
+    <div class="flex justify-between header-height-standard items-center">
+      <div>
         <p class="text-h4">Projects</p>
-        <breadcrmps :map="crumps" />
-        </div>
-        <q-btn @click="dialogue = true" color="primary" label="Create Record"  unelevated rounded no-caps />
-        </div>
+      </div>
+      <q-btn @click="dialogue = true" color="primary" label="Create Record"  unelevated rounded no-caps />
+    </div>
+    <breadcrmps :map="crumps" />
     <projects />
     <q-dialog seamless position="right" v-model="dialogue">
         <modal @closeDialogue="dialogue = false" actionType="Add"  />

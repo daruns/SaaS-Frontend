@@ -56,7 +56,7 @@
             <Datepicker class="q-mt-sm" v-model="task.plannedEndDate" showNowButton></Datepicker>
             </div>
         <q-editor             
-      v-model="task.description" :dense="$q.screen.lt.md" :toolbar="[
+      v-model="task.description" :dense="true" :toolbar="[
       [
           {
             label: $q.lang.editor.align,

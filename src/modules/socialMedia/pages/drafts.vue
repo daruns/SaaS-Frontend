@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-py-none q-my-none">
-      <div class="full-width flex justify-between items-center q-px-md q-py-md" style="border-bottom: 1px solid lightgrey;">
+      <div class="full-width flex justify-between items-center q-px-md header-height-standard" style="border-bottom: 1px solid lightgrey;">
         <div class="text-h4">Drafts</div>
         <div class="flex items-center">
           <q-btn @click="dialogue = true" color="primary" :label="'Add '+tab[0].toUpperCase()+tab.substr(1, tab.length)" unelevated rounded no-caps />

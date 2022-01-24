@@ -1,12 +1,13 @@
 <template>
-    <q-page class="q-pa-md">
-       <div class="flex justify-between items-center">
-         <div>
-        <p class="text-h4">Quotation</p>
-        <breadcrumps :map="crumps" />
-         </div>
-       <q-btn @click="prompt = true" color="primary" label="Create Record" unelevated rounded no-caps />
-       </div>
+    <q-page class="q-py-none q-my-none">
+    <div class="full-width flex justify-between items-center q-px-md header-height-standard" style="border-bottom: 1px solid lightgrey;">
+      <div class="text-h4">Quotation</div>
+    <div class="flex items-center">
+    <q-btn @click="prompt = true" color="primary" label="Create Record" unelevated rounded no-caps />
+    </div>
+    </div>
+      <breadcrumps class="q-pa-md" :map="crumps" />
+      <div class="q-px-md">
     <q-tabs
         v-model="tab"
         dense
@@ -31,6 +32,7 @@
            <tbl :type="'Rejected'" />
         </q-tab-panel>
       </q-tab-panels>
+    </div>
      <q-dialog seamless position="right" v-model="prompt" persistent>
           <modal @closeDialogue="prompt = false" action="Add" :invoiceType="tab" />
      </q-dialog>

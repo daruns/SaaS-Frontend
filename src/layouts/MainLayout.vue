@@ -9,33 +9,30 @@
         class="full-height bg-white"
         :style="'transform: translateX(' + ((drawer) ? '256px' : '0px') + ') !important'"
       >
-        <div
-          class="full-width text-white q-py-sm bg-primary"
-          style="height: 73px"
-        >
-          <q-item class="text-h6 q-ma-xs flex justify-between">
-            <q-item-section>
-              {{miniState === false ? subSideBar.title : ""}}
-            </q-item-section>
-            <q-item-section class="text-right" >
-              <q-btn
-                @click="openedSideBar();"
-                flat
-                dense
-                :icon="'las la-angle-'+(!miniState ? 'left' : 'right')"
-                class="absolute"
-                style="z-index:50000;right: 0px !important"
-              />
-            </q-item-section>
-          </q-item>
+      <div
+        class="header-height-standard full-width text-white q-py-sm bg-primary"
+      >
+      <q-item class="text-h6 q-ma-xs flex justify-between">
+        <q-item-section>
+          {{miniState === false ? subSideBar.title : ""}}
+        </q-item-section>
+        <q-item-section class="text-right" >
+          <q-btn
+            @click="openedSideBar();"
+            flat
+            dense
+            :icon="'las la-angle-'+(!miniState ? 'left' : 'right')"
+            class="absolute"
+            style="z-index:50000;right: 0px !important"
+          />
+        </q-item-section>
+      </q-item>
         </div>
-
         <q-scroll-area
           @mouseover="miniState = fixedState === false ? false : miniState"
           @mouseout="miniState = fixedState === false ? true : miniState"
-          class="" style="height: calc(100% - 73px); border-right: 1px solid #ddd;"
+          class="header-height-standard-remaining" style="border-right: 1px solid #ddd;"
         >
-        <q-list class="rounded-borders text-black">
           <!-- <q-item
             to='/'
             exact
@@ -46,9 +43,28 @@
             <q-item-section avatar>
               <q-icon name="speed" />
             </q-item-section>
-
             <q-item-section>Dashboard</q-item-section>
           </q-item> -->
+        <q-list :key="mindex" v-for="(mitem,mindex) in subSideBar.itemsArray" v-show="(subSideBar.title === 'Finance')" class="rounded-borders text-black">
+          <q-separator
+            v-if="mitem.name === 'separator'"
+          />
+          <q-item
+            v-else
+            :data-id="mitem"
+            :to="mitem.url "
+            clickable
+            @click="drawer = true"
+            class="text-grey"
+            active-class="my-menu-link"
+          >
+            <q-item-section  avatar>
+              <q-icon :name="mitem.icon" />
+            </q-item-section>
+            <q-item-section >{{mitem.name}}</q-item-section>
+          </q-item>
+        </q-list>
+        <q-list v-if="subSideBar.title !== 'Finance'" class="rounded-borders text-black">
           <q-item
             :v-if="subSideBar.title !== ''"
             v-for="(item,index) in subSideBar.itemsArray"
@@ -60,11 +76,12 @@
             class="text-grey"
             active-class="my-menu-link"
           >
-            <q-item-section avatar>
+            <q-item-section  avatar>
               <q-icon :name="item.icon" />
             </q-item-section>
-            <q-item-section>{{item.name}}</q-item-section>
+            <q-item-section >{{item.name}}</q-item-section>
           </q-item>
+
         </q-list>
         </q-scroll-area>
       </q-drawer>
@@ -80,7 +97,7 @@
         class="bg-white"
       >
 
-        <div class="full-width text-white q-py-sm bg-primary" style="height: 73px">
+        <div class="full-width text-white q-py-sm bg-primary header-height-standard">
           <q-item class="flex text-white justify-between" avatar>
           <img
             alt="oneconnect logo"
@@ -91,7 +108,7 @@
           </q-item>
         </div>
 
-        <q-scroll-area class="" style="height: calc(100% - 73px); border-right: 1px solid #ddd;">
+        <q-scroll-area class="header-height-standard-remaining" style=" border-right: 1px solid #ddd;">
         <q-list class="rounded-borders text-black">
         <!-- <q-item
           to='/'
@@ -221,13 +238,12 @@
         bordered
 
         side="right"
-        class="bg-white"
+        class="right-side-bar-custom-z-index bg-white"
       >
         <q-item
           to='/profile'
           clickable
-          style="height: 73px;"
-          class="full-width text-grey"
+          class="header-height-standard full-width text-grey"
           active-class="my-menu-link"
         >
           <q-item-section avatar>
@@ -240,7 +256,7 @@
             <q-avatar v-else size="40px" font-size="10px" color="grey" text-color="white" icon="person" />
           </q-item-section>
         </q-item>
-        <q-scroll-area class="" style="height: calc(100% - 73px); border-right: 1px solid #ddd;">
+        <q-scroll-area class="header-height-standard-remaining" style="border-right: 1px solid #ddd;">
         <q-list padding class="rounded-borders text-black">
         <!-- <q-item
           to='/'
@@ -420,11 +436,14 @@ export default {
         this.subSideBar.itemsArray = [
           {name: "Invoice", icon: "receipt", url: "/finance/invoice"},
           {name: "Quotation", icon: "request_quote", url: "/finance/quotation"},
-          {name: "Tax", icon: "receipt_long", url: "/finance/taxes"},
-          {name: "Expense categories", icon: "category", url: "/finance/categories"},
+          {name: "separator", icon: "", url: ""},
+          {name: "Expenses", icon: "savings", url: "/finance/expenses"},
+          {name: "separator", icon: "", url: ""},
+          {name: "Products & Services", icon: "category", url: "/finance/accounting"},
           {name: "Suppliers", icon: "badge", url: "/finance/suppliers"},
-          {name: "Payment", icon: "payment", url: "/finance/payment"},
-          {name: "Expenses", icon: "attach_money", url: "/finance/expenses"},
+          {name: "Expense categories", icon: "grid_view", url: "/finance/categories"},
+          {name: "Payment Types", icon: "fas fa-credit-card", url: "/finance/payment"},
+          {name: "Tax Types", icon: "receipt_long", url: "/finance/taxes"},
         ]
         this.$router.push(this.subSideBar.itemsArray[0].url)
         this.drawer = true

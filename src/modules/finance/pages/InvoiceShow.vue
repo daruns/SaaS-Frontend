@@ -1,13 +1,18 @@
 <template>
     <q-page v-if="!isLoaded" class="flex flex-center">
-        <q-spinner  color="primary" size="md" />
+      <q-spinner color="primary" size="md" />
     </q-page>
-    <q-page v-else class="q-pa-xl">
-          <q-card class="q-pa-xl">
+    <q-page v-else class="q-py-none q-my-none">
+    <div class="full-width flex justify-between items-center q-px-md header-height-standard" style="border-bottom: 1px solid lightgrey;">
+      <div class="text-h4">Invoice</div>
+    </div>
+    <breadcrumps class="q-pa-md full-width" :map="crumps" />
+    <div class="q-px-md">
+    <q-card class="q-pa-lg">
         <div class="row justify-between">
         <div class="column col-lg-6 col-md-6 col-sm-12 col-xs-12 q-gutter-lg">
         <q-avatar size="100px" font-size="52px">
-            <img src="~assets/one_logo_neat.png" />
+          <img src="~assets/one_logo_neat.png" />
         </q-avatar>
         <div class="column">
         <p class="text-h6">{{oneInvoice.client.name}}</p>
@@ -89,20 +94,29 @@
          <div class="text-grey q-pa-none">
            <p class="q-mt-md" v-html="oneInvoice.description"></p>
          </div>
-          </q-card>
+    </q-card>
+    </div>
     </q-page>
 </template>
 <script>
+import breadcrumps from 'src/components/globalComponents/BreadCrumps.vue'
 import { mapActions, mapState } from 'vuex'
 export default {
+    components: {
+      breadcrumps
+    },
     data() {
-        return{
-          isLoaded: false,
-          taxRatio: 0,
-          total: 0,
-          discount: 0,
-          stotal: 0
-        }
+      return{
+        isLoaded: false,
+        taxRatio: 0,
+        total: 0,
+        discount: 0,
+        stotal: 0,
+        crumps: [
+          {id:1,name:'OneConnect',icon: 'home',path: '/'},
+          {id:2,name:'Invoice',icon: 'receipt',path: '/finance/invoice'}
+        ],
+      }
     },
     computed : {
         ...mapState('financeStore',['oneInvoice'])

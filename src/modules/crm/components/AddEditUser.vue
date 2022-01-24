@@ -1,7 +1,7 @@
 <template>
 <q-layout style="width: 500px !important;">
-     <q-card style="max-width: 500px; height:56px;" flat square>
-       <q-toolbar class="bg-grey-3" style="position:sticky !important; top:0;z-index:15 !important;">
+     <q-card style="max-width: 500px;min-height:100vh;" flat square>
+        <q-toolbar class="q-pa-md bg-grey-3" style="position:sticky !important; top:0;z-index:15;height: 63px !important;">
             <q-toolbar-title>
                 {{action  + ' '}} User
             </q-toolbar-title>

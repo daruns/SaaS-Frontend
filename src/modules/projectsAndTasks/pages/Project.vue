@@ -1,6 +1,6 @@
 <template>
   <q-page v-if="!loading" class="q-py-none q-my-none">
-    <div class="full-width flex justify-between items-center q-px-md q-py-md" style="border-bottom: 1px solid lightgrey;">
+    <div class="full-width flex justify-between items-center q-px-md  header-height-standard" style="border-bottom: 1px solid lightgrey;">
       <div class="text-h4">{{project.name}}</div>
       <div class="flex items-center">
         <q-btn @click="dialogue = true" color="grey-5" flat icon="edit" round/>
@@ -99,9 +99,9 @@
           </div>
         </div>
         <div class="q-my-sm col-lg-12 col-md-12 col-sm-12 col-xs-12">
-          <q-card class="row q-pa-md">
-            <p class="text-subtitle2 q-mb-none">Deadline</p>
-            <p class="text-grey">{{project.plannedEndDate && project.plannedEndDate.split('T')[0]}}</p>
+          <q-card class="flex items-center row q-pa-md">
+            <div class="text-h6">Deadline:</div>
+            <div class="text-subtitle1 q-px-md">{{project.plannedEndDate && project.plannedEndDate.split('T')[0]}}</div>
             <div class="text-grey col-12 wrapword" v-html="project.description"></div>
           </q-card>
         </div>

@@ -1,7 +1,7 @@
 <template>
 <q-layout style="width: 80vw !important;">
-    <q-card class="bg-secondary" style="max-width: 80vw;" flat square>
-     <q-toolbar class="bg-grey-3" style="position:sticky !important; top:0;z-index:15;">
+    <q-card class="bg-secondary" style="max-width: 80vw; min-height:100vh;" flat square>
+     <q-toolbar class="bg-grey-3 header-height-standard" style="position:sticky !important; top:0;z-index:15;">
             <q-toolbar-title>
                 {{action  + ' '}} Invoice
             </q-toolbar-title>

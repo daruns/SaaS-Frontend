@@ -1,12 +1,13 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="flex justify-between items-center">
-        <div>
-        <p class="text-h4">Category</p>
-        <breadcrumps :map="crumps" />
-        </div>
+  <q-page class="q-py-none q-my-none">
+    <div class="full-width flex justify-between items-center q-px-md header-height-standard" style="border-bottom: 1px solid lightgrey;">
+      <div class="text-h4">Category</div>
+      <div class="flex items-center">
         <q-btn @click="action = 'Add';prompt = true" color="primary" label="Create Record" unelevated rounded no-caps />
+      </div>
     </div>
+    <breadcrumps class="q-pa-md full-width" :map="crumps" />
+    <div class="q-px-md">
     <q-table
       :rows="categories"
       :columns="columns"
@@ -74,6 +75,7 @@
         </q-tr>
       </template>
     </q-table>
+    </div>
     <q-dialog seamless position="right" v-model="prompt" persistent>
         <modal @closeDialogue="prompt = false; getCategories();" :actionType="action" :body="body" />
     </q-dialog>

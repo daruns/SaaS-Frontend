@@ -27,12 +27,6 @@
           <q-td key="phoneNumber1" :props="props">
               {{ props.row.phoneNumber1 }}
           </q-td>
-          <q-td key="phoneNumber2" :props="props">
-              {{ props.row.phoneNumber2 }}
-          </q-td>
-          <q-td key="clientType" :props="props">
-              {{ props.row.clientType }}
-          </q-td>
           <q-td key="businessType" :props="props">
               {{ props.row.businessType }}
           </q-td>
@@ -48,15 +42,14 @@
             <q-td key="rate" :props="props">
               {{ props.row.rate }}
           </q-td>
-         <q-td key="zipCode" :props="props">
+          <q-td key="zipCode" :props="props">
               {{ props.row.zipCode }}
-          </q-td>
-         <q-td key="zipCode" :props="props">
+            </q-td>
+          <q-td class="row flex text-center" key="zipCode" :props="props">
           <q-btn dense round flat icon="more_vert">
             <q-menu
               transition-show="scale"
               transition-hide="scale"
-              
             >
               <q-list style="min-width: 75px">
                 <q-item @click="deleteClient({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
@@ -68,7 +61,10 @@
                 </q-item>
               </q-list>
             </q-menu>
-            </q-btn>
+          </q-btn>
+          <router-link :to="`/client/${props.row.id}`">
+          <q-btn dense text-color="dark" round flat icon="visibility" />
+          </router-link>
           </q-td>
         </q-tr>
       </template>
@@ -132,8 +128,6 @@ export default {
     format: val => `${val}`,
     },
     { name: 'phoneNumber1', align: 'left', label: 'Phone number 1', field: 'phoneNumber1'},
-    { name: 'phoneNumber2', align: 'left', label: 'Phone number 2', field: 'phoneNumber2'},
-    { name: 'clientType', label: 'Client type', align: 'left', field: 'clientType' },
     { name: 'businessType', label: 'Business type', align: 'left', field: 'businessType' },
     { name: 'email', label: 'E-mail', align: 'left', field: 'email' },
     { name: 'website', label: 'Website', align: 'left', field: 'website'},

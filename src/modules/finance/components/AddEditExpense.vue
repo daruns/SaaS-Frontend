@@ -1,7 +1,7 @@
 <template>
 <q-layout style="width: 80vw !important;">
-    <q-card class="bg-secondary" style="max-width: 80vw;" flat square>
-     <q-toolbar class="bg-grey-3" style="position:sticky !important; top:0;z-index:15;">
+    <q-card class="bg-secondary" style="max-width: 80vw; min-height:100vh;" flat square>
+     <q-toolbar class="bg-grey-3 header-height-standard" style="position:sticky !important; top:0;z-index:15;">
             <q-toolbar-title>
                 {{action  + ' '}} Expense
             </q-toolbar-title>
@@ -208,7 +208,7 @@
        <div class="q-pa-sm">
    <q-editor             
       v-model="invoice.description" 
-      :dense="$q.screen.lt.md"
+      :dense="true"
       :toolbar="[
         [
           {
@@ -311,249 +311,254 @@ import Datepicker from 'vue3-date-time-picker';
 import 'vue3-date-time-picker/dist/main.css'
 export default {
   props: ['action','body','invoiceType'],
-    data() {
-        return {
-            file: null,
-            close: false,
-            isLoaded: false,
-            loading: false,
-            prompt: false,
-            dialogue: false,
-            id: null,
-            subtotal: 0,
-            total: 0,
-            options: [],
-            options0: [],
-            options1: [],
-            taxOptions: [],
-            paymentOptions: [],
-            itemOptions: [],
-            tax: null,
-            paymentMethod: null,
-            clientEMAIL: '',
-            supplier: null,
-            otherInfo: '',
-            invoice : {
-                supplierId: null,
-                date: '',
-                exchangeRate: null,
-                discount: null,
-                billingAddress: '',
-                currencyCode: '',
-                status: 'Sent',
-                paymentMethodId: null,
-                taxId: null,
-                dueDate: '',
-                category: null,
-                description: 'Description',
-                items:[]
-            }
-        }
-    },
-    computed : {
-      ...mapState('financeStore', ['suppliers','joinedCategories', 'taxes','paymentMethods']),
-      ...mapState('accountingStore', ['joinedItems'])
-    },
-    components: {
+  data() {
+    return {
+      file: null,
+      close: false,
+      isLoaded: false,
+      loading: false,
+      prompt: false,
+      dialogue: false,
+      id: null,
+      subtotal: 0,
+      total: 0,
+      options: [],
+      options0: [],
+      options1: [],
+      taxOptions: [],
+      paymentOptions: [],
+      itemOptions: [],
+      tax: null,
+      paymentMethod: null,
+      clientEMAIL: '',
+      supplier: null,
+      otherInfo: '',
+      invoice : {
+        supplierId: null,
+        date: '',
+        exchangeRate: null,
+        discount: null,
+        billingAddress: '',
+        currencyCode: '',
+        status: 'Sent',
+        paymentMethodId: null,
+        taxId: null,
+        dueDate: '',
+        category: null,
+        description: 'Description',
+        items:[]
+      }
+    }
+  },
+  computed : {
+    ...mapState('financeStore', ['suppliers','joinedCategories', 'taxes','paymentMethods']),
+    ...mapState('accountingStore', ['joinedItems'])
+  },
+  components: {
     modal,
     modalc,
     Datepicker
-    },
-    methods: {
-     async findTotal() {
-          this.total = 0;      
-           for(let i = 0; i < this.invoice.items.length; i++) {  
-              this.total += this.invoice.items[i].amount
-           }
-           if(this.tax) {
-             this.total = this.total + (this.total * Number(this.tax.rate)) - ((this.invoice.discount/100)*this.total);
-           }
-           this.subtotal = this.total
-      },
-    async retrievSubCategs(id, isImmediate) {
-        this.options0 = []
-        this.clientContacts = []
-        this.clientEMAIL = ''
-      },
-     async updateValues() {
-       setTimeout(async () => {
-           await this.findTotal();
-       }, 100);
-
-      },
-     async evaluate(i) {
-
-     setTimeout(() => {
-       if(Number(this.invoice.items[i].qty) === 0 && this.invoice.items[i].category !== 'inventoryItem'){
-         this.invoice.items[i].amount = Number(this.invoice.items[i].unitPrice) * 1;
-       }else{
+  },
+  methods: {
+    async findTotal() {
+    this.total = 0;      
+    for(let i = 0; i < this.invoice.items.length; i++) {  
+      this.total += this.invoice.items[i].amount
+    }
+    if(this.tax) {
+      this.total = this.total + (this.total * Number(this.tax.rate)) - ((this.invoice.discount/100)*this.total);
+    }
+    this.subtotal = this.total
+  },
+  async retrievSubCategs(id, isImmediate) {
+    this.options0 = []
+    this.clientContacts = []
+    this.clientEMAIL = ''
+  },
+  async updateValues() {
+    setTimeout(async () => {
+      await this.findTotal();
+    }, 100);
+  },
+  async evaluate(i) {
+    setTimeout(() => {
+      if(Number(this.invoice.items[i].qty) === 0 && this.invoice.items[i].category !== 'inventoryItem'){
+        this.invoice.items[i].amount = Number(this.invoice.items[i].unitPrice) * 1;
+      }else{
         this.invoice.items[i].amount = Number(this.invoice.items[i].unitPrice) * Number(this.invoice.items[i].qty);
-       }
-        this.updateValues();
-        }, 100);
-      },
-        ...mapActions('financeStore',['addExpense', 'editExpense', 'deleteInvoice','getSuppliers','getJoinedCategories','getPaymentMethods','getTaxes']),
-        ...mapActions('accountingStore',['getJoinedItems']),
-       async submit() {
-            this.$refs.supRef.validate();
-            this.$refs.taxRef.validate();
-            this.$refs.paymentRef.validate();
-            this.$refs.categRef.validate();
-            // this.$refs.invoiceDRef.validate();
-            // this.$refs.invoiceDDRef.validate();
-            this.$refs.statusRef.validate();
-            this.$refs.currencyRef.validate();
-            // this.$refs.exchangeRef.validate();
-            // this.$refs.discountRef.validate();
-            if(
-            this.$refs.supRef.hasError ||
-            this.$refs.taxRef.hasError ||
-            this.$refs.billingRef.hasError ||
-            this.$refs.paymentRef.hasError ||
+      }
+      this.updateValues();
+    }, 100);
+  },
+  ...mapActions('financeStore',['addExpense', 'editExpense', 'deleteInvoice','getSuppliers','getJoinedCategories','getPaymentMethods','getTaxes']),
+  ...mapActions('accountingStore',['getJoinedItems']),
+  async submit() {
+    this.$refs.supRef.validate();
+    this.$refs.taxRef.validate();
+    this.$refs.paymentRef.validate();
+    this.$refs.categRef.validate();
+    // this.$refs.invoiceDRef.validate();
+    // this.$refs.invoiceDDRef.validate();
+    this.$refs.statusRef.validate();
+    this.$refs.currencyRef.validate();
+    // this.$refs.exchangeRef.validate();
+    // this.$refs.discountRef.validate();
+    if (
+      this.$refs.supRef.hasError ||
+      this.$refs.taxRef.hasError ||
+      this.$refs.billingRef.hasError ||
+      this.$refs.paymentRef.hasError ||
 
-            this.$refs.statusRef.hasError ||
-            this.$refs.currencyRef.hasError ||
-            this.$refs.categRef.hasError 
-            // this.$refs.exchangeRef.hasError
-            // this.$refs.discountRef.hasError 
-            )
-            return
+      this.$refs.statusRef.hasError ||
+      this.$refs.currencyRef.hasError ||
+      this.$refs.categRef.hasError 
+      // this.$refs.exchangeRef.hasError
+      // this.$refs.discountRef.hasError 
+    )
+    return
 
-            if(this.invoice.items[0].label === '') {
-              alert('Please choose at least one item !');
-              return
-            }
+    if (this.invoice.items[0].label === '') {
+      alert('Please choose at least one item !');
+      return
+    }
 
-            this.close = true
-            this.invoice.discount = Number(this.invoice.discount) / 100
-            this.invoice.supplierId = Number(this.supplier.id)
-            this.invoice.taxId = Number(this.tax.id)
-            this.invoice.paymentMethodId = Number(this.paymentMethod.id);
-            for(let i = 0; i<this.invoice.items.length; i++) {
-                    // if(this.invoice.items[i].category === 'main') {
-                      this.invoice.items[i] = {
-                        itemId: this.invoice.items[i].itemId,
-                        name: this.invoice.items[i].label,
-                        qty: this.invoice.items[i].category === 'inventoryItem' ? Number(this.invoice.items[i].qty) : 1,
-                        unitPrice: Number(this.invoice.items[i].unitPrice),
-                        // category: this.invoice.category.category === 'main',
-                        description : this.invoice.items[i].description
-                      }
-                //     }else {
-                // this.invoice.items[i] = {
-                //     itemId: this.invoice.items[i].itemId,
-                //     name: this.invoice.items[i].label,
-                //     qty: Number(this.invoice.items[i].qty),
-                //     unitPrice: Number(this.invoice.items[i].unitPrice),
-                //     category: false,
-                //     description : this.invoice.items[i].description,
-                //     }
-                //     }
-            }
-                 this.invoice.discount = Number(this.invoice.discount);
-                 this.invoice.exchangeRate = Number(this.invoice.exchangeRate);
-                 this.invoice.date = date.formatDate(new Date(this.invoice.date), 'YYYY-MM-DD HH:mm');
-                 this.invoice.dueDate = date.formatDate(new Date(this.invoice.dueDate), 'YYYY-MM-DD HH:mm');
-                if(this.action === 'Edit'){
-                  await this.editExpense({invoice: {...this.invoice, id: this.body.id}, file: this.file })
-                }else{
-               await this.addExpense({invoice: this.invoice,file: this.file});
-                }
-        },
-        async delInvoice(id) {
-          this.deleteInvoice(id);
-        },
-        updateOptions() {
-        this.options1.length = 0;
-        this.itemOptions.length = 0;
-        for(let i  = 0; i<this.joinedCategories.length; i++) {
-          this.options1.push(this.joinedCategories[i].name)
-        }
-        for(let i  = 0; i<this.joinedItems.length; i++) {
-          this.itemOptions.push({label: this.joinedItems[i].name, itemId: this.joinedItems[i].id, category: this.joinedItems[i].category, description:this.joinedItems[i].description, qty: 0, unitPrice: 0, amount:0})
-        }
-        
-        for(let i  = 0; i<this.taxes.length; i++) {
-          this.taxOptions.push({label: this.taxes[i].name, id: this.taxes[i].id, rate: Number(this.taxes[i].rate)});
-        }
-        
-        for(let i  = 0; i<this.paymentMethods.length; i++) {
-          this.paymentOptions.push({label: this.paymentMethods[i].name, id: this.paymentMethods[i].id})
-        }
-
-        for(let i  = 0; i<this.suppliers.length; i++) {
-          this.options.push({label: this.suppliers[i].name, id: this.suppliers[i].id})
-        }
-        this.invoice.items.push({label: '', itemId: null, category: '', qty: 1, unitPrice:0, amount: 0, description: ''});
-        },
-     updateClients() {
-       this.options = [];
-          for(let i  = 0; i<this.suppliers.length; i++) {
-              this.options.push({label: this.suppliers[i].name, id: this.suppliers[i].id})
-            }
-        },
-       async updateContacts(){
-          await this.getClients();
-          await this.retrievClientContacts(Number(this.client.id), true);
-        },
-     dateConversion(dt) {
-        let dtObj = new Date(dt);
-        dtObj.setHours(dtObj.getHours() - 3)
-        return date.formatDate(dtObj, 'YYYY-MM-DD HH:mm');
-    },
-    },
-   async mounted() {
-       this.isLoaded = true
-       await this.getJoinedCategories();
-       await this.getPaymentMethods();
-       await this.getTaxes();
-       await this.getJoinedItems();
-       await this.getSuppliers();
-       this.updateOptions();
-
-
+    this.close = true
+    this.invoice.discount = Number(this.invoice.discount) / 100
+    this.invoice.supplierId = Number(this.supplier.id)
+    this.invoice.taxId = Number(this.tax.id)
+    this.invoice.paymentMethodId = Number(this.paymentMethod.id);
+    for(let i = 0; i<this.invoice.items.length; i++) {
+      // if(this.invoice.items[i].category === 'main') {
+      this.invoice.items[i] = {
+        itemId: this.invoice.items[i].itemId,
+        name: this.invoice.items[i].label,
+        qty: this.invoice.items[i].category === 'inventoryItem' ? Number(this.invoice.items[i].qty) : 1,
+        unitPrice: Number(this.invoice.items[i].unitPrice),
+        // category: this.invoice.category.category === 'main',
+        description : this.invoice.items[i].description
+      }
+      //   }else {
+      //     this.invoice.items[i] = {
+      //     itemId: this.invoice.items[i].itemId,
+      //     name: this.invoice.items[i].label,
+      //     qty: Number(this.invoice.items[i].qty),
+      //     unitPrice: Number(this.invoice.items[i].unitPrice),
+      //     category: false,
+      //     description : this.invoice.items[i].description,
+      //   }
+      // }
+    }
+    this.invoice.discount = Number(this.invoice.discount);
+    this.invoice.exchangeRate = Number(this.invoice.exchangeRate);
+    this.invoice.date = date.formatDate(new Date(this.invoice.date), 'YYYY-MM-DD HH:mm');
+    this.invoice.dueDate = date.formatDate(new Date(this.invoice.dueDate), 'YYYY-MM-DD HH:mm');
     if(this.action === 'Edit'){
-     this.invoice.supplierId = this.body.supplier.id,
-     this.invoice.date = this.dateConversion(this.body.date);
-     this.invoice.dueDate = this.dateConversion(this.body.dueDate);
-     this.invoice.billingAddress = this.body.billingAddress
-     this.invoice.paymentMethod = this.body.paymentMethod
-     this.invoice.category = this.body.category
-     this.invoice.description = this.body.description
-     this.invoice.currencyCode = this.body.currencyCode
-     this.invoice.status = this.body.status
-     this.invoice.exchangeRate = Number(this.body.exchangeRate) * 100
-     this.invoice.discount = Number(this.body.discount) * 100
-     this.supplier = {label: this.body.supplier.name, id: this.body.supplier.id}
-     this.invoice.tax = this.body.tax.id
-     this.invoice.paymentMethod = this.body.paymentMethod.id
-     this.paymentMethod = {id:this.body.paymentMethod.id, label:this.body.paymentMethod.name}
-     this.tax = {id:this.body.tax.id, label:this.body.tax.name, rate:this.body.tax.rate}
-     await this.updateValues();
+      await this.editExpense({invoice: {...this.invoice, id: this.body.id}, file: this.file })
+    }else{
+      await this.addExpense({invoice: this.invoice,file: this.file});
+    }
+    this.close = true
+  },
+  async delInvoice(id) {
+    this.deleteInvoice(id);
+  },
+  updateOptions() {
+    this.options1.length = 0;
+    this.itemOptions.length = 0;
+    this.options1 = [];
+    this.itemOptions =[];
+    this.taxOptions = []
+    this.taxes = []
+    this.paymentOptions = []
+    this.paymentMethods = []
+    this.options = []
+    this.paymentMethods = []
+    this.joinedCategories.forEach(e => {
+      this.options1.push(e.name)
+    })
+    this.joinedItems.forEach(e => {
+      this.itemOptions.push({label: e.name, itemId: e.id, category: e.category, description:e.description, qty: 0, unitPrice: 0, amount:0})
+    })
+
+    this.taxes.forEach(e => {
+      this.taxOptions.push({label: e.name, id: e.id, rate: Number(e.rate)});
+    })
+
+    this.paymentMethods.forEach(e => {
+      this.paymentOptions.push({label: e.name, id: e.id})
+    })
+
+    this.suppliers.forEach(e => {
+      this.options.push({label: e.name, id: e.id})
+    })
+    this.invoice.items.push({label: '', itemId: null, category: '', qty: 1, unitPrice:0, amount: 0, description: ''});
+  },
+  updateClients() {
+    this.options = [];
+      this.suppliers.forEach(e => {
+        this.options.push({label: e.name, id: e.id})
+      })
+    },
+    async updateContacts(){
+      await this.getClients();
+      await this.retrievClientContacts(Number(this.client.id), true);
+    },
+    dateConversion(dt) {
+      let dtObj = new Date(dt);
+      dtObj.setHours(dtObj.getHours() - 3)
+      return date.formatDate(dtObj, 'YYYY-MM-DD HH:mm');
+    },
+  },
+  async mounted() {
+    this.isLoaded = true
+    await this.getJoinedCategories();
+    await this.getPaymentMethods();
+    await this.getTaxes();
+    await this.getJoinedItems();
+    await this.getSuppliers();
+    this.updateOptions();
+    if(this.action === 'Edit'){
+      this.invoice.supplierId = this.body.supplier.id,
+      this.invoice.date = this.dateConversion(this.body.date);
+      this.invoice.dueDate = this.dateConversion(this.body.dueDate);
+      this.invoice.billingAddress = this.body.billingAddress
+      this.invoice.paymentMethod = this.body.paymentMethod
+      this.invoice.category = this.body.category
+      this.invoice.description = this.body.description
+      this.invoice.currencyCode = this.body.currencyCode
+      this.invoice.status = this.body.status
+      this.invoice.exchangeRate = Number(this.body.exchangeRate) * 100
+      this.invoice.discount = Number(this.body.discount) * 100
+      this.supplier = {label: this.body.supplier.name, id: this.body.supplier.id}
+      this.invoice.tax = this.body.tax.id
+      this.invoice.paymentMethod = this.body.paymentMethod.id
+      this.paymentMethod = {id:this.body.paymentMethod.id, label:this.body.paymentMethod.name}
+      this.tax = {id:this.body.tax.id, label:this.body.tax.name, rate:this.body.tax.rate}
+      await this.updateValues();
 
       for(let i = 0 ; i<this.body.expenseItems.length; i++){
-          this.invoice.items[i].itemId = this.body.expenseItems[i].itemId,
-          this.invoice.items[i].qty = Number(this.body.expenseItems[i].qty),
-          this.invoice.items[i].category = this.body.expenseItems[i].category,
-          this.invoice.items[i].label = this.body.expenseItems[i].name,
-          this.invoice.items[i].unitPrice = Number(this.body.expenseItems[i].unitPrice),
-          this.invoice.items[i].amount = this.invoice.items[i].qty * this.invoice.items[i].unitPrice
-          this.invoice.items[i].description = this.body.expenseItems[i].description
-          if(i+1 !== this.body.expenseItems.length)
-          this.invoice.items.push({
-                  itemId: null,
-                  qty: null,
-                  category: '',
-                  label: '',
-                  unitPrice: null,
-                  amount: 0
-          })
+        this.invoice.items[i].itemId = this.body.expenseItems[i].itemId,
+        this.invoice.items[i].qty = Number(this.body.expenseItems[i].qty),
+        this.invoice.items[i].category = this.body.expenseItems[i].category,
+        this.invoice.items[i].label = this.body.expenseItems[i].name,
+        this.invoice.items[i].unitPrice = Number(this.body.expenseItems[i].unitPrice),
+        this.invoice.items[i].amount = this.invoice.items[i].qty * this.invoice.items[i].unitPrice
+        this.invoice.items[i].description = this.body.expenseItems[i].description
+        if(i+1 !== this.body.expenseItems.length)
+        this.invoice.items.push({
+          itemId: null,
+          qty: null,
+          category: '',
+          label: '',
+          unitPrice: null,
+          amount: 0
+        })
       }
-     }else{
-        this.invoice.date = date.formatDate(new Date, 'YYYY-MM-DD HH:mm');
-        this.invoice.dueDate = date.formatDate(new Date, 'YYYY-MM-DD HH:mm');
-     }
-        this.isLoaded = false;
+    }else{
+      this.invoice.date = date.formatDate(new Date, 'YYYY-MM-DD HH:mm');
+      this.invoice.dueDate = date.formatDate(new Date, 'YYYY-MM-DD HH:mm');
     }
+    this.isLoaded = false;
+  }
 }
 </script>

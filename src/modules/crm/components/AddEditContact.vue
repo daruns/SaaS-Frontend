@@ -1,23 +1,52 @@
 <template>
-<q-layout style="width: 500px !important;">
-     <q-card style="max-width: 500px; height:56px;" flat square>
-       <q-toolbar class="bg-grey-3" style="position:sticky !important; top:0;z-index:15 !important;">
-            <q-toolbar-title>
-                {{actionType  + ' '}}Contact
-            </q-toolbar-title>
-            <q-btn icon="close" flat round dense v-close-popup />
-    </q-toolbar>
-    <q-card-section class="q-gutter-sm scroll">
-                <q-input
-            ref="nameRef"
+  <q-layout style="width: 500px !important;">
+    <q-card style="max-width: 500px;min-height:100vh;" flat square>
+      <q-toolbar class="q-pa-md bg-grey-3" style="position:sticky !important; top:0;z-index:15;height: 63px !important;">
+        <q-toolbar-title>
+          {{actionType  + ' '}}Contact
+        </q-toolbar-title>
+        <q-btn icon="close" flat round dense v-close-popup />
+      </q-toolbar>
+      <q-card-section class="q-gutter-sm scroll">
+        <q-input
+
+          ref="nameRef"
+          outlined
+          v-model="contact.name"
+          label="Name"
+          lazy-rules
+          :rules="[val => (val && val.length > 0) || 'Please write the name']"
+        />
+        <vue-tel-input required @country-changed="countryChange1" class="phone-input q-mt-lg" defaultCountry="iq" @on-input="valid1" @input="phoneValidate1" v-model="phone1"></vue-tel-input>
+        <vue-tel-input required @country-changed="countryChange2" class="phone-input q-mt-lg" defaultCountry="iq" @on-input="valid2" @input="phoneValidate2" v-model="phone2"></vue-tel-input>
+
+        <!-- <phone required defaultCountry="iq" searchText="Search" label="Phone number 2" @input="phoneValidate2" :error="error2" :rules="[val => (val && val.length > 0) || 'Please write your 2nd phone number']" v-model:tel="contact.businessPhoneNumber2" dense outlined /> -->
+
+        <q-input
+        class="q-mt-lg"
+            ref="emailRef"
             outlined
-            v-model="contact.name"
-            label="Name"
+            type="email"
+            v-model="contact.email"
+            label="E-mail"
             lazy-rules
-            :rules="[val => (val && val.length > 0) || 'Please write the name']"
+            :rules="[val => (val && val.length > 0) || 'Please type your E-mail']"
+        />
+        <q-input
+            outlined
+            v-model="contact.position"
+            label="Position"
             />
-   <q-editor             
-      v-model="contact.description" :dense="$q.screen.lt.md" :toolbar="[
+         <q-input
+            ref="deptRef"
+            outlined
+            v-model="contact.department"
+            label="Department"
+            lazy-rules
+            :rules="[val => (val && val.length > 0) || 'Please write the department']"
+            />
+               <q-editor
+      v-model="contact.description" dense :toolbar="[
       [
           {
             label: $q.lang.editor.align,
@@ -96,37 +125,6 @@
         verdana: 'Verdana'
       }"
     />
-        <vue-tel-input required @country-changed="countryChange1" class="phone-input q-mt-lg" defaultCountry="iq" @on-input="valid1" @input="phoneValidate1" v-model="phone1"></vue-tel-input>
-        <vue-tel-input required @country-changed="countryChange2" class="phone-input q-mt-lg" defaultCountry="iq" @on-input="valid2" @input="phoneValidate2" v-model="phone2"></vue-tel-input>
-
-        <!-- <phone required defaultCountry="iq" searchText="Search" label="Phone number 2" @input="phoneValidate2" :error="error2" :rules="[val => (val && val.length > 0) || 'Please write your 2nd phone number']" v-model:tel="contact.businessPhoneNumber2" dense outlined /> -->
-        
-        <q-input
-        class="q-mt-lg"
-            ref="emailRef"
-            outlined
-            type="email"
-            v-model="contact.email"
-            label="E-mail"
-            lazy-rules
-            :rules="[val => (val && val.length > 0) || 'Please type your E-mail']"
-        />
-        <q-input
-            ref="posRef"
-            outlined
-            v-model="contact.position"
-            label="Position"
-            lazy-rules
-            :rules="[val => (val && val.length > 0) || 'Please write the position']"
-            />
-         <q-input
-            ref="deptRef"
-            outlined
-            v-model="contact.department"
-            label="Department"
-            lazy-rules
-            :rules="[val => (val && val.length > 0) || 'Please write the department']"
-            />
     </q-card-section>
     </q-card>
           <q-toolbar class="bg-grey-3 submitBtnClass" style="position:sticky !important; bottom:0;z-index:5;">
@@ -215,13 +213,9 @@ export default {
     async submit() {
             this.$refs.nameRef.validate();
             this.$refs.emailRef.validate();
-            this.$refs.posRef.validate();
-            this.$refs.deptRef.validate();
             if(
             this.$refs.nameRef.hasError ||
-            this.$refs.emailRef.hasError ||
-            this.$refs.posRef.hasError ||
-            this.$refs.deptRef.hasError
+            this.$refs.emailRef.hasError
             ){
             return
             }
@@ -244,7 +238,9 @@ export default {
       let response = await axios.post(process.env.OC_BACKEND_API + 'clientContacts/create', 
       {...this.contact, clientId: Number(this.clientId)}, 
       {headers: {Authorization: localStorage.getItem('accessToken')}})
-      this.loading = false
+      .catch((err) => {
+        this.loading = false
+      })
        await this.$emit('updateForInvoice');
           this.$q.notify({
               type: 'positive',

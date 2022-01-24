@@ -149,6 +149,7 @@
     </q-page>
 </template>
 <script>
+const socket = new WebSocket(process.env.CHAT_END_SOCKET);
 import breadcrmps from '../../../components/globalComponents/BreadCrumps.vue';
 import { date } from 'quasar'
 import { mapState, mapActions } from 'vuex';
@@ -163,7 +164,7 @@ export default {
             isTyping: false,
             avatar: null,
             room_id: null,
-            socket: this.sckt
+            socket: socket,
         }
     },
     components : {

@@ -2,7 +2,11 @@
     <q-page v-if="!isLoaded" class="flex flex-center">
         <q-spinner  color="primary" size="md" />
     </q-page>
-    <q-page v-else class="q-pa-xl">
+    <q-page v-else class="q-py-none q-my-none">
+    <div class="full-width flex justify-between items-center q-px-md header-height-standard" style="border-bottom: 1px solid lightgrey;">
+      <div class="text-h4">Quotation</div>
+    </div>
+      <div class="q-pa-md">
           <q-card class="q-pa-xl">
         <div class="row justify-between">
         <div class="column col-lg-6 col-md-6 col-sm-12 col-xs-12 q-gutter-lg">
@@ -90,6 +94,7 @@
            <p class="q-mt-md" v-html="oneQuote.description"></p>
          </div>
           </q-card>
+      </div>
     </q-page>
 </template>
 <script>

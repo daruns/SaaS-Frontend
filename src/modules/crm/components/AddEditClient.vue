@@ -1,75 +1,75 @@
 <template>
 <q-layout style="width: 500px !important;">
-     <q-card style="max-width: 500px; height:56px;" flat square>
-       <q-toolbar class="bg-grey-3" style="position:sticky !important; top:0;z-index:15 !important;">
+  <q-card style="max-width: 500px;min-height:100vh;" flat square>
+    <q-toolbar class="q-pa-md bg-grey-3" style="position:sticky !important; top:0;z-index:15;height: 63px !important;">
       <q-toolbar-title>
         {{actionType}} {{type[0].toUpperCase()+type.substr(1, type.length)}}
       </q-toolbar-title>
       <q-btn icon="close" flat round dense v-close-popup />
     </q-toolbar>
-        <q-card-section class="q-gutter-sm scroll">
-            <q-input
-            ref="companyRef"
-            outlined
-            v-model="credentials.name"
-            label="Company"
-            lazy-rules
-            :rules="[val => (val && val.length > 0) || 'Please type the company name']"
-          />
-           <q-file
-                v-model="credentials.logo"
-                clearable 
-                outlined
-                label="Client logo"
-                filled
-                class="q-pb-md"
-            >
-             <template v-slot:prepend>
-                  <q-icon name="attach_file" accept=".jpg, image/*" />
-                </template> 
-           </q-file>
-                <q-btn-toggle
-                v-model="credentials.businessType"
-                class="my-custom-toggle"
-                no-caps
-                rounded
-                toggle-color="primary"
-                color="white"
-                text-color="primary"
-                :options="[
-                {label: 'Company', value: 'Company'},
-                {label: 'Individual', value: 'Individual'}
-                ]"
-            />
-           <q-btn-toggle
-                v-if="actionType === 'Edit'"
-                v-model="credentials.clientType"
-                class="my-custom-toggle"
-                no-caps
-                rounded
-                toggle-color="primary"
-                color="white"
-                text-color="primary"
-                :options="[
-                {label: 'Client', value: 'client'},
-                {label: 'Lead', value: 'lead'},
-                {label: 'Blacklist', value: 'blacklist'},
-                ]"
-            />
-            <vue-tel-input required @country-changed="countryChange" class="phone-input q-mt-lg" defaultCountry="iq" :customValidate="false" @on-input="valid" @input="phoneValidate" v-model="phone"></vue-tel-input>
-        <q-input
+    <q-card-section class="q-gutter-sm scroll">
+      <q-input
+        ref="companyRef"
+        outlined
+        v-model="credentials.name"
+        label="Company"
+        lazy-rules
+        :rules="[val => (val && val.length > 0) || 'Please type the company name']"
+      />
+      <q-file
+        v-model="credentials.logo"
+        clearable 
+        outlined
+        label="Client logo"
+        filled
+        class="q-pb-md"
+      >
+        <template v-slot:prepend>
+          <q-icon name="attach_file" accept=".jpg, image/*" />
+        </template> 
+      </q-file>
+      <q-btn-toggle
+        v-model="credentials.businessType"
+        class="my-custom-toggle"
+        no-caps
+        rounded
+        toggle-color="primary"
+        color="white"
+        text-color="primary"
+        :options="[
+        {label: 'Company', value: 'Company'},
+        {label: 'Individual', value: 'Individual'}
+        ]"
+      />
+      <q-btn-toggle
+        v-if="actionType === 'Edit'"
+        v-model="credentials.clientType"
+        class="my-custom-toggle"
+        no-caps
+        rounded
+        toggle-color="primary"
+        color="white"
+        text-color="primary"
+        :options="[
+        {label: 'Client', value: 'client'},
+        {label: 'Lead', value: 'lead'},
+        {label: 'Blacklist', value: 'blacklist'},
+        ]"
+      />
+      <vue-tel-input required @country-changed="countryChange" class="phone-input q-mt-lg" defaultCountry="iq" :customValidate="false" @on-input="valid" @input="phoneValidate" v-model="phone"></vue-tel-input>
+      <q-input
         class="q-mt-lg"
-          ref="emailRef"
-          outlined
-          type="email"
-          v-model="credentials.email"
-          label="E-mail"
-          lazy-rules
-          :rules="[val => (val && val.length > 0) || 'Please type a valid E-mail']"
-        />
-        <div class="flex items-center">
+        ref="emailRef"
+        outlined
+        type="email"
+        v-model="credentials.email"
+        label="E-mail"
+        lazy-rules
+        :rules="[val => (val && val.length > 0) || 'Please type a valid E-mail']"
+      />
+      <div class="flex items-center">
         <p style="padding:0 !important; font-size:1rem;">Rate: </p>
-         <q-rating
+          <q-rating
             v-model="credentials.rate"
             size="2em"
             class="q-mb-md q-ml-sm"
@@ -77,30 +77,30 @@
             color="primary"
           />
         </div>
-       <q-input
-            outlined
-            v-model="credentials.website"
-            label="Website"
-            lazy-rules
-          />
-          <q-input
-            outlined
-            v-model="credentials.address"
-            label="Address"
-            lazy-rules
-          />
-         <q-input
-            outlined
-            v-model="credentials.zipCode"
-            label="Zipcode"
-            lazy-rules
-          />
-        </q-card-section>
-      </q-card>
-      <q-toolbar class="bg-grey-3 submitBtnClass" style="position:sticky !important; bottom:0;z-index:5;">
-        <q-btn :loading="loading" @click="submit" class="full-width" color="primary" label="Submit" no-caps />
+        <q-input
+          outlined
+          v-model="credentials.website"
+          label="Website"
+          lazy-rules
+        />
+        <q-input
+          outlined
+          v-model="credentials.address"
+          label="Address"
+          lazy-rules
+        />
+        <q-input
+          outlined
+          v-model="credentials.zipCode"
+          label="Zipcode"
+          lazy-rules
+        />
+      </q-card-section>
+    </q-card>
+    <q-toolbar class="bg-grey-3 submitBtnClass" style="position:sticky !important; bottom:0;z-index:5;">
+      <q-btn :loading="loading" @click="submit" class="full-width" color="primary" label="Submit" no-caps />
     </q-toolbar>
-</q-layout>
+  </q-layout>
 </template>
 <script>
 import { mapActions } from 'vuex'

@@ -1,12 +1,13 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="flex justify-between items-center">
-        <div>
-        <p class="text-h4">Tax</p>
-        <breadcrumps :map="crumps" />
-        </div>
-        <q-btn @click="actionType = 'Add';dialogue = true" color="primary" label="Create Record" unelevated rounded no-caps />
+  <q-page class="q-py-none q-my-none">
+  <div class="full-width flex justify-between items-center q-px-md header-height-standard" style="border-bottom: 1px solid lightgrey;">
+    <div class="text-h4">Tax Types</div>
+    <div class="flex items-center">
+      <q-btn @click="actionType = 'Add';dialogue = true" color="primary" label="Create Record" unelevated rounded no-caps />
     </div>
+  </div>
+  <breadcrumps class="q-pa-md" :map="crumps" />
+  <div class="q-px-md">
     <q-table
       :rows="taxes"
       :columns="columns"
@@ -50,6 +51,7 @@
         </q-tr>
       </template>
     </q-table>
+  </div>
     <q-dialog seamless position="right" v-model="dialogue" persistent>
           <modal @closeDialogue="dialogue = false; getTaxes();" :actionType="actionType" :body="body" />
     </q-dialog>

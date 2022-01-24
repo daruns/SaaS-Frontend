@@ -1,11 +1,44 @@
 <template>
-<q-page class="">
-  <div class="full-width flex justify-between items-center q-px-md q-py-md" style="hright: 56px !important;border-bottom: 1px solid lightgrey;">
-  <div class="text-h4">CRM</div>
-  </div>
-  <breadcrmps class="q-pa-md full-width" :map="crumps" />
-  <div class="q-px-md">
-  <q-skeleton v-if="!currentClient.name" class="custom-skeleton-border" height="250px" />
+  <q-page class="q-py-none q-my-none">
+    <div class="full-width flex justify-between items-center q-px-md header-height-standard" style="border-bottom: 1px solid lightgrey;">
+      <div class="text-h4">CRM</div>
+    </div>
+    <breadcrmps class="q-pa-md full-width" :map="crumps" />
+    <div class="q-px-md">
+      <q-card v-if="isloading">
+      <q-skeleton class="row items-center q-pa-md">
+        <div class="flex items-center col-md-6 col-sm-12 q-pb-md avatar">
+          <q-avatar size="120px" font-size="52px" color="grey" text-color="white" icon="person" />
+          <div>
+            <p class="q-ml-md text-h5 text-weight-medium q-pb-sm q-mt-lg q-ma-none"><q-skeleton class="col"/></p>
+            <p class="text-subtitle2 text-grey q-ml-md q-ma-none"><q-skeleton class="col"/></p>
+            <q-btn class="q-ml-md q-mt-md" color="primary" no-caps label="Send Message" unelevated />
+          </div>
+        </div>
+        <div class="row client-infos col q-pa-md" >
+          <div class="column col-12">
+            <div class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+            <p class="text-grey flex flex-start full-width"><q-skeleton class="col"/></p>
+            </div>
+            <div class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+            <p class="text-grey flex flex-start full-width"><q-skeleton class="col"/></p>
+            </div>
+            <div class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+            <p class="text-grey flex flex-start full-width"><q-skeleton class="col"/></p>
+            </div>
+            <div class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+            <p class="text-grey flex flex-start full-width"><q-skeleton class="col"/></p>
+            </div>
+            <div class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+            <p class="text-grey flex flex-start full-width"><q-skeleton class="col"/></p>
+            </div>
+            <div class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+              <p class="text-grey flex flex-start full-width"><q-skeleton class="col"/></p>
+            </div>
+          </div>
+        </div>
+      </q-skeleton>
+    </q-card>
      <q-card v-else class="row items-center q-pa-md">
        <q-btn @click="dialogue = true" class="absolute-top-right q-mt-xs q-mr-xs" flat text-color="grey" size="sm" round unelevated icon="edit" color="primary" />
        <div class="flex items-center col-md-6 col-sm-12 q-pb-md avatar">
@@ -42,8 +75,12 @@
             <p class="text-grey">{{currentClient.zipCode}}</p>
             </div>
             <div v-if="currentClient.website"  class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
-            <p>Website:</p>
-            <p class="text-grey">{{currentClient.website}}</p>
+              <p>Website:</p>
+              <p class="text-grey">{{currentClient.website}}</p>
+            </div>
+            <div v-if="currentClient.createdBy"  class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+              <p>Created By:</p>
+              <p class="text-grey">{{currentClient.createdBy}}</p>
             </div>
             </div>
         </div>
@@ -110,6 +147,7 @@ export default {
         return {
           dialogue: false,
           close: false,
+          isloading: ref(false),
           crumps: [
             {id:1,name:'OneConnect',icon: 'home',path: '/'},
             {id:2,name:'CRM',icon: 'groups',path: '/crm'},
@@ -159,7 +197,9 @@ export default {
         }
     },
    async mounted() {
+      this.isloading = true
       await this.getOneClient(this.$route.params.id);
+      this.isloading = false
       if(this.currentClient.user) {
         this.user.name = this.currentClient.user.name;
         this.user.username = this.currentClient.user.username;

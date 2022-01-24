@@ -1,16 +1,14 @@
 <template>
-    <q-page class="q-pa-md" style="overflow-x: hidden !important;">
-     <div class="flex items-center justify-between">
-       <div>
-        <p class="text-h4">Tasks</p>
-        <breadcrmps :map="crumps" />
-        </div>
+    <q-page style="overflow-x: hidden !important;">
+    <div class="full-width flex justify-between items-center q-px-md  header-height-standard" style="border-bottom: 1px solid lightgrey;">
+      <div class="text-h4">Tasks</div>
+      <div class="flex items-center">
          <q-btn @click="this.action = 'Add'; dialogue = true" color="primary" label="Create Board" unelevated rounded no-caps />
-        </div>
-        <div class="row">
-        </div>
-        <q-scroll-area :thumb-style="thumbStyle" :bar-style="barStyle" style="height: 70vh; width: 100% !important;">
-        <q-markup-table class="flex q-mt-md tasks-table bg-secondary" flat>
+      </div>
+    </div>
+    <breadcrmps class="q-pa-md full-width" :map="crumps" />
+    <q-scroll-area class="q-px-md" :thumb-style="thumbStyle" :bar-style="barStyle" style="height: 70vh; width: 100% !important;">
+      <q-markup-table class="flex q-mt-md tasks-table bg-secondary" flat>
           <thead>
             <tr>
               <th class="round-borders"  :style="`background-color: ${column.boardAttribute.color}`" v-for="column in columns" :key="column.id"

@@ -3,7 +3,7 @@
     <div class="row items-center q-pa-sm" >
     <div class="col-xl-2 col-lg-2 col-md-3 col-sm-6 col-xs-12 q-pa-sm" v-for="(client, i) in data" :key="i">
     <q-card flat bordered style="position: relative !important;" class="my-card">
-         <q-btn style="z-index:2;" class="absolute-top-right" dense round flat icon="more_vert">
+      <q-btn style="z-index:2;" class="absolute-top-right" dense round flat icon="more_vert">
         <q-menu
           transition-show="scale"
           transition-hide="scale"
@@ -18,7 +18,7 @@
             </q-item>
           </q-list>
         </q-menu>
-         </q-btn>
+      </q-btn>
       <q-card-section class="flex flex-center">
         <div class="flex column flex-center">
         <router-link :to="`/client/${client.id}`">
@@ -27,13 +27,14 @@
         </q-avatar>
         <q-avatar v-else size="100px" font-size="52px" color="grey" text-color="white" icon="person" />
         </router-link>
-        <router-link class="text-black" style="max-width: 200px !important;min-width:80% !important;white-space: nowrap;overflow:hidden !important;text-overflow: ellipsis" :to="`/client/${client.id}`">
-        <p style="max-width: 200px !important;min-width:80% !important;white-space: nowrap;overflow:hidden !important;text-overflow: ellipsis"  class="text-h5 text-center q-mt-sm q-mb-none">{{client.name}}</p></router-link>
+        <router-link class="q-py-sm row flex wrapword" style="min-width:80% !important;white-space: nowrap;overflow:hidden !important;text-overflow: ellipsis" :to="`/client/${client.id}`">
+          <p class="text-black text-h6 text-center col-12 wrapword" v-html="client.name" style="width: 10vw"></p>
+        </router-link>
         <p class="text-span text-grey">{{client.businessType}}</p>
-        </div>
+      </div>
       </q-card-section>
       <q-card-actions align="center">
-      <router-link :to="`/client/${client.id}`"><q-btn color="primary" class="q-mb-md" outline no-caps>View Client</q-btn></router-link>
+      <router-link :to="`/client/${client.id}`"><q-btn color="primary" class="q-mb-md" outline no-caps>View Profile</q-btn></router-link>
       </q-card-actions>
     </q-card>
     </div>

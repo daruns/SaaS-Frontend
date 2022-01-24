@@ -2,7 +2,13 @@
     <q-page v-if="!isLoaded" class="flex flex-center">
         <q-spinner  color="primary" size="md" />
     </q-page>
-    <q-page v-else class="q-pa-xl">
+
+    <q-page v-else class="q-py-none q-my-none">
+    <div class="full-width flex justify-between items-center q-px-md header-height-standard" style="border-bottom: 1px solid lightgrey;">
+      <div class="text-h4">Expenses</div>
+    </div>
+    <breadcrumps class="q-pa-md full-width" :map="crumps" />
+    <q-scroll-area class="q-px-md" style="height: calc(100vh - 93px)">
         <q-card class="q-pa-xl">
           <!-- <q-btn label="Upload files" icon="backup" color="grey" no-caps push flat unelevated class="absolute-bottom-right q-mr-sm q-mb-sm">
                 <q-popup-proxy>
@@ -184,6 +190,7 @@
                   </q-popup-proxy>
           </q-btn>
         </q-card>
+    </q-scroll-area>
           <q-dialog v-model="confirm" persistent>
             <q-card style="width:300px;">
               <q-card-section>
@@ -201,9 +208,16 @@
 <script>
 import { mapActions, mapState } from 'vuex';
 import axios from 'axios'
+import BreadCrumpsVue from 'src/components/globalComponents/BreadCrumps.vue';
 export default {
+  components: {
+    BreadCrumpsVue
+    },
     data() {
-        return{
+      return{
+          crumps: [
+             
+          ],
           files: [],
           file: null,
           image: null,
