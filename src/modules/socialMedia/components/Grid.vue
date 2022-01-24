@@ -3,7 +3,6 @@
   <q-scroll-area
     class="col-12 items-start flex column"
   >
-  {{data}}
     <div v-for="(post, i) in data" :key="i" class="fit col-12 flex row justify-center" >
       <div class="row flex col-8 bg-white my-card q-my-md" flat bordered>
           <!-- medias -->
