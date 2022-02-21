@@ -30,3 +30,7 @@ export function GET_SERVICE_ITEMS (state, payload) {
 export function GET_JOINED_ITEMS (state, payload) {
   state.joinedItems = payload
 }
+
+export function GET_NEW_ITEM_CATEGORY (state, payload) {
+  state.newItemCategory = payload
+}

@@ -3,7 +3,7 @@
       <div class="full-width flex justify-between items-center q-px-md q-py-md" style="border-bottom: 1px solid lightgrey;">
         <div class="text-h4">In Production</div>
         <div class="flex items-center">
-          <q-btn @click="dialogue = true" color="primary" :label="'Add '+tab[0].toUpperCase()+tab.substr(1, tab.length)" unelevated rounded no-caps />
+          <q-btn @click="dialogue = true" color="primary" :label="'Add to '+tab[0].toUpperCase()+tab.substr(1, tab.length)" unelevated rounded no-caps />
         </div>
       </div>
       <breadcrmps class="q-pa-md full-width" :map="crumps" />

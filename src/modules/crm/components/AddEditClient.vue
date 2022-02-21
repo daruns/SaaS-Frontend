@@ -8,37 +8,64 @@
       <q-btn icon="close" flat round dense v-close-popup />
     </q-toolbar>
     <q-card-section class="q-gutter-sm scroll">
+      <div class="col-12 flex flex-center q-py-lg tems-center row">
+        <q-avatar
+          v-show="actionType === 'Edit'"
+          clickable :color="!credentials.logo ? 'grey' : 'white'" size="120px" @click="toggleShow" class="cursor-pointer" style="border: 0.2px solid grey;">
+          <q-img round style="border-radius:50% !important" v-if="credentials.logo" :src="credentials.logo"/>
+          <q-icon v-else color="white" name="person"/>
+          <q-badge floating color="grey" ><q-icon color="white" circle name="edit" size="xs" /></q-badge>
+        </q-avatar>
+      </div>
+
+      <cropableUpload
+        field="logo"
+        v-show="actionType === 'Edit'"
+        lang-type="en"
+        :url="imgUrl"
+        :params="imgParams"
+        :headers="imgHeaders"
+        :value.sync="show"
+        v-model="show"
+      />
+
       <q-input
         ref="companyRef"
         outlined
         v-model="credentials.name"
-        label="Company"
+        label="Name"
         lazy-rules
         :rules="[val => (val && val.length > 0) || 'Please type the company name']"
       />
-      <q-file
-        v-model="credentials.logo"
-        clearable 
-        outlined
-        label="Client logo"
-        filled
-        class="q-pb-md"
-      >
-        <template v-slot:prepend>
-          <q-icon name="attach_file" accept=".jpg, image/*" />
-        </template> 
-      </q-file>
-      <q-btn-toggle
+      <div v-show="actionType === 'Add'" class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-xs-12">
+        <q-uploader
+          max-files="1"
+          max-file-size="1048576"
+          class="q-pb-sm fit"
+          max-total-size="1048576"
+          label="Client logo"
+          @removed="files => {credentials.logo = files[0]}"
+          hide-upload-btn
+          v-show="actionType === 'Add'"
+          @added="files => {credentials.logo = files[0]}"
+          :multiple="false"
+        />
+      </div>
+      <q-select
         v-model="credentials.businessType"
         class="my-custom-toggle"
         no-caps
-        rounded
-        toggle-color="primary"
-        color="white"
-        text-color="primary"
+        outlined
+        option-label="label"
+        option-value="value"
         :options="[
         {label: 'Company', value: 'Company'},
-        {label: 'Individual', value: 'Individual'}
+        {label: 'Individual', value: 'Individual'},
+        {label: 'NGO', value: 'NGO'},
+        {label: 'Organization', value: 'Organization'},
+        {label: 'Government', value: 'Government'},
+        {label: 'Startup', value: 'Startup'},
+        {label: 'Small Business', value: 'SmallBusiness'}
         ]"
       />
       <q-btn-toggle
@@ -65,7 +92,16 @@
         v-model="credentials.email"
         label="E-mail"
         lazy-rules
-        :rules="[val => (val && val.length > 0) || 'Please type a valid E-mail']"
+        :rules="[val => {
+          
+          if (val && !(val.length > 0) ) {
+            return 'Please type a valid E-mail'
+          }
+          if (val && checkEmailExistence('email',val) === true ) {
+            return 'This E-mail already exist'
+          }
+          return true
+        }]"
       />
       <div class="flex items-center">
         <p style="padding:0 !important; font-size:1rem;">Rate: </p>
@@ -103,15 +139,24 @@
   </q-layout>
 </template>
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import { VueTelInput } from 'vue-tel-input';
+import myUpload from 'vue-image-crop-upload';
 export default {
   components : {
     VueTelInput,
+    cropableUpload: myUpload,
   },
  props: ['actionType', 'type', 'inProfile','body'],
    data()  { 
    return {
+     imgUrl: (process.env.OC_BACKEND_API + 'brands/update'),
+     imgHeaders: {Authorization: localStorage.getItem('accessToken')},
+     imgDataUrl: null,
+     imgParams: {
+       id: null
+     },
+     show: true,
      id: null,
      phone: '',
      loading: false,
@@ -129,7 +174,33 @@ export default {
      },
     }
 },
+  computed: {
+    ...mapState('userStore', ['users']),
+    ...mapState('crmStore', ['clients']),
+  },
   methods: {
+			toggleShow() {
+				this.show = !this.show;
+			},
+    checkEmailExistence(key,value) {
+      var userFnd = false;
+
+      if (key === "email"){
+        let emailfnd = this.users?.find(e => {e.email === value})
+        let emailclfnd = this.clients?.find(e => {e.email === value})
+        if (emailclfnd || emailfnd) {
+          userFnd = true
+        }
+        console.log("keyvalue: ",key,value,emailfnd)
+      } else if (key === "username"){
+        let usernamefnd = this.clients?.find(e => {e.username === value})
+        let usernameclfnd = this.clients?.find(e => {e.username === value})
+        if (usernamefnd || usernameclfnd) {
+          userFnd = true
+        }
+      }
+      return userFnd ? true : false
+    },
     phoneValidate(evt) {
       if(isNaN(Number(evt.data))) {
         this.phone = this.phone.substring(0, this.phone.length-1)
@@ -152,6 +223,7 @@ export default {
       i = i + 1;
     },
     ...mapActions('crmStore', ['createClient', 'updateClient','getClients', 'getOneClient']),
+    ...mapActions('userStore', ['getUsers']),
    async submit() {
       this.$refs.companyRef.validate();
       this.$refs.emailRef.validate();
@@ -166,7 +238,7 @@ export default {
           let data = new FormData();
           data.append('name', this.credentials.name);
           data.append('logo', this.credentials.logo);
-          data.append('businessType', this.credentials.businessType);
+          data.append('businessType', this.credentials.businessType?.value);
           data.append('email', this.credentials.email);
           data.append('website', this.credentials.website);
           data.append('address', this.credentials.address);
@@ -209,8 +281,11 @@ export default {
         }
     }
   },
- async mounted() { 
+ async mounted() {
+   this.show = false
+   await this.getUsers()
    if(this.actionType === 'Edit'){
+    this.imgParams.id = this.body.id
     this.id = this.body.id
     this.credentials.name = this.body.name
     this.credentials.website = this.body.website

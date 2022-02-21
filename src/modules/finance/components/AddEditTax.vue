@@ -17,7 +17,7 @@
             :rules="[val => (val && val.length > 0) || 'Please write the name']"
             />
                <q-editor             
-      v-model="tax.description" :dense="$q.screen.lt.md" :toolbar="[
+      v-model="tax.description" dense :toolbar="[
       [
           {
             label: $q.lang.editor.align,
@@ -97,16 +97,11 @@
       }"
     />
          <q-input
-            ref="typeRef"
             outlined
             v-model="tax.type"
             label="Type"
-            lazy-rules
-            :rules="[val => (val && val.length > 0) || 'Please write the type']"
             />
         <q-input
-           ref="rateRef"
-          :rules="[ val => (Number(val) <= 100 && Number(val) > 0) || 'Not less than 1']"
            bg-color="white"
            class="col-lg-3 col-md-4 col-sm-6 col-xs-12" 
            mask="#"
@@ -142,12 +137,8 @@ export default {
   methods : {
     async submit() {
             this.$refs.nameRef.validate();
-            this.$refs.typeRef.validate();
-            this.$refs.rateRef.validate();
             if(
-            this.$refs.nameRef.hasError ||
-            this.$refs.typeRef.hasError ||
-            this.$refs.rateRef.hasError
+            this.$refs.nameRef.hasError
             )
             return
      this.loading = true

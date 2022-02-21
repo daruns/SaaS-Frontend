@@ -1,20 +1,22 @@
 <template>
-  <q-page v-if="!loading" class="q-py-none q-my-none">
-    <div class="full-width flex justify-between items-center q-px-md  header-height-standard" style="border-bottom: 1px solid lightgrey;">
-      <div class="text-h4">{{project.name}}</div>
+  <q-page class="q-py-none q-my-none">
+    <div class="full-width flex justify-between items-center q-px-md header-height-standard" style="border-bottom: 1px solid lightgrey;">
+      <div v-if="project.name" class="text-h4">{{project.name}}</div>
+      <div v-else><q-skeleton class="q-pa-sm" style="width:200px" /></div>
       <div class="flex items-center">
         <q-btn @click="dialogue = true" color="grey-5" flat icon="edit" round/>
+        <q-separator color="grey-5"/>
+        <q-btn @click="allowQuickEdit = !allowQuickEdit" :color="allowQuickEdit ? 'primary' : 'grey-5'" flat label="Quick Edit" />
       </div>
     </div>
-    <breadcrmps class="q-pa-md full-width" :map="crumps" />
-    <q-scroll-area style="max-height:auto !important;min-height:auto !important;height: calc(100vh - 131px);" class="q-px-md">
+    <q-scroll-area v-if="!loading" style="max-height:auto !important;min-height:auto !important;height: calc(100vh - 131px);" class="q-px-md">
       <div class="col-12 row flex q-my-sm">
         <div class="q-mb-sm row flex col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 q-pr-sm">
             <q-card class="q-pa-md">
             <p v-if="project.leaderUsers.length !== 0" class="text-h6">Assigned Team Leaders</p>
             <p v-if="project.leaderUsers.length === 0" class="text-subtitle1 text-grey-5">No leaders assigned.</p>
-            <q-btn @click="getLeaderOptions(project)" class="absolute-bottom-right q-mr-sm q-mb-sm" size="10px" color="primary" round icon="add" unelevated rounded no-caps>
+            <q-btn :disable="!allowQuickEdit" @click="getLeaderOptions(project)" class="absolute-bottom-right q-mr-sm q-mb-sm" size="10px" color="primary" round icon="add" unelevated rounded no-caps>
               <q-popup-edit v-model="leaders" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
                 <q-select
                     :rules="[val => (val !== null) || 'This field is required']"
@@ -32,21 +34,23 @@
                     <template v-slot:option="scope">
                     <q-item v-bind="scope.itemProps">
                         <q-item-section class="avatar-list">
-                        <q-avatar class="q-mr-xs" size="30px">
-                            <img src="~/assets/one_logo_neat.png">
+                        <q-avatar class="q-mr-xs" size="40px">
+                            <img v-if="scope.opt.avatar" :src="scope.opt.avatar">
+                            <img v-else src="~/assets/one_logo_neat.png">
                         </q-avatar>
                         <q-item-label>{{ scope.opt.label }}</q-item-label>       
                         </q-item-section>
                     </q-item>
                     </template>
                 </q-select>
-                <q-btn @click="addProjectLeaders(project.id)" no-caps flat label="submit" color="primary" :disable="leaders.length === 0" v-close-popup />
+                <q-btn @click="addProjectLeaders(project.id)" no-caps flat label="submit" color="primary" :disable="leaders.length === 0 || !allowQuickEdit" v-close-popup />
               </q-popup-edit>
             </q-btn>
             <div v-if="project.leaderUsers.length !== 0" class="row" >
-              <q-chip @remove="leaderId = leader.userId; deleteLeaderConfirm = true" v-for="(leader,i) in project.leaderUsers" :key="leader.userId" removable>
+              <q-chip @remove="leaderId = leader.userId; deleteLeaderConfirm = true" v-for="(leader,i) in project.leaderUsers" :key="leader.userId"  :removable="allowQuickEdit">
                 <q-avatar>
-                  <img src="~/assets/one_logo_neat.png">
+                  <img v-if="leader.avatar" :src="leader.avatar">
+                  <img v-else src="~/assets/one_logo_neat.png">
                 </q-avatar>
                 {{leader.name}}
               </q-chip>
@@ -57,7 +61,7 @@
             <q-card class="q-pa-md">
             <p v-if="project.memberUsers.length !== 0" class="text-h6">Assigned Team Members</p>
             <p v-if="project.memberUsers.length === 0" class="text-subtitle1 text-grey-5">No members assigned.</p>
-            <q-btn @click="getUserOptions(project)" class="absolute-bottom-right q-mr-sm q-mb-sm" size="10px" color="primary" round icon="add" unelevated rounded no-caps>
+            <q-btn :disable="!allowQuickEdit" @click="getUserOptions(project)" class="absolute-bottom-right q-mr-sm q-mb-sm" size="10px" color="primary" round icon="add" unelevated rounded no-caps>
               <q-popup-edit v-model="members" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
                 <q-select
                   ref="clientRef"
@@ -76,22 +80,24 @@
                   <template v-slot:option="scope">
                   <q-item v-bind="scope.itemProps">
                       <q-item-section class="avatar-list">
-                      <q-avatar class="q-mr-xs" size="30px">
-                          <img src="~/assets/one_logo_neat.png">
+                      <q-avatar class="q-mr-xs" size="40px">
+                        <img v-if="scope.opt.avatar" :src="scope.opt.avatar">
+                        <img v-else src="~/assets/one_logo_neat.png">
                       </q-avatar>
                       <q-item-label>{{ scope.opt.label }}</q-item-label>       
                       </q-item-section>
                   </q-item>
                   </template>
                 </q-select>
-                <q-btn @click="addProjectMembers(project.id)" no-caps flat label="submit" color="primary" :disable="members.length === 0" v-close-popup />
+                <q-btn @click="addProjectMembers(project.id)" no-caps flat label="submit" color="primary" :disable="members.length === 0 || !allowQuickEdit" v-close-popup />
               </q-popup-edit>
             </q-btn>
             <div v-if="project.memberUsers.length !== 0" class="row">
-              <q-chip @remove="memberId = member.userId; deleteMemberConfirm = true;" v-for="(member,i) in project.memberUsers" :key="member.userId" removable>
+              <q-chip @remove="memberId = member.userId; deleteMemberConfirm = true;" v-for="(member,i) in project.memberUsers" :key="member.userId" :removable="allowQuickEdit">
               <q-avatar>
-                <img src="~/assets/one_logo_neat.png">
-                </q-avatar>
+                <img v-if="member.avatar" :src="member.avatar">
+                <img v-else src="~/assets/one_logo_neat.png">
+              </q-avatar>
                 {{member.name}}
               </q-chip>
             </div>
@@ -102,6 +108,8 @@
           <q-card class="flex items-center row q-pa-md">
             <div class="text-h6">Deadline:</div>
             <div class="text-subtitle1 q-px-md">{{project.plannedEndDate && project.plannedEndDate.split('T')[0]}}</div>
+            <div class="text-h6">Priority:</div>
+            <div class="text-subtitle1 q-px-md">{{project.priority}}</div>
             <div class="text-grey col-12 wrapword" v-html="project.description"></div>
           </q-card>
         </div>
@@ -127,7 +135,7 @@
                 </div>
               </div>
             </div>
-            <q-btn label="Upload images" icon="backup" color="grey" no-caps push flat unelevated class="absolute-bottom-right q-mr-sm q-mb-sm">
+            <q-btn :disable="!allowQuickEdit" label="Upload images" icon="backup" color="grey" no-caps push flat unelevated class="absolute-bottom-right q-mr-sm q-mb-sm">
               <q-popup-proxy>
                 <q-banner>
                   <q-file :filter="checkType" @rejected="onRejectedImage" clearable label="Image" outlined v-model="image">
@@ -145,12 +153,12 @@
           <q-card class="q-pa-md q-mt-md">
             <p v-show="files.length !== 0" class="text-h6 text-grey q-mt-lg">Uploaded files</p>
             <p v-show="files.length === 0" class="text-subtitle1 text-grey-5">No files has been uploaded.</p>
-              <div v-show="files.length !== 0" class="row q-pb-xl">
-                <div v-for="(file, i) in files" :key="file.id">
-                  <div  class="flex column flex-center q-pr-md q-pt-md">
+            <div v-show="files.length !== 0" class="row q-pb-xl">
+              <div v-for="(file, i) in files" :key="file.id">
+                <div  class="flex column flex-center q-pr-md q-pt-md">
                   <q-avatar square size="100px"> 
-                  <q-badge style="background: transparent !important;" transparent floating>
-                      <q-btn @click="fileId = file.id, confirm = true" round size="7.5px" icon="delete" color="negative" class="absolute-top-right"/>
+                    <q-badge v-if="allowQuickEdit" style="background: transparent !important;" transparent floating>
+                      <q-btn :disable="!allowQuickEdit" @click="fileId = file.id, confirm = true" round size="7.5px" icon="delete" color="negative" class="absolute-top-right"/>
                     </q-badge>
                     <q-icon  color="grey" name="attach_file" />
                   </q-avatar>
@@ -158,25 +166,33 @@
                   <a :href="file.url" target="_blank">
                     <q-btn class="text-primary bg-blue-1" unelevated label="Download" no-caps/>
                   </a>
-                  </div>
-                  </div>
                 </div>
-                  <q-btn label="Upload files" icon="backup" color="grey" no-caps push flat unelevated class="absolute-bottom-right q-mr-sm q-mb-sm">
-                      <q-popup-proxy>
-                            <q-banner>
-                              <q-file :filter="checkFileType" @rejected="onRejectedFile" clearable label="File" outlined v-model="file">
-                                <template v-slot:prepend>
-                                  <q-icon name="attach_file" />
-                                </template>
-                              </q-file>
-                              <q-btn v-close-popup label="Upload" @click="addProjectFile('file'); file = null" no-caps :disable="!file" flat color="primary" class="q-mt-sm" size="md" />
-                            </q-banner>
-                          </q-popup-proxy>
-                  </q-btn>
+              </div>
+            </div>
+            <q-btn :disable="!allowQuickEdit" label="Upload files" icon="backup" color="grey" no-caps push flat unelevated class="absolute-bottom-right q-mr-sm q-mb-sm">
+              <q-popup-proxy>
+                <q-banner>
+                  <q-file :filter="checkFileType" @rejected="onRejectedFile" clearable label="File" outlined v-model="file">
+                    <template v-slot:prepend>
+                      <q-icon name="attach_file" />
+                    </template>
+                  </q-file>
+                  <q-btn v-close-popup label="Upload" @click="addProjectFile('file'); file = null" no-caps :disable="!file" flat color="primary" class="q-mt-sm" size="md" />
+                </q-banner>
+              </q-popup-proxy>
+            </q-btn>
           </q-card>
         </div>
       </div>
     </q-scroll-area>
+    <div v-else style="max-height:auto !important;min-height:auto !important;height: calc(100vh - 131px);" class="q-px-md flex items-center justify-between row flex-center">
+      <div class="q-pa-sm col-6"> <q-skeleton style="height:30vh"/></div>
+      <div class="q-pa-sm col-6"> <q-skeleton style="height:30vh"/></div>
+      <div class="q-pa-sm col-12"> <q-skeleton style="height:30vh"/></div>
+      <div class="q-pa-sm col-6"> <q-skeleton style="height:30vh"/></div>
+      <div class="q-pa-sm col-6"> <q-skeleton style="height:30vh"/></div>
+
+    </div>
     <q-dialog v-model="confirm" persistent>
       <confirm @confirm="deleteProjectFile" />
     </q-dialog>
@@ -191,7 +207,6 @@
     </q-dialog>
     <!-- <p class="text-caption text-grey-7 q-ma-none" v-show="project.leaderUsers.length !== 0">Assigned Leaders:</p> -->
   </q-page>
-  <q-page v-else class="flex flex-center"><q-spinner /></q-page>
 </template>
 <script>
 import axios from 'axios';
@@ -207,6 +222,7 @@ components :{
  },
  data() {
    return {
+     allowQuickEdit: false,
      project: {
        leaderUsers: [],
        memberUsers: [],
@@ -286,10 +302,10 @@ components :{
       for(let i = 0; i<this.users.length; i++) {
       for(let j = 0; j<payload.memberUsers.length; j++) {
         if(Number(payload.memberUsers[j].userId) === Number(this.users[i].id)){
-          optionsB.push({id:this.users[i].id, label: this.users[j].name});
+          optionsB.push({id:this.users[i].id,avatar: this.users[j].avatar , label: this.users[j].name});
         }
       }
-          optionsA.push({id:this.users[i].id, label: this.users[i].name});
+          optionsA.push({id:this.users[i].id,avatar: this.users[i].avatar , label: this.users[i].name});
       }
       this.options = optionsA.filter(({ id: id1 }) => !optionsB.some(({ id: id2 }) => id2 === id1));
       }, 200);
@@ -317,10 +333,10 @@ components :{
       for(let i = 0; i<this.users.length; i++) {
       for(let j = 0; j<payload.leaderUsers.length; j++) {
         if(Number(payload.leaderUsers[j].userId) === Number(this.users[i].id)){
-          optionsB.push({id:this.users[i].id, label: this.users[j].name});
+          optionsB.push({id:this.users[i].id,avatar: this.users[j].avatar , label: this.users[j].name});
         }
       }
-          optionsA.push({id:this.users[i].id, label: this.users[i].name});
+          optionsA.push({id:this.users[i].id,avatar: this.users[i].avatar , label: this.users[i].name});
       }
       this.options = optionsA.filter(({ id: id1 }) => !optionsB.some(({ id: id2 }) => id2 === id1));
       }, 200);
@@ -346,7 +362,7 @@ components :{
      this.files = [];
      this.images = [];
      for(let i = 0; i<this.project.attachments.length; i++) {
-       if(this.project.attachments[i].contentType.includes('image'))
+       if(this.project.attachments[i].contentType?.includes('image'))
        this.images.push(this.project.attachments[i]);
        else
        this.files.push(this.project.attachments[i]);

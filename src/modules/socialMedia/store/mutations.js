@@ -59,5 +59,12 @@ export function GET_COMPLETEDS (state, payload) {
 }
 
 export function GET_REJECTEDS (state, payload) {
-  Object.assign(state.rejecteds, payload.res);
+  let rejecteds = [];
+  for (let i = payload.res.length-1; i>-1; i--) {
+    if (payload.res[i].status === 'rejected') {
+      rejecteds.push(payload.res[i])
+    }
+  }
+
+  Object.assign(state.rejecteds, rejecteds);
 }

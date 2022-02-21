@@ -98,6 +98,9 @@
         <q-tab name="contacts" @click="updateTab('contacts')" no-caps label="Contact Persons" />
         <q-tab name="sociallinks" @click="updateTab('sociallinks')" no-caps label="Social links" />
         <q-tab name="users" @click="updateTab('users')" no-caps label="Users" />
+        <q-tab name="projects" @click="updateTab('projects')" no-caps label="Projects" />
+        <q-tab name="invoices" @click="updateTab('invoices')" no-caps label="Invoices" />
+        <q-tab name="quotes" @click="updateTab('quotes')" no-caps label="Quotes" />
       </q-tabs>
 
       <q-tab-panels v-model="tab" animated>
@@ -114,6 +117,15 @@
         </q-tab-panel>
         <q-tab-panel name="users">
             <users />
+        </q-tab-panel>
+        <q-tab-panel name="projects">
+            <projects :bodyData="currentClient?.projects" />
+        </q-tab-panel>
+        <q-tab-panel name="invoices">
+            <invoices :bodyData="currentClient?.invoices" />
+        </q-tab-panel>
+        <q-tab-panel name="quotes">
+            <quotes :bodyData="currentClient?.quotes" />
         </q-tab-panel>
       </q-tab-panels>
       <q-dialog :inProfile="true" seamless position="right" v-model="dialogue">
@@ -132,6 +144,9 @@ import { mapActions, mapState } from 'vuex'
 import meetings from '../components/Meetings.vue'
 import sociallinks from '../components/SocialMediaLinks.vue';
 import users from '../components/UsersTable.vue';
+import projects from '../components/ProjectsGrid.vue'
+import invoices from '../components/InvoicesGrid.vue'
+import quotes from '../components/QuotesGrid.vue'
 import AddEditClient from '../components/AddEditClient.vue';
 import axios from 'axios'
 export default {
@@ -141,7 +156,10 @@ export default {
         sociallinks,
         contacts,
         modal: AddEditClient,
-        users
+        users,
+        projects,
+        invoices,
+        quotes,
     },
     data() {
         return {

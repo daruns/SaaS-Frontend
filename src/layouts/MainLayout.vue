@@ -4,41 +4,37 @@
         v-model="drawer"
         show-if-above
         :mini="miniState"
-        :width="256"
+        :width="245"
         :breakpoint="500"
-        class="full-height bg-white"
-        :style="'transform: translateX(' + ((drawer) ? '256px' : '0px') + ') !important'"
+        class="right-side-bar-custom-z-index-below-dialog full-height bg-lie-dark"
+        :style="'transform: translateX(' + ((drawer) ? '245px' : '0px') + ') !important'"
       >
-      <div
-        class="header-height-standard full-width text-white q-py-sm bg-primary"
-      >
-      <q-item class="text-h6 q-ma-xs flex justify-between">
-        <q-item-section>
-          {{miniState === false ? subSideBar.title : ""}}
-        </q-item-section>
-        <q-item-section class="text-right" >
-          <q-btn
-            @click="openedSideBar();"
+      <div class="col flex header-height-standard full-width text-white q-py-sm">
+        <q-item-list :class="!miniState ? 'col text-h6 q-ma-xs row flex justify-between' : 'col text-h6 q-ma-xs flex justify-center'">
+          <q-item v-if="!miniState">{{subSideBar.title}}</q-item>
+          <q-item
             flat
             dense
-            :icon="'las la-angle-'+(!miniState ? 'left' : 'right')"
-            class="absolute"
-            style="z-index:50000;right: 0px !important"
-          />
-        </q-item-section>
-      </q-item>
-        </div>
+            text-color="white"
+            class="flex items-center justify-center"
+            color="white"
+          ><q-btn flat @click="openedSideBar();" style="transition:0.2s cease; transform: rotate(90deg);"
+            text-color="white" :icon="miniState ? 'fas fa-window-maximize' : 'fas fa-minus'" />
+          </q-item>
+        </q-item-list>
+      </div>
+      <q-separator class="bg-white"/>
         <q-scroll-area
           @mouseover="miniState = fixedState === false ? false : miniState"
           @mouseout="miniState = fixedState === false ? true : miniState"
-          class="header-height-standard-remaining" style="border-right: 1px solid #ddd;"
+          class="header-height-standard-remaining"
         >
           <!-- <q-item
             to='/'
             exact
             clickable
             class="text-grey"
-            active-class="my-menu-link"
+            active-class="hovered my-menu-link"
           >
             <q-item-section avatar>
               <q-icon name="speed" />
@@ -47,6 +43,7 @@
           </q-item> -->
         <q-list :key="mindex" v-for="(mitem,mindex) in subSideBar.itemsArray" v-show="(subSideBar.title === 'Finance')" class="rounded-borders text-black">
           <q-separator
+            class="bg-white"
             v-if="mitem.name === 'separator'"
           />
           <q-item
@@ -56,7 +53,7 @@
             clickable
             @click="drawer = true"
             class="text-grey"
-            active-class="my-menu-link"
+            active-class="hovered my-menu-link"
           >
             <q-item-section  avatar>
               <q-icon :name="mitem.icon" />
@@ -74,7 +71,7 @@
             clickable
             @click="drawer = true"
             class="text-grey"
-            active-class="my-menu-link"
+            active-class="hovered my-menu-link"
           >
             <q-item-section  avatar>
               <q-icon :name="item.icon" />
@@ -91,31 +88,39 @@
         show-if-above
         @mouseover="miniState = fixedState === false ? false : miniState"
         @mouseout="miniState = fixedState === false ? true : miniState"
-        :width="256"
+        :width="245"
         :breakpoint="500"
-        style=""
-        class="bg-white"
+        style="border-right: 1px solid #ddd;"
+        class="items-center bg-lie-dark right-side-bar-custom-z-index-below-dialog"
       >
-
-        <div class="full-width text-white q-py-sm bg-primary header-height-standard">
-          <q-item class="flex text-white justify-between" avatar>
-          <img
-            alt="oneconnect logo"
-            src="~assets/onelogo.png"
-            class=""
-            style="height: 40px;"
-          >
-          </q-item>
+        <div class="items-center flex full-width text-white bg-white header-height-standard">
+          <btn class="color-grey">
+            <q-item class="flex bg-white justify-between" avatar>
+              <img
+                alt="oneconnect logo"
+                src="~assets/onelogo.png"
+                class="btn"
+                style="height: 40px;"
+              >
+            </q-item>
+          </btn>
         </div>
-
-        <q-scroll-area class="header-height-standard-remaining" style=" border-right: 1px solid #ddd;">
+        <div v-if="brandCodeName" class="items-center flex full-width row text-white q-px-md q-my-sm q-mb-none bg-none header-height-standard" style="min-height:48px">
+          <q-avatar avatar style="font-size:40px">
+            <img v-if="brandLogo" :src="brandLogo" />
+            <icon v-else class="bg-grey" name="person" color="grey" />
+          </q-avatar>
+          <div class="q-px-md">@{{brandCodeName}}</div>
+        </div>
+        <q-separator class="bg-white"/>
+        <q-scroll-area class="header-height-standard-remaining">
         <q-list class="rounded-borders text-black">
         <!-- <q-item
           to='/'
           exact
           clickable
           class="text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar>
             <q-icon name="speed" />
@@ -128,7 +133,7 @@
           clickable
           @click="sendSubSideBardData('crm')"
           class="text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar>
             <q-icon name="groups" />
@@ -137,12 +142,26 @@
           <q-item-section>CRM</q-item-section>
         </q-item>
         <q-item
-          :to="$route.path.split('/')[1] === 'finance' ? $route.path : undefined"
+          to="/suppliers"
+          @click="sendSubSideBardData('suppliers')"
+          exact
+          clickable
+          class="text-grey"
+          active-class="hovered my-menu-link"
+        >
+          <q-item-section avatar>
+            <q-icon name="badge" />
+          </q-item-section>
+
+          <q-item-section>Suppliers</q-item-section>
+        </q-item>
+        <q-item
+          :to="$route.path.split('/')[1] === 'finance' && $route.path.split('/')[2] !== 'suppliers' ? $route.path : undefined"
           exact
           @click="sendSubSideBardData('finance')"
           clickable
           class="text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar>
             <q-icon name="account_balance" />
@@ -156,7 +175,7 @@
           @click="sendSubSideBardData('projects')"
           clickable
           class="text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar>
             <q-icon name="work" />
@@ -170,7 +189,7 @@
           @click="sendSubSideBardData('social-media-management')"
           clickable
           class="text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar>
             <q-icon name="fas fa-project-diagram" />
@@ -183,7 +202,7 @@
           @click="openChat"
           clickable
           class="text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar>
             <q-icon name="chat" />
@@ -196,7 +215,7 @@
           clickable
           @click="sendSubSideBardData('profile')"
           class="text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar>
             <q-icon name="account_circle" />
@@ -209,7 +228,7 @@
           clickable
           @click="sendSubSideBardData('users')"
           class="text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar>
             <q-icon name="person" />
@@ -222,14 +241,13 @@
       </q-drawer>
 
       <q-page-container class="bg-silk"
-        style="margin: 0px; width: calc(100% - 256px) !important;transform: translateX(256px);"
+        style="margin: 0px; width: calc(100% - 245px) !important;transform: translateX(245px);"
       >
         <router-view class="full-height" />
       </q-page-container>
-          <!-- <q-page-sticky position="bottom-right" :offset="[18, 18]">
-                  <chat :props="showChat" @morph="show" />
-          </q-page-sticky>
-           -->
+      <!-- <q-page-sticky position="bottom-right" :offset="[18, 18]">
+              <chat :props="showChat" @morph="show" />
+      </q-page-sticky> -->
       <q-drawer
         :v-model="true"
         show-if-above
@@ -238,13 +256,13 @@
         bordered
 
         side="right"
-        class="right-side-bar-custom-z-index bg-white"
+        class="bg-white"
       >
         <q-item
           to='/profile'
           clickable
           class="header-height-standard full-width text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar>
             <img
@@ -263,7 +281,7 @@
           exact
           clickable
           class="text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar>
             <q-icon name="speed" />
@@ -275,7 +293,7 @@
           to='/chat'
           clickable
           class="text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar>
             <q-icon name="mail" />
@@ -287,7 +305,7 @@
           to='/notifications'
           clickable
           class="text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar>
             <q-icon name="notifications" />
@@ -300,7 +318,7 @@
           @click="openChat"
           clickable
           class="text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar>
             <q-icon name="chat" />
@@ -312,7 +330,7 @@
           to='/users'
           clickable
           class="text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar>
             <q-icon name="people_alt" />
@@ -323,7 +341,7 @@
           to='/profile'
           clickable
           class="text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar>
             <q-icon name="settings" />
@@ -335,7 +353,7 @@
           to='/login'
           clickable
           class="text-grey"
-          active-class="my-menu-link"
+          active-class="hovered my-menu-link"
         >
           <q-item-section avatar @click="logout">
             <q-icon name="logout" />
@@ -357,6 +375,8 @@ import chat from '../components/PopupChat.vue'
 export default {
   data() {
     return {
+      brandCodeName: null,
+      brandLogo: null,
       isLoggedIn: localStorage.getItem('accessToken'),
       showChat: true,
       statusof: "",
@@ -378,9 +398,8 @@ export default {
       if (this.miniState === true) { this.fixedState = false }
     },
     drawerState(evnt) {
-      // console.log(evnt,this.toggledM,this.routePath)
       if (this.routePath) {
-        if(['finance','projects','social-media-management'].includes(this.routePath) ) {
+        if(['finance','projects','social-media-management'].includes(this.routePath)) {
           if (evnt === "mount") {
             this.drawer = true
             this.sendSubSideBardData(this.routePath)
@@ -440,7 +459,7 @@ export default {
           {name: "Expenses", icon: "savings", url: "/finance/expenses"},
           {name: "separator", icon: "", url: ""},
           {name: "Products & Services", icon: "category", url: "/finance/accounting"},
-          {name: "Suppliers", icon: "badge", url: "/finance/suppliers"},
+          // {name: "Suppliers", icon: "badge", url: "/finance/suppliers"},
           {name: "Expense categories", icon: "grid_view", url: "/finance/categories"},
           {name: "Payment Types", icon: "fas fa-credit-card", url: "/finance/payment"},
           {name: "Tax Types", icon: "receipt_long", url: "/finance/taxes"},
@@ -503,14 +522,27 @@ export default {
     }
   },
  async mounted() {
-    console.log("started: ", this.subSideBar )
+   console.log("started: ", this.subSideBar )
     this.defaultValueSubSide()
     console.log("ended: ", this.subSideBar )
     await this.getUser();
+   this.brandCodeName = this.user.brand?.name ? this.user.brand?.name : this.user.brand?.brandCodeName
+   this.brandLogo = this.user.brand?.logo
   }
 }
 </script>
 <style lang="sass">
 .my-menu-link
   color: #308be5 !important
+aside.q-drawer.q-drawer--right
+  z-index: 1005 !important
+.q-editor__toolbar
+  width: auto !important
+  flex-wrap: wrap !important
+.q-editor__toolbar-group
+  width: auto !important
+.bg-lie-dark
+  background-color: #1c1e21 !important
+.hovered
+  background-color: #2b343e !important
 </style>

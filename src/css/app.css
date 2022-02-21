@@ -362,13 +362,10 @@ a.q-btn.q-btn-item.non-selectable.no-outline.q-btn--flat.q-btn--rectangle.q-btn-
 }
 .q-dialog {
     transform: translateX(-58px);
-    z-index: 50 !important;
+    z-index: 1001 !important;
     /* margin-right: 57px ip !important; */
 }
-.right-side-bar-custom-z-index {
-z-index: 51 !important;
-}
-
+    
 .wrapword {
     white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
     white-space: -webkit-pre-wrap;          /* Chrome & Safari */ 

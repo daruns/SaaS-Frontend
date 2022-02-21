@@ -133,7 +133,7 @@
   </q-page>
   <q-page style="max-height:auto !important;min-height:auto !important;height: calc(100vh - 131px);" v-else class="flex justify-between row full-width">
     <div class="q-pa-md col-12 flex items-center row">
-      <div v-for="ind in 10" :key="ind" class="q-pa-sm col-lg-3 col-md-6 col-sm-6 col-xs-12 q-pa-md">
+      <div v-for="ind in 10" :key="ind" class="q-pa-sm col-3">
         <q-skeleton >
           <q-item-section class="col-12 flex column">
             <q-item class="flex items-start justify-between row col-12 1absolute-top-right">
@@ -156,17 +156,20 @@
 </template>
 <script>
 import { mapActions, mapState } from 'vuex'
+import { ref} from 'vue'
 import modal from './AddEditProject.vue'
 export default {
   computed: {
-    ...mapState('projectStore', ['projects']),
+    // ...mapState('projectStore', ['projects']),
     ...mapState('userStore', ['users'])
   },
   components : {
     modal
   },
+  props: ['bodyData'],
   data() {
     return {
+      projects: [],
       loading: false,
       dialogue: false,
       id: '',
@@ -177,7 +180,7 @@ export default {
    }
   },
   methods: {
-    ...mapActions('projectStore',['getProjects','deleteProject','addProjectMember','deleteProjectMember','addProjectLeader','deleteProjectLeader']),
+    ...mapActions('projectStore',['deleteProject','addProjectMember','deleteProjectMember','addProjectLeader','deleteProjectLeader']),
     ...mapActions('userStore',['getUsers']),
    async addProjectMembers(id) {
       let membersToAdd = []
@@ -232,8 +235,10 @@ export default {
   },
  async mounted() {
    this.loading = true
-   await this.getProjects();
+  //  await this.getProjects();
    await this.getUsers();
+   console.log('projects"""""""""""""""""""""', this.bodyData)
+   this.projects = this.bodyData?.map(e => e) || []
    this.loading = false
 
   }

@@ -2,10 +2,10 @@
    <q-page class="q-pa-md">
       <div class="flex justify-between items-center">
        <div>
-        <p class="text-h4">Accounting</p>
+        <p class="text-h4">Product & services</p>
         <breadcrumps :map="crumps" />
         </div>
-          <q-btn @click="openModal" color="primary" label="Create Record" unelevated rounded no-caps />
+          <q-btn @click="dialogSelectNewItemCat = true" color="primary" label="Create Record" unelevated rounded no-caps />
       </div>
     <q-tabs
         v-model="tab"
@@ -31,15 +31,9 @@
           <sitemtbl />
         </q-tab-panel>
       </q-tab-panels>
-    <q-dialog seamless position="right" v-model="dialogueit" persistent>
-        <modalit @closeDialogue="dialogueit = false" action="Add" :type="tab" />
-    </q-dialog>
-    <q-dialog seamless position="right" v-model="dialoguenit" persistent>
-        <modalnit @closeDialogue="dialoguenit = false" action="Add" :type="tab" />
-    </q-dialog>
-    <q-dialog seamless position="right" v-model="dialogueser" persistent>
-        <modalser @closeDialogue="dialogueser = false" action="Add" :type="tab" />
-    </q-dialog>
+      <q-dialog seamless position="right" v-model="dialogSelectNewItemCat" persistent>
+        <select-new-item-category @closeDialogue="dialogSelectNewItemCat = false" />
+      </q-dialog>
    </q-page>
 </template>
 <script>
@@ -48,42 +42,29 @@ import ItemsTbl from '../components/ItemsTable.vue';
 import NItemsTbl from '../components/NonInventoryItemsTable.vue';
 import SItemsTbl from '../components/ServiceItemsTable.vue';
 import breadcrumps from '../../../components/globalComponents/BreadCrumps.vue';
-import modalit from '../components/AddEditItem.vue'
-import modalnit from '../components/AddEditNItems.vue'
-import modalser from '../components/AddEditSItems.vue'
+import SelectNewItemCategory from '../components/SelectNewItemCategory.vue';
 export default {
-components : {
+  components : {
     breadcrumps,
     itemtbl: ItemsTbl,
     nitemtbl: NItemsTbl,
     sitemtbl: SItemsTbl,
-    modalit,
-    modalnit,
-    modalser
+    SelectNewItemCategory
+
 },
   data() {
     return {
-      dialogueit: false,
-      dialoguenit: false,
-      dialogueser: false,
+      dialogSelectNewItemCat: false,
     }
   },
   methods: {
-    openModal() {
-      if(this.tab === 'inventory item')
-      this.dialogueit = true
-      if(this.tab === 'non-inventory item')
-      this.dialoguenit = true
-      if(this.tab === 'service')
-      this.dialogueser = true
-    }
   },
   setup () {
     return {
       tab: ref('inventory item'),
       crumps: [
         {id:1,name:'OneConnect',icon: 'home',path: '/'},
-        {id:2,name:'Accounting',icon: 'calculate',path: '/accounting'}
+        {id:2,name:'Products & Services',icon: 'calculate',path: '/accounting'}
         ],
     }
   }

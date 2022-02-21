@@ -57,6 +57,10 @@ export function GET_SUB_CATEGORIES (state, payload) {
   state.subCategories = payload.reverse()
 }
 
+export function GET_CHILD_SUB_CATEGORIES (state, payload) {
+  state.childSubCategories = payload.reverse()
+}
+
 export function GET_JOINED_CATEGORIES (state, payload) {
   state.joinedCategories = payload
 }
@@ -75,4 +79,8 @@ export function GET_EXPENSES (state, payload) {
 
 export function GET_EXPENSE (state, payload) {
   state.oneExpense = payload
+}
+
+export function GET_CURRENCY_CODES (state, payload) {
+  state.currencyCodes = payload
 }

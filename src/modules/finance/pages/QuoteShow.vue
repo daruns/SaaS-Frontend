@@ -1,17 +1,18 @@
 <template>
     <q-page v-if="!isLoaded" class="flex flex-center">
-        <q-spinner  color="primary" size="md" />
+      <q-spinner color="primary" size="md" />
     </q-page>
     <q-page v-else class="q-py-none q-my-none">
     <div class="full-width flex justify-between items-center q-px-md header-height-standard" style="border-bottom: 1px solid lightgrey;">
-      <div class="text-h4">Quotation</div>
+      <div class="text-h4">Quote</div>
     </div>
-      <div class="q-pa-md">
-          <q-card class="q-pa-xl">
+    <breadcrumps class="q-pa-md full-width" :map="crumps" />
+    <div class="q-px-md">
+    <q-card class="q-pa-lg">
         <div class="row justify-between">
         <div class="column col-lg-6 col-md-6 col-sm-12 col-xs-12 q-gutter-lg">
         <q-avatar size="100px" font-size="52px">
-            <img src="~assets/one_logo_neat.png" />
+          <img src="~assets/one_logo_neat.png" />
         </q-avatar>
         <div class="column">
         <p class="text-h6">{{oneQuote.client.name}}</p>
@@ -22,13 +23,13 @@
         </div>
         <div class="column col-lg-6 col-md-6 col-xs-12 col-sm-12 items-end q-mt-xl">
         <p class="text-h6" style="padding-bottom:25px !important;">{{oneQuote.quoteNumber}}</p>
-        <p class="text-subtitle2">Invoice Date: {{dateConversion(oneQuote.date)}}</p>
+        <p class="text-subtitle2">Quote Date: {{dateConversion(oneQuote.date)}}</p>
         <p class="text-subtitle2">Due Date: {{dateConversion(oneQuote.dueDate)}}</p>
         </div>
         </div>
         <div style="justify-content: start !important;" v-if="oneQuote.clientContact" class="row q-mt-xl">
           <div class="column">
-          <p>Invoice to:</p>
+          <p>Quotation to:</p>
           <p class="text-bold">{{oneQuote.clientContact.name}}</p>
           <p>{{oneQuote.clientContact.email}}</p>
           <p>{{oneQuote.clientContact.businessPhoneNumber1}}</p>
@@ -50,13 +51,13 @@
                     </tr>
                   </thead>
             <tbody>
-                <tr :style="rowColor(i)" v-for="(invoice, i) in oneQuote.invoiceItems" :key="i">
+                <tr :style="rowColor(i)" v-for="(quote, i) in oneQuote.quoteItems" :key="i">
                     <td  class="text-left">{{i+1}}</td>
-                      <td class="text-left">{{invoice.name}}</td>
-                      <td class="text-left">{{invoice.description}}</td>
-                      <td class="text-left">{{invoice.unitPrice}}</td>
-                      <td class="text-left">{{invoice.qty}}</td>
-                      <td class="text-left">{{invoice.qty * invoice.unitPrice}}</td>
+                      <td class="text-left">{{quote.name}}</td>
+                      <td class="text-left">{{quote.description}}</td>
+                      <td class="text-left">{{quote.unitPrice}}</td>
+                      <td class="text-left">{{quote.qty}}</td>
+                      <td class="text-left">{{quote.qty * quote.unitPrice}}</td>
                     </tr>
             </tbody>
             </q-markup-table>
@@ -89,25 +90,33 @@
             <q-input readonly v-model="total" label="Grand total" type="number" />
             </div>
          </div>
-        <q-separator class="q-mt-lg" />
+         <q-separator class="q-mt-lg" />
          <div class="text-grey q-pa-none">
            <p class="q-mt-md" v-html="oneQuote.description"></p>
          </div>
-          </q-card>
-      </div>
+    </q-card>
+    </div>
     </q-page>
 </template>
 <script>
+import breadcrumps from 'src/components/globalComponents/BreadCrumps.vue'
 import { mapActions, mapState } from 'vuex'
 export default {
+    components: {
+      breadcrumps
+    },
     data() {
-        return{
-          isLoaded: false,
-          taxRatio: 0,
-          total: 0,
-          discount: 0,
-          stotal: 0
-        }
+      return{
+        isLoaded: false,
+        taxRatio: 0,
+        total: 0,
+        discount: 0,
+        stotal: 0,
+        crumps: [
+          {id:1,name:'OneConnect',icon: 'home',path: '/'},
+          {id:2,name:'Quote',icon: 'receipt',path: '/finance/quote'}
+        ],
+      }
     },
     computed : {
         ...mapState('financeStore',['oneQuote'])
@@ -127,8 +136,9 @@ export default {
         await this.getQuote(this.$route.params.id);
         this.isLoaded = true;
         this.discount = Number(this.oneQuote.discount)
-        this.taxRatio = Number(this.oneQuote.taxRate)
-        this.stotal = Number(this.oneQuote.subTotalAmount)
+        this.taxRatio = Number(this.oneQuote.taxRate);
+        this.stotal = Number(this.oneQuote.subTotalAmount);
+        this.discount = Number(this.oneQuote.discount);
         this.total = Number(this.oneQuote.totalAmount)
 
     }

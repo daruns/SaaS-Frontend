@@ -75,42 +75,42 @@ export default {
   props: ['type'],
   data() {
     return {
-    prompt: false,
-    loading: false,
-    action: '',
-    body: {},
-    crumps: [
-        {id:1,name:'OneConnect',icon: 'home',path: '/'},
-        {id:2,name:'Expense',icon: 'attach_money',path: '/finance/expenses'}
-    ],
-    columns : [
-    { name: 'expenseNumber', align: 'left', label: 'Expense number', field: 'expenseNumber'},
-    { name: 'description', align: 'left', label: 'Description', field: 'description'},
-    { name: 'date', align: 'left', label: 'Expense date', field: 'date'},
-    { name: 'dueDate', align: 'left', label: 'Due date', field: 'dueDate'}, 
-    { name: 'status', align: 'left', label: 'Status', field: 'status'}, 
-    { name: 'totalAmount', align: 'left', label: 'Total amount', field: 'totalAmount'},    
-    { name: 'actions', align: 'left', label: 'Actions', field: 'actions'}
-  ]
-   }
+      prompt: false,
+      loading: false,
+      action: '',
+      body: {},
+      crumps: [
+          {id:1,name:'OneConnect',icon: 'home',path: '/'},
+          {id:2,name:'Expense',icon: 'attach_money',path: '/finance/expenses'}
+      ],
+      columns : [
+        { name: 'expenseNumber', align: 'left', label: 'Expense number', field: 'expenseNumber'},
+        { name: 'description', align: 'left', label: 'Description', field: 'description'},
+        { name: 'date', align: 'left', label: 'Expense date', field: 'date'},
+        { name: 'dueDate', align: 'left', label: 'Due date', field: 'dueDate'}, 
+        { name: 'status', align: 'left', label: 'Status', field: 'status'}, 
+        { name: 'totalAmount', align: 'left', label: 'Total amount', field: 'totalAmount'},    
+        { name: 'actions', align: 'left', label: 'Actions', field: 'actions'}
+      ]
+    }
   },
   computed : {
-      ...mapState('financeStore', ['expenses']),
+    ...mapState('financeStore', ['expenses']),
   },
   components: {
     modal,
     breadcrumps
   },
   methods: {
-      ...mapActions('financeStore', ['getExpenses','deleteExpense']),
-      rowColor(props) {
-        if(props.rowIndex%2 !== 0)
-        return 'background: #fff;'
-      },
-     dateConversion(dt) {
+    ...mapActions('financeStore', ['getExpenses','deleteExpense']),
+    rowColor(props) {
+      if(props.rowIndex%2 !== 0)
+      return 'background: #fff;'
+    },
+    dateConversion(dt) {
       let dtObj = new Date(dt);
       dtObj.setHours(dtObj.getHours() - 3)
-       return date.formatDate(dtObj, 'YYYY-MM-DD HH:mm');
+      return date.formatDate(dtObj, 'YYYY-MM-DD HH:mm');
     },
     edit(payload) {
         this.body = payload;
@@ -118,8 +118,8 @@ export default {
         this.prompt = true;
     }
   },
-async mounted() {
-     await this.getExpenses();
+  async mounted() {
+    await this.getExpenses();
   }
 }
 </script>

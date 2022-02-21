@@ -27,6 +27,8 @@ export function GET_CLIENT (state, payload) {
   state.currentClient = payload ;
   state.clientContacts = payload.clientContacts
   state.clientSocialLinks = payload.socialMedias
+  state.invoices = payload.invoices
+  state.quotes = payload.quotes
 }
 
 

@@ -11,32 +11,33 @@ export async function getPosts({commit}) {
   commit('GET_REJECTEDS' ,{ res: response.data.data})
 }
 
-export async function getDrafts({commit, dispatch}, id) {
+export async function getDrafts({commit, dispatch}) {
   let response = await axios.get(apiUrl + `socialMediaStudios/drafts`, {headers: {Authorization: localStorage.getItem('accessToken')}})
-  await commit('GET_DRAFTS', response.data.data);
+  await commit('GET_DRAFTS', { res: response.data.data});
 }
 
-export async function getProductions({commit, dispatch}, id) {
+export async function getProductions({commit, dispatch}) {
   let response = await axios.get(apiUrl + `socialMediaStudios/productions`, {headers: {Authorization: localStorage.getItem('accessToken')}})
-  await commit('GET_PRODUCTIONS', response.data.data);
+  await commit('GET_PRODUCTIONS', { res: response.data.data});
 }
 
-export async function getReviews({commit, dispatch}, id) {
+export async function getReviews({commit, dispatch}) {
   let response = await axios.get(apiUrl + `socialMediaStudios/reviews`, {headers: {Authorization: localStorage.getItem('accessToken')}})
-  await commit('GET_REVIEWS', response.data.data);
+  await commit('GET_REVIEWS', { res: response.data.data});
 }
 
-export async function getCompleteds({commit, dispatch}, id) {
+export async function getCompleteds({commit, dispatch}) {
   let response = await axios.get(apiUrl + `socialMediaStudios/completeds`, {headers: {Authorization: localStorage.getItem('accessToken')}})
-  await commit('GET_COMPLETEDS', response.data.data);
+  await commit('GET_COMPLETEDS', { res: response.data.data});
 }
-export async function getRejecteds({commit, dispatch}, id) {
-  await dispatch('getPosts');
+export async function getRejecteds({commit, dispatch}) {
+  let response = await axios.get(apiUrl + 'socialMediaStudios/', {headers: {Authorization: localStorage.getItem('accessToken')}})
+  await commit('GET_REJECTEDS' ,{ res: response.data.data})
 }
 
-export async function getOnePost({commit, dispatch}, id) {
+export async function getOnePost({commit, dispatch},id) {
   let response = await axios.get(apiUrl + `socialMediaStudios/${id}`, {headers: {Authorization: localStorage.getItem('accessToken')}})
-  await commit('GET_POST', response.data.data);
+  await commit('GET_POST', { res: response.data.data});
 }
 
 export async function createPost({commit, dispatch}, body) {

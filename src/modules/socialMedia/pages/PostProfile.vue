@@ -64,8 +64,8 @@
             </div>
             <hr>
             <q-card class="q-my-md col-12 q-py-md q-my-lg">
-              <p v-if="post.socialMediaStudioUsers.length !== 0" class="text-h6">Assigned users</p>
-              <p v-if="post.socialMediaStudioUsers.length === 0" class="text-subtitle1 text-grey-5">No users assigned.</p>
+              <p v-if="post?.socialMediaStudioUsers?.length !== 0" class="text-h6">Assigned users</p>
+              <p v-if="post?.socialMediaStudioUsers?.length === 0" class="text-subtitle1 text-grey-5">No users assigned.</p>
               <q-btn @click="getUserOptions(post)" class="absolute-bottom-right q-mr-sm q-mb-sm" size="10px" color="primary" round icon="add" unelevated rounded no-caps>
                 <q-popup-edit v-model="userMembers" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
                   <q-select
@@ -91,19 +91,19 @@
                       </q-item>
                       </template>
                   </q-select>
-                  <q-btn @click="addUsersToPosts()" no-caps flat label="submit" color="primary" :disable="users.length === 0" v-close-popup />
+                  <q-btn @click="addUsersToPosts(post?.id)" no-caps flat label="submit" color="primary" :disable="users.length === 0" v-close-popup />
                 </q-popup-edit>
               </q-btn>
-                <div v-if="post.socialMediaStudioUsers.length !== 0" class="row">
-                    <q-chip v-for="(member, i) in post.socialMediaStudioUsers" :key="member.user.id"
+                <div v-if="post?.socialMediaStudioUsers?.length !== 0" class="row">
+                    <q-chip v-for="(member, i) in post.socialMediaStudioUsers" :key="member.user"
                       @remove="(user.id === post.creator?.id) ? (memberId = member.user.id) : false ; deleteUserConfirm = true;"
                       :removable="(user.id === post.creator?.id) ?  true : false"
                     >
-                    <q-avatar>
+                    <q-avatar v-if="member.user">
                       <img round v-if="member.user.avatar" :src="member.user.avatar" icon="person" color="grey"/>
                       <img round v-else src="~/assets/one_logo_neat.png" color="grey"/>
                     </q-avatar>
-                    {{member.user.name}}
+                    {{member.user?.name}}
                     <q-badge class="q-pa-sm q-mx-md" v-if="member.approved" color="green">Approved</q-badge>
                     <q-badge class="q-pa-sm q-mx-md bg-orange" v-if="!member.canEdit" >view-only</q-badge>
                   </q-chip>
@@ -118,7 +118,6 @@
     <q-page v-else class="flex flex-center text-h4"><q-spinner /></q-page>
 </template>
 <script>
-import axios from 'axios';
 import breadcrmps from '../../../components/globalComponents/BreadCrumps.vue';
 import confirm from '../../../components/DeleteDialogue.vue'
 import { mapActions, mapState } from 'vuex';
@@ -149,12 +148,13 @@ export default {
     }
   },
   computed: {
+    ...mapState('socialMediaManagementStore',['currentPost']),
     ...mapState('userStore', ['users']),
     ...mapState('example', ['user'])
   },
   methods: {
     ...mapActions('example', ['getUser']),
-    ...mapActions('socialMediaManagementStore',['addFiles','addUsersToPost','removeUserFromPost']),
+    ...mapActions('socialMediaManagementStore',['addFiles','addUsersToPost','removeUserFromPost','getOnePost']),
     ...mapActions('userStore',['getUsers']),
     async addUsersToPosts(id) {
       let usersToAdd = []
@@ -188,9 +188,9 @@ export default {
       }, 200);
     },
     async getPost() {
-      let response = await axios.get(process.env.OC_BACKEND_API + `socialMediaStudios/${this.$route.params.id}`, {headers: {Authorization: localStorage.getItem('accessToken')}});
-      this.post = response.data.data;
-      this.crumps[1].name = response.data.data.name;
+      await this.getOnePost(this.$route.params.id)
+      this.post = this.currentPost
+      this.crumps[1].name = this.post?.name;
     },
   },
   async mounted() {
@@ -198,6 +198,7 @@ export default {
     await this.getPost();
     await this.getUsers();
     await this.getUser();
+    console.log("currentPost", this.currentPost);
     this.loading = false;
   }
 }

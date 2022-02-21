@@ -17,12 +17,6 @@
     >
       <template v-slot:body="props">
         <q-tr :class="props.rowIndex%2 !== 0 && 'bg-white'" :props="props">
-          <q-td key="logo" :props="props">
-            <q-avatar v-if="props.row.logo" size="30px">
-            <img src="~/assets/one_logo_neat.png">
-            </q-avatar>
-            <q-avatar v-else size="30px" font-size="20px" color="grey" text-color="white" icon="person" />
-          </q-td>
           <q-td class="flex items-center justify-start" key="name" :props="props">
             <p style="font-size: 20px;">{{props.row.name}}</p>
           </q-td>
@@ -44,8 +38,14 @@
           <q-td key="address" :props="props">
               {{ props.row.address }}
           </q-td>
-            <q-td key="rate" :props="props">
-              {{ props.row.rate }}
+          <q-td key="rate" class="fit" :props="props">
+            <q-rating
+              style="min-width:73px"
+              v-model="props.row.rate"
+              :max="5"
+              color="primary"
+              readonly
+            />
           </q-td>
          <q-td key="zipCode" :props="props">
               {{ props.row.zipCode }}
@@ -98,14 +98,6 @@ export default {
         {id:2,name:'Suppliers',icon: 'badge',path: '/finance/suppliers'}
         ],
       columns : [
-    {
-    name: 'logo',
-    required: true,
-    label: '#',
-    align: 'center',
-    field: row => row.name,
-    format: val => `${val}`,
-  },
   {
     name: 'name',
     required: true,

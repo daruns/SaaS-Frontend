@@ -6,7 +6,7 @@
     <q-btn @click="prompt = true" color="primary" label="Create Record" unelevated rounded no-caps />
     </div>
     </div>
-      <breadcrumps :map="crumps" />
+      <breadcrumps class="q-pa-md" :map="crumps" />
       <div class="q-px-md">
         <q-tabs
           v-model="tab"

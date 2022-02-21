@@ -17,6 +17,7 @@ export default function () {
     suppliers: [],
     paymentMethods: [],
     expenses: [],
-    taxes: []
+    taxes: [],
+    currencyCodes: [],
   }
 }

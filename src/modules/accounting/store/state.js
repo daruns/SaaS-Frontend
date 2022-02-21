@@ -3,6 +3,7 @@ export default function () {
     inventoryItems: [],
     nonInventoryItems: [],
     serviceItems: [],
-    joinedItems: []
+    joinedItems: [],
+    newItemCategory: '',
   }
 }

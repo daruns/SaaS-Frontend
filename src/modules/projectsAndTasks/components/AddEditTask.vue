@@ -16,6 +16,7 @@
             label="Name"
             lazy-rules
         />
+        <q-select ref="priorityRef" clearable v-model="task.priority" :options="['High','Medium','Low']" outlined label="Priority" :rules="[val => (val && val.length > 0) || 'This field is required']" />
         <q-select
             ref="projectRef"
             outlined
@@ -33,6 +34,7 @@
               </q-item>
           </template>
         </q-select>
+        <q-select v-model="boardIdSec" :options="allBoards" option-label="name" option-value="id" outlined label="Move to" />
         <q-select
             ref="memberRef"
            :rules="[val => (val && val.length > 0) || 'This field is required']"
@@ -47,14 +49,30 @@
             :loading="isLoaded"
             clearable
         />
+        <div v-show="action === 'Add'" class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-xs-12">
+          <q-uploader
+            max-files="5"
+            max-file-size="1048576"
+            class="col-12 fit"
+            max-total-size="1048576"
+            label="Add Images"
+            @removed="files => {saveFiles(files)}"
+            hide-upload-btn
+            @added="files => {saveFiles(files)}"
+            :multiple="true"
+          />
+        </div>
           <div>
             <div class="q-ma-none absolute q-ml-sm text-grey-7" style="z-index:10;font-size:12px;line-height:20px;font-weight:400;">Start date</div>
             <Datepicker v-model="task.plannedStartDate" showNowButton></Datepicker>
-            </div>
-            <div>
+          </div>
+          <div>
             <div class="q-ma-none absolute q-ml-sm text-grey-7" style="z-index:10;font-size:12px;line-height:20px;font-weight:400;">Task deadline</div>
             <Datepicker class="q-mt-sm" v-model="task.plannedEndDate" showNowButton></Datepicker>
-            </div>
+          </div>
+          <div>
+
+          </div>
         <q-editor             
       v-model="task.description" :dense="true" :toolbar="[
       [
@@ -135,7 +153,6 @@
         verdana: 'Verdana'
       }"
     />
-        <q-select ref="priorityRef" clearable v-model="task.priority" :options="['High','Medium','Low']" outlined label="Priority" :rules="[val => (val && val.length > 0) || 'This field is required']" />        
     </q-card-section>
     </q-card>
           <q-toolbar class="bg-grey-3" style="position:sticky !important; bottom:0;z-index:5;">
@@ -153,11 +170,13 @@ export default {
   components: {
     Datepicker
   },
-    props: ['action', 'body', 'boardId'],
+    props: ['action', 'body', 'boardId', 'allBoards'],
    data()  { 
    return {
      isLoaded: false,
      loading: false,
+     boardIdSec: null,
+     files: [],
      projectOptions: [],
      client: null,
      project: null,
@@ -184,6 +203,9 @@ export default {
     ...mapActions('projectStore',['addTask','editTask']),
     ...mapActions('crmStore',['getClients']),
     ...mapActions('userStore',['getUsers']),
+    saveFiles(files) {
+      this.files = files
+    },
     updateProjectOptions(payload) {
       let membOptions = [];
       let leadOptions = [];
@@ -226,17 +248,18 @@ export default {
       this.$refs.priorityRef.hasError
       )
       return
+      this.loading = true;
       for(let i = 0; i<this.members.length; i++) {
         this.task.members.push(Number(this.members[i].id));
       }
-      this.task.boardId = Number(this.boardId)
-      this.loading = true;
+      console.log("boardId: ",this.boardIdSec.id,"endddddd")
+      this.task.boardId = Number(this.boardIdSec.id)
       this.task.plannedStartDate = date.formatDate(this.task.plannedStartDate, 'YYYY-MM-DD HH:mm');
       this.task.plannedEndDate = date.formatDate(this.task.plannedEndDate, 'YYYY-MM-DD HH:mm');
-     if(this.action === 'Add') {
+      if(this.action === 'Add') {
         await this.create()
       }else{
-        console.log(this.task)
+        console.log("task: ",this.task)
         await this.update()
       }
       this.loading = false;
@@ -244,7 +267,7 @@ export default {
 
     },
     async create() {
-      await this.addTask(this.task) 
+      await this.addTask({data: this.task, files: this.files}) 
     },
       async update() {
       await this.editTask({...this.task, id:Number(this.body.id)}) 
@@ -252,9 +275,11 @@ export default {
   },
  async mounted() {
    if(this.action === 'Edit'){
+     this.boardIdSec = this.body.boardId
      this.task.name = this.body.name
      this.task.description = this.body.description
      this.task.priority = this.body.priority
+     this.task.boardId = this.body.boardId
      this.task.plannedStartDate =  this.dateConversion(this.body.plannedStartDate)
      this.task.plannedEndDate = this.dateConversion(this.body.plannedEndDate)
      if (this.body.project) {
@@ -264,6 +289,7 @@ export default {
       this.members.push({label: this.body.memberUsers[i].name, id: this.body.memberUsers[i].userId})
     }
    }else{
+     this.boardIdSec = this.allBoards.find(e => e.id === this.boardId)
         this.task.plannedStartDate = date.formatDate(new Date, 'YYYY-MM-DD HH:mm');
         this.task.plannedEndDate = date.formatDate(new Date, 'YYYY-MM-DD HH:mm');
    }

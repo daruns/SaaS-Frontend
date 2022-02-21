@@ -16,61 +16,13 @@
             lazy-rules
             :rules="[val => (val && val.length > 0) || 'Please type the company name']"
           />
-            <!-- <q-input
-            ref="nameRef"
-            outlined
-            v-model="credentials.user.username"
-            label="Username"
-            lazy-rules
-            v-show="actionType === 'Add' "
-          /> -->
-            <!-- <q-input
-                ref="passRef"
-                outlined
-                type="password"
-                v-model="credentials.user.password"
-                label="Password"
-                lazy-rules
-                v-show="actionType === 'Add' "
-            /> -->
-                <!-- <q-btn-toggle
-                v-model="credentials.businessType"
-                class="my-custom-toggle"
-                no-caps
-                rounded
-                toggle-color="primary"
-                color="white"
-                text-color="primary"
-                :options="[
-                {label: 'Company', value: 'Company'},
-                {label: 'Individual', value: 'Individual'}
-                ]"
-            /> -->
-           <!-- <q-btn-toggle
-                v-if="actionType === 'Edit'"
-                v-model="credentials.clientType"
-                class="my-custom-toggle"
-                no-caps
-                rounded
-                toggle-color="primary"
-                color="white"
-                text-color="primary"
-                :options="[
-                {label: 'Client', value: 'Client'},
-                {label: 'Lead', value: 'Lead'},
-                {label: 'Blacklist', value: 'Blacklist'},
-                ]"
-            /> -->
         <q-input
-          ref="emailRef"
           outlined
           type="email"
           v-model="credentials.email"
           label="E-mail"
-          lazy-rules
-          :rules="[val => (val && val.length > 0) || 'Please type a valid E-mail']"
         />
-                <vue-tel-input required @country-changed="countryChange" class="phone-input q-mt-sm" defaultCountry="iq" :customValidate="false" @on-input="valid" @input="phoneValidate" v-model="phone"></vue-tel-input>
+        <vue-tel-input required @country-changed="countryChange" class="phone-input q-mt-sm" defaultCountry="iq" :customValidate="false" @input="phoneValidate" v-model="phone"></vue-tel-input>
         <div class="flex items-center">
         <p style="padding:0 !important; font-size:1rem;">Rate: </p>
          <q-rating
@@ -82,28 +34,18 @@
           />
         </div>
        <q-input
-            ref="webRef"
             outlined
             v-model="credentials.website"
             label="Website"
-            lazy-rules
-            :rules="[val => (val && val.length > 0) || 'Please type the website']"
           />
           <q-input
-            ref="addressRef"
             outlined
             v-model="credentials.address"
             label="Address"
-            lazy-rules
-            :rules="[val => (val && val.length > 0) || 'Please type the address']"
           />
          <q-input
-            ref="zipRef"
             outlined
             v-model="credentials.zipCode"
-            label="Zipcode"
-            lazy-rules
-            :rules="[val => (val && val.length > 0) || 'Please type the zipcode']"
           />
         </q-card-section>
       </q-card>
@@ -162,16 +104,8 @@ export default {
     },
    async submit() {
       this.$refs.companyRef.validate();
-      this.$refs.emailRef.validate();
-      this.$refs.webRef.validate();
-      this.$refs.zipRef.validate();
-      this.$refs.addressRef.validate();
       if(
-        this.$refs.companyRef.hasError ||
-        this.$refs.emailRef.hasError ||
-        this.$refs.webRef.hasError ||
-        this.$refs.zipRef.hasError |
-        this.$refs.addressRef.hasError
+        this.$refs.companyRef.hasError
         ) {
           return
         }else{

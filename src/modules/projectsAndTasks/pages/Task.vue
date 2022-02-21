@@ -3,42 +3,42 @@
     <div class="full-width flex justify-between items-center q-px-md  header-height-standard" style="border-bottom: 1px solid lightgrey;">
       <div class="text-h4">Tasks</div>
       <div class="flex items-center">
-         <q-btn @click="this.action = 'Add'; dialogue = true" color="primary" label="Create Board" unelevated rounded no-caps />
+        <q-btn @click="this.action = 'Add'; dialogue = true" color="primary" label="Create Board" unelevated rounded no-caps />
       </div>
     </div>
-    <breadcrmps class="q-pa-md full-width" :map="crumps" />
-    <q-scroll-area class="q-px-md" :thumb-style="thumbStyle" :bar-style="barStyle" style="height: 70vh; width: 100% !important;">
+    <q-scroll-area class="q-px-md" v-if="!isLoaded" :thumb-style="thumbStyle" :bar-style="barStyle" style="height: 70vh; width: 100% !important;">
       <q-markup-table class="flex q-mt-md tasks-table bg-secondary" flat>
           <thead>
             <tr>
-              <th class="round-borders"  :style="`background-color: ${column.boardAttribute.color}`" v-for="column in columns" :key="column.id"
+              <th class="paddingRid" v-for="column in columns" :key="column.id"
               >
-               <div class="flex items-center justify-between">
-              <p class="q-mb-none text-white">{{column.name}}</p>
-              <q-btn color="white" dense round flat icon="more_vert">
-              <q-menu
-                transition-show="scale"
-                transition-hide="scale"
-                
-              >
-                <q-list style="min-width: 75px">
-                  <q-item @click="delBoard(column.id)" style="padding 0 !important" clickable v-close-popup>
-                    <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
-                  </q-item>
-                  <q-separator />
-                  <q-item @click="body = column; action = 'Edit'; dialogue = true;"  clickable v-close-popup>
-                    <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
-                  </q-item>
-                </q-list>
-              </q-menu>
-              </q-btn>
+               <div style='border-radius:6px !important;' :style="`background-color: ${column.boardAttribute.color}`"
+               class="q-pa-sm q-ma-none flex items-center justify-between">
+                <div class="q-mb-none text-white">{{column.name}}</div>
+                <q-btn color="white" dense round flat icon="more_vert">
+                  <q-menu
+                    transition-show="scale"
+                    transition-hide="scale"
+                    
+                  >
+                    <q-list style="min-width: 75px">
+                      <q-item @click="delBoard(column.id)" style="padding 0 !important" clickable v-close-popup>
+                        <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
+                      </q-item>
+                      <q-separator />
+                      <q-item @click="body = column; action = 'Edit'; dialogue = true;"  clickable v-close-popup>
+                        <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
+                      </q-item>
+                    </q-list>
+                  </q-menu>
+                </q-btn>
                </div>
               </th>
             </tr>
           </thead>
           <tbody>
-          <td v-for="column in columns" :key="column.id" :style="`background-color: ${column.boardAttribute.accent};`" class="q-mr-sm round-borders" style="width:15rem; height:auto;">
-            <q-scroll-area :thumb-style="thumbStyle1" :bar-style="barStyle1" style="height: 50vh; width: 15rem;">
+          <td v-for="column in columns" :key="column.id" class="bg-grey-4 q-mr-sm" round :style="`width:265px; height:auto `">
+            <q-scroll-area :thumb-style="thumbStyle1" :bar-style="barStyle1" style="height: 50vh; width: 265px;">
             <div style="height: auto;">
           <draggable
             style="height: 49vh;"
@@ -53,41 +53,51 @@
            @clone="clone"
            item-key="id">
             <template #item="{element}">
-                <div class="bg-white relative-position q-pa-sm q-mb-xs q-ml-xs q-mr-xs rounded-borders" style="border: 0.25px solid lightgrey;max-width: 14.5rem !important;">
-                  <div class="flex items-center justify-between">
-                    <p @click="taskBody = element;taskDialogue = true" class="q-mb-none cursor-pointer" style="width:50% !important;overflow:hidden !important;text-overflow: ellipsis !important;">{{element.name}}</p>
-                    <q-btn style="border: 0.25px solid lightgrey;" dense round flat icon="more_vert">
-                    <q-menu
-                      transition-show="scale"
-                      transition-hide="scale"
-                      
-                    >
-                      <q-list style="min-width: 75px">
-                        <q-item @click="delTask({id: element.id})" style="padding 0 !important" clickable v-close-popup>
-                          <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
-                        </q-item>
-                        <q-separator />
-                        <q-item @click="openDialogue(element, column.id)" clickable v-close-popup>
-                          <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
-                        </q-item>
-                      </q-list>
-                    </q-menu>
+                <div class="bg-white relative-position q-pa-sm q-mb-xs q-ml-xs q-mr-xs rounded-borders" style="border: 0.25px solid lightgrey;">
+                  <div class="flex row items-center justify-between">
+                    <p @click="taskBody = element;taskDialogue = true" class="column col-12 q-mb-none cursor-pointer" style="width:50% !important;overflow:hidden !important;text-overflow: ellipsis !important;">
+                      {{element.name}}
+                      <q-chip square style="height:6px;width:100px" :class="priority(element.priority) + ' q-px-none q-mx-none'" size="xs"></q-chip>
+                    </p>
+                    <q-btn dense round flat color="grey" icon="edit">
+                      <q-menu
+                        transition-show="scale"
+                        transition-hide="scale"
+                        
+                      >
+                        <q-list style="min-width: 75px">
+                          <q-item @click="delTask({id: element.id})" style="padding 0 !important" clickable v-close-popup>
+                            <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
+                          </q-item>
+                          <q-separator />
+                          <q-item @click="openDialogue(element, column.id)" clickable v-close-popup>
+                            <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
                     </q-btn>
-                    </div>
-                  <p class="q-mt-none text-grey" style="width:50% !important;overflow:hidden !important;text-overflow: ellipsis !important;" v-html="element.description"></p>
-                  <div class="row">
+                  </div>
+                  <q-item-section  @click="taskBody = element;taskDialogue = true" clickable v-if="element && element.attachments && element.attachments.length > 0" class="col-12 q-my-sm flex flex-center items-center cursor-pointer">
+                    <q-img :src="element.attachments[0]?.url" />
+                  </q-item-section>
+                  <p class="q-mt-none text-grey cursor-pointer" @click="taskBody = element;taskDialogue = true" clickable style="width:50% !important;overflow:hidden !important;text-overflow: ellipsis !important;" v-html="element.description"></p>
+                  <div class="q-py-md cursor-pointer" @click="taskBody = element;taskDialogue = true" clickable >
+                    <q-icon color="grey" size="sm" name="insert_invitation"/>
+                    <q-badge color="green" size="xs">{{convertDate(element.plannedEndDate)}}</q-badge>
+                  </div>
+                  <div class="row flex flex-reverse">
                     <div class="flex">
-                    <div class="q-mr-xs q-mt-xs q-mb-xs" v-for="(member,i) in element.memberUsers.slice(0, 2)" :key="member.id">
-                    <q-avatar  size="30px">
-                     <q-btn round size="5px" @click="delMember({id:element.id,members: [member.userId]})" icon="close" color="negative" class="absolute-top-right"/>
-                    <img src="~/assets/one_logo_neat.png">
-                    <!-- <q-tooltip>
-                      {{member}}
-                    </q-tooltip> -->
-                    </q-avatar>
+                      <div class=" flex-end q-mr-xs q-mt-xs q-mb-xs" v-for="(member,i) in element.memberUsers" :key="member.id">
+                        <q-avatar  size="40px">
+                          <q-btn round size="5px" @click="delMember({id:element.id,members: [member.userId]})" icon="close" color="negative" class="absolute-top-right"/>
+                            <img v-if="member.avatar" :src="member.avatar">
+                            <img v-else src="~/assets/one_logo_neat.png">
+                          <!-- <q-tooltip>
+                            {{member}}
+                          </q-tooltip> -->
+                        </q-avatar>
+                      </div>
                     </div>
-                    </div>
-                   <p v-if="element.memberUsers.length > 2"  class="q-mt-sm text-subtitle1 text-grey">....+{{element.memberUsers.length - 2}}</p>
                     <div class="flex items-start q-mt-xs q-ml-xs">
                     <q-btn @click="getUserOptions(element)" round size="11px" text-color="black" unelevated color="grey-4" icon="add">
                         <q-popup-edit v-model="members" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
@@ -110,7 +120,8 @@
                             <q-item v-bind="scope.itemProps">
                                 <q-item-section class="avatar-list">
                                 <q-avatar class="q-mr-xs" size="30px">
-                                   <img src="~/assets/one_logo_neat.png">
+                                    <img v-if="scope.opt.avatar" :src="scope.opt.avatar">
+                                    <img v-else src="~/assets/one_logo_neat.png">
                                 </q-avatar>
                                 <q-item-label>{{ scope.opt.label }}</q-item-label>       
                                 </q-item-section>
@@ -120,7 +131,6 @@
                         <q-btn @click="addMembs(element.id)" no-caps flat label="submit" color="primary" :disable="members.length === 0" v-close-popup />
                         </q-popup-edit>
                     </q-btn>
-                    <q-chip square :class="priority(element.priority)" class="absolute-bottom-right q-mb-sm q-mr-sm" size="sm">{{element.priority}}</q-chip>
                     </div>
                 </div>
                 </div>
@@ -128,28 +138,39 @@
           </draggable>
             </div>
             </q-scroll-area>
-          <div class="justify-end flex">
-          <q-btn icon="add" size="10px" @click="bId = column.id; actiont = 'Add'; dialoguet = true" unelevated round no-caps color="primary"/>
+          <div class="full-width row flex">
+          <q-btn
+            icon="add"
+            text-color="grey"
+            label="Add new task..."
+            class="text-left col"
+            @click="bId = column.id;allBoards = columns; actiont = 'Add'; dialoguet = true"
+            unelevated
+            no-caps
+          />
+          {{attempt}}
           </div>
         </td>
         </tbody>
         </q-markup-table>
-        </q-scroll-area>
-        <q-dialog seamless position="right" v-model="dialogue">
-          <modal @closeDialogue="getAll" :action="action" :body="body" />
-        </q-dialog>
-        <q-dialog seamless position="right" v-model="dialoguet">
-          <modalt @closeDialogue="getAll" :action="actiont" :boardId="bId" :body="bodyt" />
-        </q-dialog>   
-        <q-dialog v-model="taskDialogue">   
-          <task :task="taskBody" />
-        </q-dialog>
-    </q-page>
+    </q-scroll-area>
+    <q-page v-else class="flex flex-center"><q-spinner /></q-page>
+    <q-dialog seamless position="right" v-model="dialogue">
+      <modal @closeDialogue="getAll" :action="action" :body="body" />
+    </q-dialog>
+    <q-dialog seamless position="right" v-model="dialoguet">
+      <modalt @closeDialogue="getAll" :action="actiont" :boardId="bId" :body="bodyt" :allBoards="allBoards" />
+    </q-dialog>   
+    <q-dialog v-model="taskDialogue">   
+      <task :task="taskBody" />
+    </q-dialog>
+  </q-page>
 </template>
 <script>
 import { mapActions, mapState } from 'vuex';
 import breadcrmps from '../../../components/globalComponents/BreadCrumps.vue';
 import draggable from 'vuedraggable'
+import moment from 'moment'
 import axios from 'axios';
 import modal from '../components/AddEditBoard.vue'
 import modalt from '../components/AddEditTask'
@@ -166,8 +187,10 @@ export default {
     return{
       taskBody: null,
       taskDialogue: false,
+      loading: false,
       projectsToChoose: [],
       project: null,
+      allBoards: null,
       projects: [],
       isLoaded: false,
       members: [],
@@ -220,21 +243,24 @@ export default {
   methods: {
     ...mapActions('projectStore',['getProjects','deleteBoard', 'addMembers', 'deleteTask', 'deleteMember']),
     ...mapActions('userStore',['getUsers']),
+    convertDate(datStr) {
+      return moment(datStr).format('MMM Do YYYY')
+    },
     priority(priority) {
       switch(priority){
 
       case 'High':
-      return 'text-positive bg-green-1'
+      return 'text-positive bg-green-4'
 
       case 'Medium':
-      return 'text-warning bg-yellow-2'
+      return 'text-warning bg-yellow-4'
 
       case 'Low':
-      return 'text-negative bg-red-1'
+      return 'text-negative bg-red-4'
       }
     },
-    clone({ name, description, memberUsers, id, priority }) {
-      return { name, description, memberUsers, id: id, priority };
+    clone({ name, description, memberUsers, id, priority, attachments }) {
+      return { name, description, memberUsers, id: id, priority,attachments };
     },
     pullFunction() {
       return this.controlOnStart ? "clone" : true;
@@ -270,10 +296,12 @@ export default {
         time = 0
       }
       setTimeout(() => {
-          this.bodyt = payload;
-          this.actiont = 'Edit';
-          this.dialoguet = true; 
-          this.boardId = bId
+        this.bodyt = payload
+        this.allBoards = this.columns
+        console.log(this.allBoards)
+        this.actiont = 'Edit';
+        this.dialoguet = true; 
+        this.boardId = bId
       }, time);
     },
     async delTask(payload) {
@@ -298,56 +326,54 @@ export default {
       let optionsB = [];
       this.options = [];
       setTimeout(() => {
-      if(!payload) return
-      for(let i = 0; i<this.users.length; i++) {
-      for(let j = 0; j<payload.memberUsers.length; j++) {
-        if(Number(payload.memberUsers[j].userId) === Number(this.users[i].id)){
-          optionsB.push({id:this.users[i].id, label: this.users[j].name});
+        if(!payload) return
+        for(let i = 0; i<this.users.length; i++) {
+          for(let j = 0; j<payload.memberUsers.length; j++) {
+            if(Number(payload.memberUsers[j].userId) === Number(this.users[i].id)){
+              optionsB.push({id:this.users[i].id, label: this.users[j].name, avatar: this.users[j].avatar});
+            }
+          }
+          optionsA.push({id:this.users[i].id, label: this.users[i].name, avatar: this.users[i].avatar});
         }
-      }
-          optionsA.push({id:this.users[i].id, label: this.users[i].name});
-      }
-      this.options = optionsA.filter(({ id: id1 }) => !optionsB.some(({ id: id2 }) => id2 === id1));
+        this.options = optionsA.filter(({ id: id1 }) => !optionsB.some(({ id: id2 }) => id2 === id1));
       }, 200);
     },
-   async change(evt) {
+    async change(evt) {
       this.attempt += 1
-      if(this.attempt%2 !== 0){
-             for(let i = 0; i<this.columns.length; i++) {
-               for(let j = 0; j<this.columns[i].tasks.length; j++) {
-                   if(Number(this.columns[i].tasks[j].id) === Number(evt.added.element.id)){
-                      let response = await axios.post(process.env.OC_BACKEND_API + 'tasks/changeBoard',  
-                      {id:Number(evt.added.element.id), boardId:Number(this.columns[i].id)  }, 
-                      {headers: {Authorization: localStorage.getItem('accessToken')}})
-                   }
-               }
-             }
+      if (this.attempt%2 !== 0) {
+        for (let i = 0; i<this.columns.length; i++) {
+          for (let j = 0; j<this.columns[i].tasks.length; j++) {
+            if (Number(this.columns[i].tasks[j].id) === Number(evt.added.element.id)) {
+              let response = await axios.post(process.env.OC_BACKEND_API + 'tasks/changeBoard',  
+              {id:Number(evt.added.element.id), boardId:Number(this.columns[i].id)  },   
+              {headers: {Authorization: localStorage.getItem('accessToken')}})
+            }
+          }
+        }
       }
     },
-     async getAll() {
-    let res = await axios.get(process.env.OC_BACKEND_API + 'boards', {headers: {Authorization: localStorage.getItem('accessToken')}});
-    this.columns = res.data.data;
-    for(let i = 0; i<this.columns.length; i++) {
-      this.columns[i].boardAttribute = {
-        ...this.columns[i].boardAttribute,
-        accent: this.getAccentColor(this.columns[i].boardAttribute.color)
+    async getAll() {
+      let res = await axios.get(process.env.OC_BACKEND_API + 'boards', {headers: {Authorization: localStorage.getItem('accessToken')}});
+      this.columns = res.data.data;
+      for(let i = 0; i<this.columns.length; i++) {
+        this.columns[i].boardAttribute = {
+          ...this.columns[i].boardAttribute,
+          accent: this.getAccentColor(this.columns[i].boardAttribute.color)
         }
+      }
+      if(this.dialogue === true) this.dialogue = false;
+      if(this.dialoguet === true) this.dialoguet = false;
+    },
+    async delBoard(id) {
+      await this.deleteBoard({id: id});
+      this.getAll();
     }
-    if(this.dialogue === true) this.dialogue = false;
-    if(this.dialoguet === true) this.dialoguet = false;
-
-
   },
-  async delBoard(id) {
-    await this.deleteBoard({id: id});
-    this.getAll();
-  }
-  },
- async mounted() {
-   this.isLoaded = true
-  await this.getAll();
-  await this.getUsers();
-  await this.getUserOptions();
+  async mounted() {
+    this.isLoaded = true
+    await this.getAll();
+    await this.getUsers();
+    await this.getUserOptions();
     this.isLoaded = false;
   },
   setup () {
@@ -381,5 +407,12 @@ div.q-avatar div.q-avatar__content img {
 
 .q-markup-table.q-table__container.q-table__card.q-table--horizontal-separator.q-table--flat.q-table--no-wrap.flex.q-mt-md.tasks-table.bg-secondary {
   border-radius: 0 !important;
+}
+.paddingRidonly {
+  padding: 0px !important;
+}
+.paddingRid {
+  padding: 0px !important;
+  background-color: #f2f2f2 !important;
 }
 </style>

@@ -150,8 +150,8 @@ export default {
      contact: {
          name: '',
          description: 'description',
-         businessPhoneNumber1: '',
-         businessPhoneNumber2: '',
+         businessPhoneNumber1: null,
+         businessPhoneNumber2: null,
          position: '',
          email: '',
          department: '',
@@ -222,8 +222,8 @@ export default {
             this.error1 = false
             this.error2 = false
      this.loading = true;
-     this.contact.businessPhoneNumber1 = this.dialCode1 + this.phone1
-     this.contact.businessPhoneNumber2 = this.dialCode1 + this.phone2
+     this.contact.businessPhoneNumber1 = (this.phone1 !== '' && this.phone1 !== null) ? (this.dialCode1 + this.phone1) : null
+     this.contact.businessPhoneNumber2 = (this.phone2  !== '' && this.phone2  !== null) ? (this.dialCode2  + this.phone2 ) : null
      if(this.actionType === 'Add') {
         await this.create()
       }else{

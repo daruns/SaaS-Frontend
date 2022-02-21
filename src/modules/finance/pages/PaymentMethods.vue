@@ -18,15 +18,16 @@
     >
       <template v-slot:body="props">
         <q-tr :class="props.rowIndex%2 !== 0 && 'bg-white'" :props="props">
-          <q-td key="logo" :props="props">
+          <!-- <q-td key="logo" :props="props">
             <q-avatar size="30px">
             <img src="~/assets/one_logo_neat.png">
             </q-avatar>
-          </q-td>
+          </q-td> -->
           <q-td class="flex items-center justify-start" key="name" :props="props">
             <p style="font-size: 20px;">{{props.row.name}}</p>
           </q-td>
-          <q-td key="description" v-html="props.row.description" :props="props">
+          <q-td class="col" key="description" :props="props">
+            <p style="">{{props.row.description}}</p>
           </q-td>
           <!-- <q-td key="clientType" :props="props">
               {{ props.row.clientType }}
@@ -34,7 +35,7 @@
           <q-td key="businessType" :props="props">
               {{ props.row.businessType }}
           </q-td> -->
-          <q-td key="pin" :props="props">
+          <!-- <q-td key="pin" :props="props">
               {{ props.row.pin }}
           </q-td>
           <q-td key="cvs" :props="props">
@@ -42,7 +43,7 @@
           </q-td>
          <q-td key="expireDate" :props="props">
               {{ dateConversion(props.row.expireDate) }}
-          </q-td>
+          </q-td> -->
          <q-td key="actions" :props="props">
           <q-btn dense round flat icon="more_vert">
             <q-menu
@@ -93,26 +94,18 @@ export default {
         {id:2,name:'Payment',icon: 'payment',path: '/finance/payment'}
         ],
       columns : [
-    {
-    name: 'logo',
-    required: true,
-    label: '#',
-    align: 'center',
-    field: row => row.name,
-    format: val => `${val}`,
-  },
   {
     name: 'name',
     required: true,
-    label: 'Company/Individual',
+    label: 'Name',
     align: 'left',
     field: row => row.name,
     format: val => `${val}`,
     },
     { name: 'description', label: 'Description', align: 'left', field: 'description' },
-    { name: 'pin', label: 'PIN code', align: 'left', field: 'pin'},
-    { name: 'cvs', label: 'CVV', align: 'left', field: 'cvs'},
-    { name: 'expireDate', label: 'Expire date', align: 'left', field: 'expireDate'},
+    // { name: 'pin', label: 'PIN code', align: 'left', field: 'pin'},
+    // { name: 'cvs', label: 'CVV', align: 'left', field: 'cvs'},
+    // { name: 'expireDate', label: 'Expire date', align: 'left', field: 'expireDate'},
     { name: 'actions', label: 'Actions', align: 'left', field: 'actions'}
   ]
    }

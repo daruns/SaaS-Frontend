@@ -9,10 +9,11 @@ const routes = [
         { path: '/finance/quote/:id', component: () => import('../pages/QuoteShow.vue') },
         { path: '/finance/taxes', component: () => import('../pages/Taxes.vue') },
         { path: '/finance/categories', component: () => import('../pages/Categories.vue') },
-        { path: '/finance/suppliers', component: () => import('../pages/Suppliers.vue') },
         { path: '/finance/payment', component: () => import('../pages/PaymentMethods.vue') },
         { path: '/finance/expenses', component: () => import('../pages/Expenses.vue') },
-        { path: '/finance/expense/:id', component: () => import('../pages/ExpenseShow.vue') }
+        { path: '/finance/expense/:id', component: () => import('../pages/ExpenseShow.vue') },
+        { path: '/finance/accounting', component: () => import('src/modules/accounting/pages/Index.vue') },
+        { path: '/suppliers', component: () => import('../pages/Suppliers.vue') },
       ],
       meta: {needsAuth: true}
     }
