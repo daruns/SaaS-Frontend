@@ -626,7 +626,7 @@ export default {
       }
     },
     updateTaxRateValue(e) {
-      this.quote.taxRate = e.rate
+      this.invoice.taxRate = e?.rate
       this.updateValues()
     },
     addItemToQuoteTable(ind) {
@@ -748,7 +748,7 @@ export default {
       this.quote.discount = Number(this.quote.discount) / 100
       this.quote.taxRate = Number(this.quote.taxRate) / 100
       this.quote.bankFee = Number(this.bankFee)
-      this.quote.taxId = this.tax ?  Number(this.tax?.id) : null
+      this.quote.taxId = this.tax ? Number(this.tax?.id) : null
       this.quote.paymentMethodId = this.paymentMethod ? Number(this.paymentMethod?.id) : null
       this.quote.date = date.formatDate(new Date(this.quote.date), 'YYYY-MM-DD HH:mm');
       this.quote.dueDate = date.formatDate(new Date(this.quote.dueDate), 'YYYY-MM-DD HH:mm');

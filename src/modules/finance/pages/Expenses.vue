@@ -37,23 +37,25 @@
           <q-td key="totalAmount" :props="props">
               {{ props.row.totalAmount }}
           </q-td>
-         <q-td key="actions" :props="props">
+          <q-td key="actions" :props="props">
+          <router-link :to="`/finance/expense1/${props.row.id}`">
+            <q-btn dense text-color="dark" round flat icon="visibility" />
+          </router-link>
           <q-btn  :disable="props.row.status === 'Paid'" dense round flat icon="more_vert">
-            <q-menu
-              transition-show="scale"
-              transition-hide="scale"
-              
-            >
-              <q-list style="min-width: 75px">
-                <q-item @click="deleteExpense({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
-                  <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
-                </q-item>
-                <q-separator />
-                <q-item @click="edit(props.row)" clickable v-close-popup>
-                 <q-item-section  class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
+              <q-menu
+                transition-show="scale"
+                transition-hide="scale"
+              >
+                <q-list style="min-width: 75px">
+                  <q-item @click="deleteExpense({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
+                    <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
+                  </q-item>
+                  <q-separator />
+                  <q-item @click="edit(props.row)" clickable v-close-popup>
+                  <q-item-section  class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
             </q-btn>
           </q-td>
         </q-tr>

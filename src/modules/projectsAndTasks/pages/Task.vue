@@ -80,7 +80,7 @@
                   <q-item-section  @click="taskBody = element;taskDialogue = true" clickable v-if="element && element.attachments && element.attachments.length > 0" class="col-12 q-my-sm flex flex-center items-center cursor-pointer">
                     <q-img :src="element.attachments[0]?.url" />
                   </q-item-section>
-                  <p class="q-mt-none text-grey cursor-pointer" @click="taskBody = element;taskDialogue = true" clickable style="width:50% !important;overflow:hidden !important;text-overflow: ellipsis !important;" v-html="element.description"></p>
+                  <p class="q-mt-none text-grey cursor-pointer" @click="taskBody = element;taskDialogue = true" clickable style="overflow: hidden !important;text-overflow: ellipsis;word-break: break-all !important;width: 229px;display: flex;flex-wrap: wrap;justify-content: space-between;flex-direction: row;max-width:229px!important"><q-icon name="subject" size="sm" /></p>
                   <div class="q-py-md cursor-pointer" @click="taskBody = element;taskDialogue = true" clickable >
                     <q-icon color="grey" size="sm" name="insert_invitation"/>
                     <q-badge color="green" size="xs">{{convertDate(element.plannedEndDate)}}</q-badge>
@@ -148,7 +148,6 @@
             unelevated
             no-caps
           />
-          {{attempt}}
           </div>
         </td>
         </tbody>

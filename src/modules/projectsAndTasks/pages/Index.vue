@@ -3,7 +3,7 @@
     <div class="full-width flex justify-between items-center q-px-md  header-height-standard" style="border-bottom: 1px solid lightgrey;">
       <div class="text-h4">Projects</div>
       <div class="flex items-center">
-        <q-btn @click="dialogue = true" color="primary" label="Create Record"  unelevated rounded no-caps />
+        <q-btn @click="dialogue = true" color="primary" label="Create Project"  unelevated rounded no-caps />
       </div>
     </div>
     <projects />

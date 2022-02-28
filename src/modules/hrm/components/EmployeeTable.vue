@@ -24,28 +24,25 @@
             <p style="font-size: 20px;">{{props.row.name}}</p>
             </router-link>
           </q-td>
-          <q-td key="phoneNumber1" :props="props">
-              {{ props.row.phoneNumber1 }}
+          <q-td key="salary" :props="props">
+              {{ props.row.salary }}
           </q-td>
-          <q-td key="businessType" :props="props">
-              {{ props.row.businessType }}
+          <q-td key="Leave Balance (in days)" :props="props">
+              {{ props.row.leaveBalance }}
           </q-td>
-          <q-td key="email" :props="props">
-              {{ props.row.email }}
+          <q-td key="department" :props="props">
+              {{ props.row.department.name }}
           </q-td>
-          <q-td key="website" :props="props">
-              {{ props.row.website }}
+          <q-td key="designation" :props="props">
+              {{ props.row.designation.name }}
           </q-td>
-          <q-td key="address" :props="props">
-              {{ props.row.address }}
+          <q-td v-if="props.row.managerId" key="Manager" :props="props">
+              {{ props.row.manager?.name }}
           </q-td>
-            <q-td key="rate" :props="props">
-              {{ props.row.rate }}
+            <q-td key="email" :props="props">
+              {{ props.row.user.email }}
           </q-td>
-          <q-td key="zipCode" :props="props">
-              {{ props.row.zipCode }}
-            </q-td>
-          <q-td class="row flex text-center" key="zipCode" :props="props">
+          <q-td class="row flex text-center" key="email" :props="props">
           <router-link :to="`/client/${props.row.id}`">
           <q-btn dense text-color="dark" round flat icon="visibility" />
           </router-link>
@@ -129,7 +126,7 @@ export default {
     },
     { name: 'phoneNumber1', align: 'left', label: 'Phone number 1', field: 'phoneNumber1'},
     { name: 'businessType', label: 'Business type', align: 'left', field: 'businessType' },
-    { name: 'email', label: 'E-mail', align: 'left', field: 'email' },
+    { name: 'leaveBalance', label: 'Leave Balance (in days)', align: 'left', field: 'leaveBalance' },
     { name: 'website', label: 'Website', align: 'left', field: 'website'},
     { name: 'address', label: 'Address', align: 'left', field: 'address'},
     { name: 'rate', label: 'Rate', align: 'left', field: 'rate'},

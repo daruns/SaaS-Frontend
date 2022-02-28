@@ -5,6 +5,7 @@ import projectRoutes from '../modules/projectsAndTasks/routes';
 import usersRoutes from '../modules/Users/routes';
 import chatRoutes from '../modules/chat/router';
 import socialMedias from '../modules/socialMedia/router'
+import hrmRoutes from '../modules/hrm/router'
 
 const routes = [
   {
@@ -37,6 +38,7 @@ const routes = [
   ...usersRoutes,
   ...chatRoutes,
   ...socialMedias,
+  ...hrmRoutes,
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/Error404.vue')

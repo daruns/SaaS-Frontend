@@ -8,6 +8,34 @@
             <q-btn icon="close" flat round dense v-close-popup />
     </q-toolbar>
     <q-card-section class="q-gutter-md scroll">
+        <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-xs-12">
+          <q-card v-show="action === 'Edit'" v-for="imgUrl in body?.attachments" :key="imgUrl" class="my-card" flat bordered>
+            <q-card-section horizontal>
+              <q-img
+                class="col"
+                :src="imgUrl?.url"
+              />
+              <q-card-actions vertical class="justify-around q-px-md">
+                <q-btn flat round color="red" icon="favorite" />
+                <q-btn flat round color="accent" icon="bookmark" />
+                <q-btn flat round color="primary" icon="share" />
+              </q-card-actions>
+            </q-card-section>
+          </q-card>
+        </div>
+        <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-xs-12">
+          <q-uploader
+            max-files="5"
+            max-file-size="1048576"
+            class="col-12 fit"
+            max-total-size="1048576"
+            label="Add Images"
+            @removed="files => {saveFiles(files)}"
+            hide-upload-btn
+            @added="files => {saveFiles(files)}"
+            :multiple="true"
+          />
+        </div>
         <q-input
             ref="nameRef"
             :rules="[val => (val && val.length > 0) || 'This field is required']"
@@ -49,19 +77,6 @@
             :loading="isLoaded"
             clearable
         />
-        <div v-show="action === 'Add'" class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-xs-12">
-          <q-uploader
-            max-files="5"
-            max-file-size="1048576"
-            class="col-12 fit"
-            max-total-size="1048576"
-            label="Add Images"
-            @removed="files => {saveFiles(files)}"
-            hide-upload-btn
-            @added="files => {saveFiles(files)}"
-            :multiple="true"
-          />
-        </div>
           <div>
             <div class="q-ma-none absolute q-ml-sm text-grey-7" style="z-index:10;font-size:12px;line-height:20px;font-weight:400;">Start date</div>
             <Datepicker v-model="task.plannedStartDate" showNowButton></Datepicker>
@@ -199,8 +214,7 @@ export default {
       ...mapState('projectStore', ['projects'])
   },
   methods : {
-    ...mapActions('projectStore',['addProject','editProject', 'getProjects']),
-    ...mapActions('projectStore',['addTask','editTask']),
+    ...mapActions('projectStore',['addProject','editProject', 'getProjects','addTask','editTask','addTaskFiles']),
     ...mapActions('crmStore',['getClients']),
     ...mapActions('userStore',['getUsers']),
     saveFiles(files) {
@@ -254,6 +268,7 @@ export default {
       }
       console.log("boardId: ",this.boardIdSec.id,"endddddd")
       this.task.boardId = Number(this.boardIdSec.id)
+      this.task.files = this.files
       this.task.plannedStartDate = date.formatDate(this.task.plannedStartDate, 'YYYY-MM-DD HH:mm');
       this.task.plannedEndDate = date.formatDate(this.task.plannedEndDate, 'YYYY-MM-DD HH:mm');
       if(this.action === 'Add') {
@@ -270,7 +285,7 @@ export default {
       await this.addTask({data: this.task, files: this.files}) 
     },
       async update() {
-      await this.editTask({...this.task, id:Number(this.body.id)}) 
+      await this.editTask({...this.task, id:Number(this.body.id)})
     }
   },
  async mounted() {

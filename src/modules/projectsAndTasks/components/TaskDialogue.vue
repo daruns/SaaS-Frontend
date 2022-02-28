@@ -6,7 +6,7 @@
             <q-btn color="negative" flat label="Close" v-close-popup />
           </q-card-actions>
           <q-separator />
-          <q-card-section class="q-py-md row flex col-6">
+          <q-card-section class="q-py-md row wrap flex col-6">
             <div class="row flex q-py-sm col-6">
               <q-chip class="q-px-md" text-color="white" color="green">Start date: {{dateConversion(task.plannedEndDate)}}</q-chip>
             </div>

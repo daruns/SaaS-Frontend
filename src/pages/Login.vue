@@ -39,7 +39,7 @@
       </div>
     </div>
       </q-card-section>
-      <!-- <p class="text-center">You don`t have an account?<router-link to="/signup" style="color: #1976D2;"> Sign up</router-link></p> -->
+      <p class="text-center">You don`t have an account?<router-link to="/signup" style="color: #1976D2;"> Sign up</router-link></p>
     </q-card>
 </div>
 </template>

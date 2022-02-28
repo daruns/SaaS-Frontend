@@ -6,29 +6,28 @@
             <q-btn flat round icon="menu" @click="drawer = !drawer"/>
             <q-btn flat round>
               <img
-                  alt="oneconnect logo"
-                  src="~assets/one_logo_neat.png"
-                  style="height:30px; width:30px;"
-                >
+                alt="oneconnect logo"
+                src="~assets/one_logo_neat.png"
+                style="height:30px; width:30px;"
+              >
             </q-btn>
         <q-space />
         <div class="flex flex-center q-mr-sm">
-            <q-btn flat color="white" round icon="email" size="sm">
-              <q-badge color="red" rounded floating>4</q-badge>
-            </q-btn>
-            <q-btn flat color="white" round icon="notifications" size="sm">
-              <q-badge rounded color="red" floating>2</q-badge>
-            </q-btn>
+          <q-btn flat color="white" round icon="email" size="sm">
+            <q-badge color="red" rounded floating>4</q-badge>
+          </q-btn>
+          <q-btn flat color="white" round icon="notifications" size="sm">
+            <q-badge rounded color="red" floating>2</q-badge>
+          </q-btn>
         </div>
             <q-btn flat round>
-                 <img
-                  alt="User logo"
-                  v-if="user.avatar !== null"
-                  :src="user.avatar"
-                  style="height:30px; width:30px; border-radius:50%;"
-                >
-                <q-avatar v-else size="35px" font-size="10px" color="grey" text-color="white" icon="person" />    
-                
+              <img
+                alt="User logo"
+                v-if="user.avatar !== null"
+                :src="user.avatar"
+                style="height:30px; width:30px; border-radius:50%;"
+              >
+              <q-avatar v-else size="35px" font-size="10px" color="grey" text-color="white" icon="person" />
             <q-menu>
               <q-list>
                 <q-item to="/profile" v-close-popup clickable>
@@ -62,7 +61,8 @@
           </template>
           </q-input>
           <div class="q-ml-sm q-mt-xs" style="margin-top:7px;">
-              <q-btn :ripple="false" class="bg-blue-1" @click="createRoom = true" flat round color="primary">
+              <q-btn 
+                ipple="false" class="bg-blue-1" @click="createRoom = true" flat round color="primary">
                <i style="font-size: 24px;" class="las la-edit"></i>
              </q-btn>
           </div>

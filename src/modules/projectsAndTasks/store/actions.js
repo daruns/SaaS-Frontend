@@ -74,10 +74,12 @@ export async function deleteBoard({dispatch}, payload) {
   let response = await axios.post(process.env.OC_BACKEND_API + 'boards/delete', payload, {headers: {Authorization: localStorage.getItem('accessToken')}})
 }
 
-
 //Tasks
 
 export async function addTask({dispatch}, payload) {
+  if (payload.data.files) {
+    delete payload.data.files
+  }
   let response = await axios.post(process.env.OC_BACKEND_API + 'tasks/create', payload.data, {headers: {Authorization: localStorage.getItem('accessToken')}})
   await dispatch('getProjects');
   if(payload.files){
@@ -97,6 +99,13 @@ export async function addTaskFiles({dispatch}, payload) {
 
 export async function editTask({dispatch}, payload) {
   let response = await axios.post(process.env.OC_BACKEND_API + 'tasks/update', payload, {headers: {Authorization: localStorage.getItem('accessToken')}})
+  if(payload.files){
+    let data = new FormData();
+    data.append('id', payload.id);
+    data.append('files', payload.files);
+    await dispatch('addTaskFiles', data);
+  }
+  await dispatch('getProjects');
 }
 
 export async function deleteTask({dispatch}, payload) {

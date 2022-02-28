@@ -9,17 +9,17 @@
         class="right-side-bar-custom-z-index-below-dialog full-height bg-lie-dark"
         :style="'transform: translateX(' + ((drawer) ? '245px' : '0px') + ') !important'"
       >
-      <div class="col flex header-height-standard full-width text-white q-py-sm">
-        <q-item-list :class="!miniState ? 'col text-h6 q-ma-xs row flex justify-between' : 'col text-h6 q-ma-xs flex justify-center'">
+      <div class="col flex items-center justify-between header-height-standard full-width text-white q-pa-xs">
+        <q-item-list :class="!miniState ? 'col text-h6 q-pa-xs row flex justify-between' : 'col text-h6 q-ma-xs flex justify-center'">
           <q-item v-if="!miniState">{{subSideBar.title}}</q-item>
           <q-item
             flat
             dense
             text-color="white"
-            class="flex items-center justify-center"
+            class="q-pa-none flex items-center justify-center"
             color="white"
           ><q-btn flat @click="openedSideBar();" style="transition:0.2s cease; transform: rotate(90deg);"
-            text-color="white" :icon="miniState ? 'fas fa-window-maximize' : 'fas fa-minus'" />
+            text-color="white" class="q-px-none q-py-md" :icon="miniState ? 'fas fa-window-maximize' : 'fas fa-minus'" />
           </q-item>
         </q-item-list>
       </div>
@@ -168,6 +168,20 @@
           </q-item-section>
 
           <q-item-section>Finance</q-item-section>
+        </q-item>
+        <q-item
+          :to="$route.path.split('/')[1] === 'hrm' ? $route.path : undefined"
+          exact
+          @click="sendSubSideBardData('hrm')"
+          clickable
+          class="text-grey"
+          active-class="hovered my-menu-link"
+        >
+          <q-item-section avatar>
+            <q-icon name="people_alt" />
+          </q-item-section>
+
+          <q-item-section>HRM</q-item-section>
         </q-item>
         <q-item
           :to="$route.path.split('/')[1] === 'projects' ? $route.path : undefined"
@@ -399,7 +413,7 @@ export default {
     },
     drawerState(evnt) {
       if (this.routePath) {
-        if(['finance','projects','social-media-management'].includes(this.routePath)) {
+        if(['hrm','finance','projects','social-media-management'].includes(this.routePath)) {
           if (evnt === "mount") {
             this.drawer = true
             this.sendSubSideBardData(this.routePath)
@@ -427,6 +441,9 @@ export default {
       }
       if (path == 'finance') {
         this.sendSubSideBardData("finance")
+      }
+      if (path == 'hrm') {
+        this.sendSubSideBardData("hrm")
       }
       if (path == 'projects') {
         this.sendSubSideBardData("projects")
@@ -463,6 +480,20 @@ export default {
           {name: "Expense categories", icon: "grid_view", url: "/finance/categories"},
           {name: "Payment Types", icon: "fas fa-credit-card", url: "/finance/payment"},
           {name: "Tax Types", icon: "receipt_long", url: "/finance/taxes"},
+        ]
+        this.$router.push(this.subSideBar.itemsArray[0].url)
+        this.drawer = true
+        this.miniState = true
+        this.toggledM = true
+      } else if (payload === "hrm") {
+        this.subSideBar.title = "HRM"
+        this.subSideBar.itemsArray = [
+          {name: "Employees", icon: "person", url: "/hrm/employees"},
+          {name: "Leaves", icon: "description", url: "/hrm/leaves"},
+          {name: "Attendance", icon: "touch_app", url: "/hrm/attendances"},
+          {name: "Leave Types", icon: "category", url: "/hrm/leaveTypes"},
+          {name: "Departments", icon: "groups", url: "/hrm/departments"},
+          {name: "Designations", icon: "grid_view", url: "/hrm/designations"},
         ]
         this.$router.push(this.subSideBar.itemsArray[0].url)
         this.drawer = true

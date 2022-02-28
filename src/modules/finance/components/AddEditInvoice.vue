@@ -626,7 +626,7 @@ export default {
       }
     },
     updateTaxRateValue(e) {
-      this.invoice.taxRate = e.rate
+      this.invoice.taxRate = e?.rate
       this.updateValues()
     },
     addItemToInvoiceTable(ind) {
@@ -748,7 +748,7 @@ export default {
       this.invoice.discount = Number(this.invoice.discount) / 100
       this.invoice.taxRate = Number(this.invoice.taxRate) / 100
       this.invoice.bankFee = Number(this.bankFee)
-      this.invoice.taxId = this.tax ?  Number(this.tax?.id) : null
+      this.invoice.taxId = this.tax ? Number(this.tax?.id) : null
       this.invoice.paymentMethodId = this.paymentMethod ? Number(this.paymentMethod?.id) : null
       this.invoice.date = date.formatDate(new Date(this.invoice.date), 'YYYY-MM-DD HH:mm');
       this.invoice.dueDate = date.formatDate(new Date(this.invoice.dueDate), 'YYYY-MM-DD HH:mm');
