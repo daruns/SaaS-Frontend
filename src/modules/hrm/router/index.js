@@ -7,6 +7,7 @@ const routes = [
         { path: '/hrm/employee/:id', component: () => import('../pages/EmployeeProfile.vue')},
         { path: '/hrm/departments', component: () => import('../pages/Departments.vue')},
         { path: '/hrm/designations', component: () => import('../pages/Designations.vue')},
+        { path: '/hrm/leaves', component: () => import('../pages/Leaves.vue')},
         { path: '/hrm/leaveTypes', component: () => import('../pages/LeaveTypes.vue')},
         { path: '/hrm/attendances', component: () => import('../pages/Attendances.vue')},
       ],

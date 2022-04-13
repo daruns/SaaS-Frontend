@@ -77,9 +77,12 @@
             <p>Leave Balance (in days):</p>
             <p class="text-grey">{{currentEmployee.leaveBalance}}</p>
             </div>
-            <div v-if="currentEmployee.website"  class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+            <div v-if="currentEmployee.manager"  class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
             <p>Manager:</p>
-            <p class="text-grey">{{currentEmployee.manager.name}}</p>
+            <p class="text-grey">{{currentEmployee.manager?.user?.name}}</p>
+            </div>
+            <div v-if="currentEmployee.hrMember"  class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+            <p>HR Member: <q-icon name="done" size="sm" color="primary" /></p>
             </div>
             <div v-if="currentEmployee.createdBy"  class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
               <p>Created By:</p>

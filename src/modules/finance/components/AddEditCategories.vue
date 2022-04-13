@@ -3,7 +3,7 @@
     <q-card style="max-width: 550px; min-height:100vh;" flat square>
       <q-toolbar class="bg-grey-3 header-height-standard" style="position:sticky !important; top:0;z-index:15;">
         <q-toolbar-title>
-          {{actionType  + ' '}}Tax
+          {{actionType  + ' '}}Category
         </q-toolbar-title>
         <q-btn icon="close" flat round dense v-close-popup />
       </q-toolbar>

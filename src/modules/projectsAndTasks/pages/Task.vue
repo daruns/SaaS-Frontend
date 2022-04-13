@@ -19,7 +19,7 @@
                   <q-menu
                     transition-show="scale"
                     transition-hide="scale"
-                    
+
                   >
                     <q-list style="min-width: 75px">
                       <q-item @click="delBoard(column.id)" style="padding 0 !important" clickable v-close-popup>
@@ -63,7 +63,7 @@
                       <q-menu
                         transition-show="scale"
                         transition-hide="scale"
-                        
+
                       >
                         <q-list style="min-width: 75px">
                           <q-item @click="delTask({id: element.id})" style="padding 0 !important" clickable v-close-popup>
@@ -123,7 +123,7 @@
                                     <img v-if="scope.opt.avatar" :src="scope.opt.avatar">
                                     <img v-else src="~/assets/one_logo_neat.png">
                                 </q-avatar>
-                                <q-item-label>{{ scope.opt.label }}</q-item-label>       
+                                <q-item-label>{{ scope.opt.label }}</q-item-label>
                                 </q-item-section>
                             </q-item>
                             </template>

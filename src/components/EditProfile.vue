@@ -25,7 +25,6 @@
             :headers="imgHeaders"
             v-model="show"
           />
-            <!-- :params="imgParams" -->
             <q-input
             ref="nameRef"
             outlined

@@ -14,31 +14,45 @@
         v-model="credentials.name"
         label="Name"
         lazy-rules
-        :rules="[val => (val && val.length > 0) || 'Please type the company name']"
+        :rules="[val => (val && val.length > 0) || 'Please type the name']"
       />
       <q-input
         ref="emailRef"
         outlined
         v-model="credentials.email"
         label="Email"
+        v-if="actionType === 'Add'"
         lazy-rules
-        :rules="[val => (val && val.length > 0) || 'Please type the company Email']"
+        :rules="[val => (val && val.length > 0) || 'Please type the Email']"
       />
       <q-input
         ref="usernameRef"
         outlined
         v-model="credentials.username"
+        v-if="actionType === 'Add'"
         label="Username"
         lazy-rules
-        :rules="[val => (val && val.length > 0) || 'Please type the company username']"
+        :rules="[val => (val && val.length > 0) || 'Please type the username']"
       />
       <q-input
         ref="passwordRef"
         outlined
-        v-model="credentials.passsword"
+        v-model="credentials.password"
+        v-if="actionType === 'Add'"
         label="Password"
+        type="password"
         lazy-rules
-        :rules="[val => (val && val.length > 0) || 'Please type the company password']"
+        :rules="[val => (val && val.length > 0) || 'Please type the password']"
+      />
+      <q-input
+        ref="passwordMatchRef"
+        outlined
+        v-if="actionType === 'Add'"
+        v-model="passwordMatch"
+        label="Repeat Password"
+        type="password"
+        lazy-rules
+        :rules="[val => (val && val.length > 0 && passwordMatch === credentials.password) || 'Password Mismatch!']"
       />
       <q-input
         ref="salaryRef"
@@ -47,7 +61,7 @@
         label="Salary"
         type="number"
         lazy-rules
-        :rules="[val => (val && val.length > 0) || 'Please type the company salary']"
+        :rules="[val => (val && val > 0) || 'Please type the salary']"
       />
       <q-input
         ref="leaveBalanceRef"
@@ -56,12 +70,13 @@
         label="Leave Balance (in days)"
         type="number"
         lazy-rules
-        :rules="[val => (val && val.length > 0) || 'Please type the company salary']"
+        :rules="[val => (val && val > 0) || 'Please type the leave balance']"
       />
       <q-select
         v-model="designation"
         ref="designationRef"
         no-caps
+        label="Designation (position)"
         :loading="designationLoading"
         outlined
         :options="designationOptions"
@@ -69,9 +84,23 @@
       <q-select
         v-model="manager"
         no-caps
+        clearable
+        label="Reports to (manager)"
         :loading="managerLoading"
         outlined
         :options="managerOptions"
+      />
+      <q-checkbox
+        ref="hrMemberRef"
+        outlined
+        v-model="credentials.hrMember"
+        label="HR Member"
+      />
+      <q-checkbox
+        ref="isManagerRef"
+        outlined
+        v-model="credentials.isManager"
+        label="Manager"
       />
       </q-card-section>
     </q-card>
@@ -99,12 +128,14 @@ export default {
       designationOptions: [],
       designationLoading: false,
       managerLoading: false,
+      passwordMatch: null,
       credentials : {
         leaveBalance: 0,
         salary: 0,
         managerId: null,
-        phoneNumber: null,
         name: null,
+        hrMember: false,
+        isManager: false,
         username: null,
         email: null,
         password: null,
@@ -119,24 +150,32 @@ export default {
     toggleShow() {
       this.show = !this.show;
     },
-    ...mapActions('hrmStore', ['getEmployees', 'createDesignation', 'updateDesignation','getDesignations', 'getDepartments', 'getOneDesignation']),
+    ...mapActions('hrmStore', ['getEmployees', 'createEmployee', 'updateEmployee','getDesignations']),
    async submit() {
       this.$refs.nameRef.validate();
       this.$refs.salaryRef.validate();
       this.$refs.leaveBalanceRef.validate();
-      this.$refs.usernameRef.validate();
-      this.$refs.emailRef.validate();
       this.$refs.designationRef.validate();
+      if (this.actionType === 'Add') {
+        this.$refs.emailRef.validate();
+        this.$refs.usernameRef.validate();
+        this.$refs.passwordMatchRef.validate();
+        if (
+          this.$refs.usernameRef.hasError
+          ||
+          this.$refs.emailRef.hasError
+          ||
+          this.$refs.passwordMatchRef.hasError
+        ) {
+          return
+        }
+      }
       if (
         this.$refs.nameRef.hasError
         ||
         this.$refs.salaryRef.hasError
         ||
         this.$refs.leaveBalanceRef.hasError
-        ||
-        this.$refs.usernameRef.hasError
-        ||
-        this.$refs.emailRef.hasError
         ||
         this.$refs.designationRef.hasError
       ) {
@@ -146,20 +185,38 @@ export default {
         let data = {
           name: this.credentials.name,
           designationId: Number(this.designation.id),
-          username: this.credentials.username
+          leaveBalance: this.credentials.leaveBalance,
+          salary: this.credentials.salary,
+          managerId: this.credentials.managerId,
+          hrMember: this.credentials.hrMember,
         };
+        if (this.actionType === "Add") {
+          data["isManager"] = this.credentials.isManager
+          data['username'] = this.credentials.username
+          data["email"] = this.credentials.email
+          data["password"] = this.credentials.password
+        }
         if (this.manager) {
           data['managerId'] = Number(this.manager.id)
         }
         if (this.designation) {
           data['designationId'] = Number(this.designation.id)
         }
-        console.log(this.credentials.name)
         if(this.actionType === 'Add'){
-          await this.createDesignation(data);
+          await this.createEmployee(data).catch(() => {
+            this.$q.notify({
+              type: 'negative',
+              message: 'something went wrong! creating employee failed',
+              color: 'negative',
+              position: 'top',
+              timeout: '500'
+            })
+            this.$emit('closeDialogue')
+            this.loading = false
+          })
           this.$q.notify({
             type: 'positive',
-            message: 'Designation created',
+            message: 'Employee created',
             color: 'positive',
             position: 'top',
             timeout: '500'
@@ -167,10 +224,20 @@ export default {
         }else{
           data['id'] = Number(this.id)
           console.log(data);
-          await this.updateDesignation(data);
+          await this.updateEmployee(data).catch(() => {
+            this.$q.notify({
+              type: 'negative',
+              message: 'something went wrong! updating employee failed',
+              color: 'negative',
+              position: 'top',
+              timeout: '500'
+            })
+            this.$emit('closeDialogue')
+            this.loading = false
+          })
           this.$q.notify({
             type: 'positive',
-            message: 'Designation updated',
+            message: 'Employee updated',
             color: 'positive',
             position: 'top',
             timeout: '500'
@@ -179,31 +246,45 @@ export default {
         this.loading = false
         this.$emit('closeDialogue');
       }
+    },
+    getValuesFromApiAsync(apiAct) {
+      return new Promise(async resolve => {
+        resolve(await apiAct)
+      });
     }
   },
   async mounted() {
     this.show = false
     this.designationLoading = true
-    await this.getDesignations()
-    this.designationLoading = false
-    for (let designation of this.designations) {
-      this.designationOptions.push({label: designation.name, id: designation.id})
-    }
+    this.getValuesFromApiAsync(this.getDesignations()).then((res) => {
+      for (let designation of this.designations) {
+        this.designationOptions.push({label: `${designation?.department.name} - ${designation.name}`, id: designation.id})
+      }
+      if (this.actionType === 'Edit') {
+        this.designation = {label: `${this.body.designation?.department.name} - ${this.body.designation.name}` , id: this.body.designation.id};
+      }
+      this.designationLoading = false
+    })
     this.managerLoading = true
-    await this.getEmployees()
-    this.managerLoading = false
-    for (let manager of this.allEmployees) {
-      this.managerOptions.push({label: manager.name, id: manager.id})
-    }
+    this.getValuesFromApiAsync(this.getEmployees()).then((res) => {
+      for (let manager of this.allEmployees) {
+        this.managerOptions.push({label: manager.name, id: manager.id})
+      }
+      if (this.actionType === 'Edit') {
+        this.manager = {label: this.body.manager?.name, id: this.body.manager?.id}
+      }
+      this.managerLoading = false
+    })
     if (this.actionType === 'Edit') {
+      console.log("body:    ",this.body)
+      this.credentials.isManager = (this.body.user && this.body.user?.userType === 'admin')
       this.id = this.body.id
       this.credentials.name = this.body.name
+      this.credentials.hrMember = this.body.hrMember === 1 || false
       this.credentials.salary = this.body.salary
       this.credentials.leaveBalance = this.body.leaveBalance
       this.credentials.email = this.body.user.email
       this.credentials.username = this.body.user.username
-      this.designation = {label: this.body.designation.name, id: this.body.designation.id};
-      this.manager = {label: this.body.manager?.name, id: this.body.manager?.id}
     }
   }
 }

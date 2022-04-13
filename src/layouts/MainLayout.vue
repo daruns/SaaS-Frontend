@@ -253,7 +253,6 @@
       </q-list>
         </q-scroll-area>
       </q-drawer>
-
       <q-page-container class="bg-silk"
         style="margin: 0px; width: calc(100% - 245px) !important;transform: translateX(245px);"
       >
@@ -268,7 +267,6 @@
         :mini="true"
         :breakpoint="500"
         bordered
-
         side="right"
         class="bg-white"
       >
@@ -416,7 +414,7 @@ export default {
         if(['hrm','finance','projects','social-media-management'].includes(this.routePath)) {
           if (evnt === "mount") {
             this.drawer = true
-            this.sendSubSideBardData(this.routePath)
+            this.sendSubSideBardData(this.routePath,true)
             this.statusof = "mount"
           }
           if (evnt === "mouseover" && this.toggledM) {
@@ -437,22 +435,22 @@ export default {
     defaultValueSubSide() {
       let path = this.routePath
       if (path == 'social-media-managemenet') {
-        this.sendSubSideBardData("social-media-managemenet")
+        this.sendSubSideBardData("social-media-managemenet",true)
       }
       if (path == 'finance') {
-        this.sendSubSideBardData("finance")
+        this.sendSubSideBardData("finance",true)
       }
       if (path == 'hrm') {
-        this.sendSubSideBardData("hrm")
+        this.sendSubSideBardData("hrm",true)
       }
       if (path == 'projects') {
-        this.sendSubSideBardData("projects")
+        this.sendSubSideBardData("projects",true)
       }
       this.drawerState("mount")
     },
-    sendSubSideBardData(payload) {
+    sendSubSideBardData(payload,mounted) {
       if (payload === "social-media-management") {
-        this.subSideBar.title = "Social Management"
+        this.subSideBar.title = "SMM"
         this.subSideBar.itemsArray = [
           {name: "Drafts", icon: "mode_edit", url: "/social-media-management/drafts"},
           {name: "Calendar", icon: "far fa-calendar-alt", url: "/social-media-management/calendar"},
@@ -463,7 +461,7 @@ export default {
           {name: "Completeds", icon: "assignment_turned_in", url: "/social-media-management/completeds"},
           {name: "Connect Profile", icon: "fas fa-plus-square", url: "/social-media-management/accounts"},
         ]
-        this.$router.push(this.subSideBar.itemsArray[0].url)
+        if (mounted !== true) this.$router.push(this.subSideBar.itemsArray[0].url)
         this.drawer = true
         this.miniState = true
         this.toggledM = true
@@ -481,7 +479,7 @@ export default {
           {name: "Payment Types", icon: "fas fa-credit-card", url: "/finance/payment"},
           {name: "Tax Types", icon: "receipt_long", url: "/finance/taxes"},
         ]
-        this.$router.push(this.subSideBar.itemsArray[0].url)
+        if (mounted !== true) this.$router.push(this.subSideBar.itemsArray[0].url)
         this.drawer = true
         this.miniState = true
         this.toggledM = true
@@ -495,7 +493,7 @@ export default {
           {name: "Departments", icon: "groups", url: "/hrm/departments"},
           {name: "Designations", icon: "grid_view", url: "/hrm/designations"},
         ]
-        this.$router.push(this.subSideBar.itemsArray[0].url)
+        if (mounted !== true) this.$router.push(this.subSideBar.itemsArray[0].url)
         this.drawer = true
         this.miniState = true
         this.toggledM = true
@@ -505,7 +503,7 @@ export default {
           {name: "Projects", icon: "work", url: "/projects/dashboard"},
           {name: "Tasks", icon: "task", url: "/projects/tasks"}
         ]
-        this.$router.push(this.subSideBar.itemsArray[0].url)
+        if (mounted !== true) this.$router.push(this.subSideBar.itemsArray[0].url)
         this.drawer = true
         this.miniState = true
         this.toggledM = true

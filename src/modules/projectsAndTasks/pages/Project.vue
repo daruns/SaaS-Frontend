@@ -38,7 +38,7 @@
                             <img v-if="scope.opt.avatar" :src="scope.opt.avatar">
                             <img v-else src="~/assets/one_logo_neat.png">
                         </q-avatar>
-                        <q-item-label>{{ scope.opt.label }}</q-item-label>       
+                        <q-item-label>{{ scope.opt.label }}</q-item-label>
                         </q-item-section>
                     </q-item>
                     </template>
@@ -84,7 +84,7 @@
                         <img v-if="scope.opt.avatar" :src="scope.opt.avatar">
                         <img v-else src="~/assets/one_logo_neat.png">
                       </q-avatar>
-                      <q-item-label>{{ scope.opt.label }}</q-item-label>       
+                      <q-item-label>{{ scope.opt.label }}</q-item-label>
                       </q-item-section>
                   </q-item>
                   </template>

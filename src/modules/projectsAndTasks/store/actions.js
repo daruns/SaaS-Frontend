@@ -84,6 +84,9 @@ export async function addTask({dispatch}, payload) {
   await dispatch('getProjects');
   if(payload.files){
     console.log(response.data.data.id)
+    console.log
+    ("ctedt debug")
+    console.log("test Debug: ", )
     let data = new FormData();
     data.append('id', response.data.data.id);
     data.append('files', payload.files);

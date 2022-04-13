@@ -26,11 +26,11 @@ const routes = [
     component: () => import('pages/Login.vue'),
     meta: {needsAuth: false}
   },
-  // {
-  //   path: '/signup',
-  //   component: () => import('pages/Signup.vue'),
-  //   meta: {needsAuth: false}
-  // },
+  {
+    path: '/signup',
+    component: () => import('pages/Signup.vue'),
+    meta: {needsAuth: false}
+  },
   ...crmRoutes,
   ...financeRoutes,
   ...accountingRoutes,

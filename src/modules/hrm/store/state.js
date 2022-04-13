@@ -1,6 +1,11 @@
 export default function () {
   return {
     allEmployees: [],
+    myEmployee: {},
+    leaves: [],
+    leaveApprovals: [],
+    myLeaves: [],
+    currentLeave: {},
     currentEmployee: {},
     departments: [],
     currentDepartment: {},
@@ -9,5 +14,6 @@ export default function () {
     leaveTypes: [],
     currentLeaveType: {},
     attendances: [],
+    myAttendances: [],
   }
 }

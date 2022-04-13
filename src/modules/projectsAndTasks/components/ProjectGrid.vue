@@ -12,7 +12,7 @@
               <q-menu
                 transition-show="scale"
                 transition-hide="scale"
-                
+
               >
                 <q-list style="min-width: 75px">
                   <q-item @click="deleteProject({id: project.id})" style="padding 0 !important" clickable v-close-popup>
@@ -27,17 +27,21 @@
             </q-btn>
           </div>
           <q-card-section class="q-pa-sm flex justify-start text-overflow">
-            <router-link :to="`/projects/${project.id}`">
               <div  style="max-width: 100% !important;" class="flex column justify-start">
-              <p class="text-subtitle2 q-mb-none">Deadline:</p>
-              <p class="text-grey">{{project.plannedEndDate.split('T')[0]}}</p>
-              <p class="text-subtitle2 q-mb-none">Priority:</p>
-              <p class="text-grey">{{project.priority}}</p>
+              <router-link style="width: 100%" :to="`/projects/${project.id}`">
+                <p class="text-subtitle2 q-mb-none">Deadline:</p>
+                <p class="text-grey">{{project.plannedEndDate.split('T')[0]}}</p>
+                <p class="text-subtitle2 q-mb-none">Priority:</p>
+                <p class="text-grey">{{project.priority}}</p>
+              </router-link>
               <p class="text-subtitle2 q-mb-sm">Project Leader:</p>
               <div class="row q-mb-lg">
-                <div class="q-mr-xs q-mt-xs q-mb-xs" v-for="leader in project.leaderUsers.slice(0,2)" :key="leader.id">
+                <div class="q-mr-xs q-mt-xs q-mb-xs" v-for="leader in project.leaderUsers" :key="leader.id">
                   <q-avatar size="40px">
-                  <q-btn @click="deleteProjectLeader({id:project.id, leaders: [leader.userId]})" round size="5px" icon="close" color="negative" class="absolute-top-right"/>
+                  <q-btn @click="confirmDeleteLeaderDialogue = true" round size="5px" icon="close" color="negative" class="absolute-top-right"/>
+                  <q-dialog v-model="confirmDeleteLeaderDialogue">
+                    <confirmDelete @confirm="() => deleteProjectLeader({id:project.id, leaders: [leader.userId]})" />
+                  </q-dialog>
                   <img v-if="leader.avatar" :src="leader.avatar">
                   <img v-else src="~/assets/one_logo_neat.png">
                   <q-tooltip>
@@ -45,84 +49,86 @@
                       </q-tooltip>
                   </q-avatar>
                 </div>
-                <p v-if="project.leaderUsers.length > 2" class="text-subtitle1 q-pt-xs q-ma-none text-grey">....+{{project.leaderUsers.length - 2}}</p>
+                <!-- <p v-if="project.leaderUsers.length > 2" class="text-subtitle1 q-pt-xs q-ma-none text-grey">....+{{project.leaderUsers.length - 2}}</p> -->
                 <div class="flex justify-center items-start q-mt-xs" :class="project.leaderUsers.length > 2 && 'q-ml-xs'">
-                          <q-btn @click="getLeaderOptions(project)" round size="15px" text-color="black" unelevated color="grey-4" icon="add">
-                              <q-popup-edit v-model="leaders" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
-                              <q-select
-                                  :rules="[val => (val !== null) || 'This field is required']"
-                                  bg-color="white"
-                                  outlined
-                                  counter
-                                  multiple
-                                  use-chips
-                                  v-model="leaders" 
-                                  :options="options"
-                                  label="Choose leaders"
-                                  :disable="options.length === 0"
-                                  :hint="options.length === 0 ? 'All users has been added' : ''"
-                                >
-                                  <template v-slot:option="scope">
-                                  <q-item v-bind="scope.itemProps">
-                                      <q-item-section class="avatar-list">
-                                      <q-avatar class="q-mr-xs" size="30px">
-                                        <img src="~/assets/one_logo_neat.png">
-                                      </q-avatar>
-                                      <q-item-label>{{ scope.opt.label }}</q-item-label>       
-                                      </q-item-section>
-                                  </q-item>
-                                  </template>
-                              </q-select>
-                              <q-btn class="q-mt-xs q-mb-xs" @click="addProjectLeaders(project.id)" no-caps flat label="submit" color="primary" :disable="leaders.length === 0" v-close-popup />
-                              </q-popup-edit>
-                          </q-btn>
+                  <q-btn @click="getLeaderOptions(project)" round size="15px" text-color="black" unelevated color="grey-4" icon="add">
+                    <q-popup-edit v-model="leaders" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
+                      <q-select
+                        :rules="[val => (val !== null) || 'This field is required']"
+                        bg-color="white"
+                        outlined
+                        counter
+                        multiple
+                        use-chips
+                        v-model="leaders"
+                        :options="options"
+                        label="Choose leaders"
+                        :disable="options.length === 0"
+                        :hint="options.length === 0 ? 'All users has been added' : ''"
+                      >
+                        <template v-slot:option="scope">
+                          <q-item v-bind="scope.itemProps">
+                            <q-item-section class="avatar-list">
+                            <q-avatar class="q-mr-xs" size="30px">
+                              <img src="~/assets/one_logo_neat.png">
+                            </q-avatar>
+                            <q-item-label>{{ scope.opt.label }}</q-item-label>
+                            </q-item-section>
+                          </q-item>
+                        </template>
+                      </q-select>
+                    <q-btn class="q-mt-xs q-mb-xs" @click="addProjectLeaders(project.id)" no-caps flat label="submit" color="primary" :disable="leaders.length === 0" v-close-popup />
+                    </q-popup-edit>
+                  </q-btn>
                 </div>
               </div>
               <p class="text-subtitle2 q-mb-sm">Project Team:</p>
               <div class="row">
-                  <q-avatar class="q-mr-xs" v-for="member in project.memberUsers" :key="member.id" size="40px">
-                  <q-btn @click="deleteProjectMember({id:project.id, members: [member.userId]})" round size="5px" icon="close" color="negative" class="absolute-top-right"/>
+                <q-avatar class="q-mr-xs" v-for="member in project.memberUsers" :key="member.id" size="40px">
+                  <q-btn @click="confirmDeleteMemberDialogue = true" round size="5px" icon="close" color="negative" class="absolute-top-right"/>
+                  <q-dialog maximized v-model="confirmDeleteMemberDialogue">
+                    <confirmDelete @confirm="deleteProjectMember({id:project.id, members: [member.userId]})" />
+                  </q-dialog>
                   <img v-if="member.avatar" :src="member.avatar">
                   <img v-else src="~/assets/one_logo_neat.png">
                   <q-tooltip>
-                      {{member.name}}
-                      </q-tooltip>
-                  </q-avatar>
-                        <div class="flex justify-center items-start" :class="project.memberUsers.length > 2 && 'q-ml-xs'">
-                          <q-btn @click="getUserOptions(project)" round size="15px" text-color="black" unelevated color="grey-4" icon="add">
-                              <q-popup-edit v-model="members" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
-                              <q-select
-                                  ref="clientRef"
-                                  :rules="[val => (val !== null) || 'This field is required']"
-                                  bg-color="white"
-                                  outlined
-                                  counter
-                                  multiple
-                                  use-chips
-                                  v-model="members" 
-                                  :options="options"
-                                  label="Choose members"
-                                  :disable="options.length === 0"
-                                  :hint="options.length === 0 ? 'All users has been added' : ''"
-                                >
-                                  <template v-slot:option="scope">
-                                  <q-item v-bind="scope.itemProps">
-                                      <q-item-section class="avatar-list">
-                                      <q-avatar class="q-mr-xs" size="30px">
-                                        <img src="~/assets/one_logo_neat.png">
-                                      </q-avatar>
-                                      <q-item-label>{{ scope.opt.label }}</q-item-label>       
-                                      </q-item-section>
-                                  </q-item>
-                                  </template>
-                              </q-select>
-                              <q-btn @click="addProjectMembers(project.id)" no-caps flat label="submit" color="primary" :disable="members.length === 0" v-close-popup />
-                              </q-popup-edit>
-                          </q-btn>
-                          </div>
+                    {{member.name}}
+                  </q-tooltip>
+                </q-avatar>
+                <div class="flex justify-center items-start" :class="project.memberUsers.length > 2 && 'q-ml-xs'">
+                  <q-btn @click="getUserOptions(project)" round size="15px" text-color="black" unelevated color="grey-4" icon="add">
+                    <q-popup-edit v-model="members" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
+                      <q-select
+                        ref="clientRef"
+                        :rules="[val => (val !== null) || 'This field is required']"
+                        bg-color="white"
+                        outlined
+                        counter
+                        multiple
+                        use-chips
+                        v-model="members" 
+                        :options="options"
+                        label="Choose members"
+                        :disable="options.length === 0"
+                        :hint="options.length === 0 ? 'All users has been added' : ''"
+                      >
+                        <template v-slot:option="scope">
+                          <q-item v-bind="scope.itemProps">
+                            <q-item-section class="avatar-list">
+                              <q-avatar class="q-mr-xs" size="30px">
+                                <img src="~/assets/one_logo_neat.png">
+                              </q-avatar>
+                              <q-item-label>{{ scope.opt.label }}</q-item-label>
+                            </q-item-section>
+                          </q-item>
+                        </template>
+                      </q-select>
+                      <q-btn @click="addProjectMembers(project.id)" no-caps flat label="submit" color="primary" :disable="members.length === 0" v-close-popup />
+                    </q-popup-edit>
+                  </q-btn>
+                </div>
               </div>
-              </div>
-            </router-link>
+            </div>
           </q-card-section>
         </q-card>
       </div>
@@ -157,18 +163,22 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import modal from './AddEditProject.vue'
+import confirmDelete from '../../../components/DeleteDialogue.vue'
 export default {
   computed: {
     ...mapState('projectStore', ['projects']),
     ...mapState('userStore', ['users'])
   },
   components : {
-    modal
+    modal,
+    confirmDelete
   },
   data() {
     return {
       loading: false,
       dialogue: false,
+      confirmDeleteMemberDialogue: false,
+      confirmDeleteLeaderDialogue: false,
       id: '',
       body:{},
       options: [],
@@ -179,6 +189,9 @@ export default {
   methods: {
     ...mapActions('projectStore',['getProjects','deleteProject','addProjectMember','deleteProjectMember','addProjectLeader','deleteProjectLeader']),
     ...mapActions('userStore',['getUsers']),
+    printitincons() {
+      console.log('worked')
+    },
    async addProjectMembers(id) {
       let membersToAdd = []
       for(let i = 0; i<this.members.length; i++) {

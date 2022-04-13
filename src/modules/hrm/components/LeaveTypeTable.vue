@@ -5,6 +5,7 @@
       :columns="columns"
       row-key="id"
       :loading="loading"
+      :rows-per-page-options="[20,50,100,0]"
       flat
       class="bg-secondary q-pa-md"
     >
@@ -13,14 +14,23 @@
           <q-td class="items-center justify-start" key="name" :props="props">
             <p style="font-size: 20px;">{{props.row.name}}</p>
           </q-td>
-          <q-td class="text-right" key="name" :props="props">
+          <q-td class="items-center justify-start" key="fund" :props="props">
+            <p style="font-size: 20px;">{{props.row.fund}}</p>
+          </q-td>
+          <q-td class="items-center justify-start" key="days" :props="props">
+            <p style="font-size: 20px;">{{props.row.days}}</p>
+          </q-td>
+          <q-td class="items-center justify-start" key="urgent" :props="props">
+            <p v-if="props.row.urgent" style="font-size: 20px;"><q-icon name="done" /></p>
+          </q-td>
+          <q-td class="text-right" key="urgent" :props="props">
             <q-btn dense round flat icon="more_vert">
               <q-menu
                 transition-show="scale"
                 transition-hide="scale"
               >
                 <q-list style="min-width: 75px">
-                  <q-item @click="deleteDesignation({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
+                  <q-item @click="deleteLeaveType({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
                     <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                   </q-item>
                   <q-separator />
@@ -59,6 +69,9 @@ export default {
       loading: false,
       columns : [
         { name: 'name', label: 'Name', align: 'left', field: 'name' },
+        { name: 'fund', label: 'Salary Deduction', align: 'left', field: 'fund' },
+        { name: 'days', label: 'Days', align: 'left', field: 'days' },
+        { name: 'urgent', label: 'Is Urgent', align: 'left', field: 'name' },
         { name: 'actions', label: 'Actions', align: 'right', field: 'actions'}
       ]
     }
@@ -67,7 +80,7 @@ export default {
     modal: AddEditLeaveType
   },
   methods: {
-    ...mapActions('hrmStore',['getDesignations', 'getLeaveTypes','deleteDesignation']),
+    ...mapActions('hrmStore',['getDesignations', 'getLeaveTypes','deleteLeaveType']),
     editLeaveType(department) {
         if(this.dialogue === true){
           this.dialogue = false;

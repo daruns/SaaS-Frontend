@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-table
-      :rows="users"
+      :rows="usersRows"
       :columns="columns"
       row-key="id"
       :loading="loading"
@@ -84,20 +84,27 @@ export default {
     modal
   },
   computed : {
-      ...mapState('userStore',['users'])
+    ...mapState('userStore',['users']),
+    usersRows(){
+      let finalArr = []
+      this.users.forEach(element => {
+        finalArr.push(JSON.parse(JSON.stringify(element)))
+      })
+      return finalArr.sort((a,b) =>b['id'] - a['id'] )
+    }
   },
   methods:  {
-      ...mapActions('userStore', ['deleteUser','getUsers']),
-     async delItem(id) {
-          await this.deleteUser({id: id});
-      },
-      edit(body) {
-        this.body = body;
-        this.dialogue = true;
-      }
+    ...mapActions('userStore', ['deleteUser','getUsers']),
+    async delItem(id) {
+      await this.deleteUser({id: id});
+    },
+    edit(body) {
+      this.body = body;
+      this.dialogue = true;
+    }
   },
  async mounted() {
-    await  this.getUsers();
+    await this.getUsers();
   }
 }
 </script>

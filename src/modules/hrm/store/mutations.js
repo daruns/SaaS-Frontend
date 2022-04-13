@@ -18,6 +18,10 @@ export function GET_ATTENDANCES (state, payload) {
   Object.assign(state.attendances, payload.res);
 }
 
+export function GET_MY_ATTENDANCES (state, payload) {
+  Object.assign(state.myAttendances, payload.res);
+}
+
 export function GET_EMPLOYEE (state, payload) {
   state.currentEmployee = payload ;
 }
@@ -32,4 +36,23 @@ export function GET_LEAVE_TYPE (state, payload) {
 
 export function GET_DESIGNATION (state, payload) {
   state.currentDesignation = payload ;
+}
+
+export function GET_LEAVES (state, payload) {
+  state.leaves = payload.res;
+}
+export function GET_LEAVE_APPROVALS (state, payload) {
+  state.leaveApprovals = payload.res ;
+}
+
+export function GET_LEAVE (state, payload) {
+  state.currenLeave = payload ;
+}
+
+export function GET_MY_LEAVES (state, payload) {
+  state.myLeaves = payload.res ;
+}
+
+export function GET_MY_EMPLOYEE (state,payload) {
+  state.myEmployee = payload
 }

@@ -6,7 +6,7 @@
       </div>
     </div>
     <q-scroll-area style="max-height:auto !important;min-height:auto !important;height: calc(100vh - 131px);" class="q-px-md">
-      <tbl />
+      <tbl :currentUser="user"/>
       <q-dialog seamless position="right" v-model="dialogue">
         <modal @closeDialogue="dialogue = false" :type="tab" actionType="Add" :id="{}" />
       </q-dialog>
@@ -16,20 +16,30 @@
 <script>
 import table from '../components/AttendanceTable.vue';
 import { ref } from 'vue';
+import { mapState,mapActions } from 'vuex';
 export default {
     components: {
-        tbl: table,
+      tbl: table,
+    },
+    computed: {
+    ...mapState('example', ['user'])
     },
     data() {
       return {
         dialogue: false
       }
     },
+    methods: {
+      ...mapActions('example', ['getUser']),
+    },
     setup() {
-        return {
+      return {
         tab: ref('leaveType'),
-        }
-    }
+      }
+    },
+    async mounted() {
+      await this.getUser()
+    },
 }
 </script>
 

@@ -20,7 +20,7 @@ export default boot(async ({ app, router }) => {
 
   router.beforeEach((to, from, next) => {
     if(to.meta.needsAuth){
-      if(localStorage.getItem('accessToken') && checkAuth(localStorage.getItem('accessToken')))
+      if(localStorage.getItem('accessToken'))
       next()
       else{
         next('/login')
