@@ -28,7 +28,7 @@
           </q-btn> -->
         <div class="row justify-between">
           <div class="column">
-            <q-avatar size="100px" font-size="52px">
+            <q-avatar square size="100px" font-size="52px">
               <img v-if="user.brand.logo" :src="user.brand.logo" />
               <img v-else src="~/assets/one_logo_neat.png" />
             </q-avatar>
@@ -38,7 +38,6 @@
               <p class="text-subtitle2">Due Date: {{dateConversion(oneExpense.dueDate)}}</p>
             </div> -->
             <div class="column">
-              <p style="border-bottom: 1px solid rgb(221, 221, 221);">Supplier</p>
               <p class="text-h6">{{user.brand.name}}</p>
               <p class="text-subtitle2 text-grey">Email: {{user.brand.email}}</p>
               <p class="text-subtitle2 text-grey">Address: {{user.brand.address}}</p>
@@ -47,30 +46,25 @@
             </div>
           </div>
           <div class="column col-lg-6 col-md-6 col-xs-12 col-sm-12 items-end q-mt-md">
+            <p><DownloadPDFButton :body="getJSPDFProps()" /></p>
             <p class="text-h6">{{oneExpense.expenseNumber}}</p>
             <p class="text-subtitle2">Expense Date: {{dateConversion(oneExpense.date)}}</p>
             <p class="text-subtitle2">Due Date: {{dateConversion(oneExpense.dueDate)}}</p>
           </div>
         </div>
-        <div v-if="oneExpense.supplier" class="row col-12 justify-between q-mt-xl">
-          <div v-if="oneExpense.supplier" class="column">
-            <p style="border-bottom: 1px solid rgb(221, 221, 221);">Supplier</p>
-            <p class="text-bold">{{oneExpense.supplier?.name}}</p>
-            <p>{{oneExpense.supplier?.email}}</p>
-            <p>{{oneExpense.supplier?.phoneNumbers}}</p>
-          </div>
-          <div v-else class="column">
-            <p style="border-bottom: 1px solid rgb(221, 221, 221);">Supplier</p>
-            <p class="text-bold">{{oneExpense.supplierName}}</p>
-            <p>{{oneExpense.supplierEmail}}</p>
-            <p>{{oneExpense.supplierPhoneNumbers}}</p>
+        <div class="row col-12 justify-between q-mt-sm">
+          <div class="column">
+            <p class="text-h6" style="border-bottom: 1px solid rgb(221, 221, 221);">Supplier</p>
+            <p>Name: {{oneExpense.supplierName}}</p>
+            <p>Email: {{oneExpense.supplierEmail}}</p>
+            <p>Phone Number: {{oneExpense.supplierPhoneNumbers}}</p>
           </div>
           <div class="column">
             <p class="text-subtitle2">Currency Code: {{oneExpense.currencyCode}}/{{oneExpense.exchangeRate}}</p>
             <p class="text-subtitle2">Billing Address: {{oneExpense.billingAddress}}</p>
             <p class="text-subtitle2">Bank Fee: {{oneExpense.bankFee}}</p>
             <p class="text-subtitle2">Payment Method: {{oneExpense.paymentMethodName}}</p>
-            <p class="text-subtitle2">Category: {{oneExpense.category}}</p>
+            <p class="text-subtitle2">{{oneExpense.category}}</p>
             <p class="text-subtitle2">Tax Type: {{oneExpense.taxName}}</p>
           </div>
         </div>
@@ -169,17 +163,17 @@
           </div>
         </div>
         </div>
-            <q-btn label="Upload images" icon="backup" color="grey" no-caps push flat unelevated class="absolute-bottom-right q-mr-sm q-mb-sm">
-              <q-popup-proxy>
-                    <q-banner>
-                      <q-file :filter="checkType" @rejected="onRejectedImage" clearable label="Image" outlined v-model="image">
-                        <template v-slot:prepend>
-                          <q-icon name="attach_file" />
-                        </template>
-                      </q-file>
-                      <q-btn v-close-popup label="Upload" @click="addExpFile('image'); image = null" :disable="!image" no-caps flat color="primary" class="q-mt-sm" size="md" />
-                    </q-banner>
-                  </q-popup-proxy>
+          <q-btn label="Upload images" icon="backup" color="grey" no-caps push flat unelevated class="absolute-bottom-right q-mr-sm q-mb-sm">
+            <q-popup-proxy>
+              <q-banner>
+                <q-file :filter="checkType" @rejected="onRejectedImage" clearable label="Image" outlined v-model="image">
+                  <template v-slot:prepend>
+                    <q-icon name="attach_file" />
+                  </template>
+                </q-file>
+                <q-btn v-close-popup label="Upload" @click="addExpFile('image'); image = null" :disable="!image" no-caps flat color="primary" class="q-mt-sm" size="md" />
+              </q-banner>
+            </q-popup-proxy>
           </q-btn>
         </q-card>
        <p v-show="files.length !== 0" class="text-h6 text-grey q-mt-lg">Uploaded files</p>
@@ -233,9 +227,11 @@
 import { mapActions, mapState } from 'vuex';
 import axios from 'axios'
 import BreadCrumpsVue from 'src/components/globalComponents/BreadCrumps.vue';
+import DownloadPDFButton from 'src/components/DownloadPDFButton.vue';
 export default {
   components: {
-    BreadCrumpsVue
+    BreadCrumpsVue,
+    DownloadPDFButton
   },
   data() {
     return{
@@ -314,17 +310,110 @@ export default {
         else
           this.files.push(this.oneExpense.attachments[i]);
       }
-    }
+    },
+    getJSPDFProps() {
+      return {
+        outputType: 'save',
+        returnJsPDFDocObject: true,
+        fileName: "Expense.pdf",
+        orientationLandscape: false,
+        compress: true,
+        logo: {
+          src: `${process.env.OC_BACKEND_API}readAsStream/?key=${this.user?.brand?.logo}`,
+          type: null, //optional, when src= data:uri (nodejs case)
+          width: 26.66, //aspect ratio = width/height
+          height: 26.66,
+          margin: {
+              top: 0, //negative or positive num, from the current position
+              left: 0 //negative or positive num, from the current position
+          }
+        },
+        business: {
+          name: `${this.user?.brand?.name}`,
+          address: `${this.user?.brand?.address}`,
+          phone: `${this.user?.brand?.phoneNumber}`,
+          email: `${this.user?.brand?.email}`,
+          website: `${this.user?.brand?.website}`,
+        },
+        contact: {
+          label: "Expense issued for:",
+          name: `${this?.oneExpense?.supplierName}`,
+          address: `${this?.oneExpense?.supplierAddress}`,
+          phone: `${this?.oneExpense?.supplierPhoneNumbers}`,
+          email: `${this?.oneExpense?.supplierEmail}`,
+        },
+        invoice: {
+          label: "#",
+          num: `${this.oneExpense.expenseNumber}`,
+          invDate: `Expense Date: ${this.dateConversion(this.oneExpense.date)}`,
+          invGenDate: `Due Date: ${this.dateConversion(this.oneExpense.dueDate)}`,
+          headerBorder: false,
+          tableBodyBorder: false,
+          header: [
+            {
+              title: "#",
+              style: {width: 10},
+            }, {
+              title: "Name",
+              style: {width: 30},
+            }, {
+              title: "Description",
+              style: {width: 80},
+            },
+            { title: "Unit Price" },
+            { title: "Quantity" },
+            { title: "Total Amount" },
+          ],
+          table: Array.from(this.oneExpense?.expenseItems, (item, index)=>([
+            `${index + 1}`,
+            `${item.name}`,
+            `${item.description}`,
+            `${item.unitPrice}`,
+            `${item.qty}`,
+            `${item.qty * item.unitPrice}`,
+          ])),
+          invSubTotalLabel: "Sub Total:",
+          invSubTotal: `${this.stotal}`,
+          invTotalLabel: "Total:",
+          invTotal: `${this.total}`,
+          invCurrency: "USD",
+          row1: {
+            col1: 'Tax:',
+            col2: `${this.taxRate}`,
+            col3: '%',
+            style: {
+              fontFamily: 'serif',
+              fontSize: 10 //optional, default 12
+            }
+          },
+          row2: {
+            col1: 'Discount:',
+            col2: `${this.discount}`,
+            col3: '%',
+            style: {
+              fontSize: 10 //optional, default 12
+            }
+          },
+          invDescLabel: "Note",
+          invDesc: this.oneExpense?.description,
+        },
+        footer: {
+          text: "",
+        },
+        pageEnable: true,
+        pageLabel: "page ",
+      }
+    },
   },
   async mounted() {
     await this.getUser()
     await this.getExpense(this.$route.params.id);
-    this.isLoaded = true;
     this.discount = Number(this.oneExpense.discount) * 100;
     this.taxRate = Number(this.oneExpense.taxRate) * 100;
     this.stotal = Number(this.oneExpense.subTotalAmount);
     this.total = Number(this.oneExpense.totalAmount);
     this.fileAndImages();
+    this.isLoaded = true;
   }
 }
 </script>

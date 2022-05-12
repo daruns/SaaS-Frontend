@@ -49,13 +49,21 @@
           label="Current Balance"
         />
         <q-input
+          v-if="leaveType?.durationType === 'hours'"
+          outlined
+          disable
+          v-model="remainBalanceHours"
+          label="Remain Balance"
+        />
+        <q-input
+          v-if="leaveType?.durationType === 'days'"
           outlined
           disable
           type="number"
-          v-model.number="remainBalance"
+          v-model="remainBalance"
           label="Remain Balance"
         />
-        <div class="flex col-12">
+        <div v-if="leaveType?.durationType === 'days'" class="flex col-12">
           <q-date
             subtitle="Pick Duration"
             mask="YYYY-MM-DD"
@@ -73,6 +81,53 @@
             <div v-if="fromtToDaysExceedToggle" class="text-red">* Days exceeded the balance limit</div>
             <div v-if="fromtToleavetypeDaysExceedToggle" class="text-red">* Days exceeded the Leave Type limit</div>
           </q-date>
+        </div>
+        <div class="flex col-12" v-if="leaveType?.durationType === 'hours'">
+          <q-date
+            subtitle="Pick Duration"
+            mask="YYYY-MM-DD"
+            class="my-2 col-12"
+            :disable="leaveType == null"
+            @update:model-value="setdatetimeDate"
+            v-model="datetimeDate"
+            emit-immediately
+            ref="fromToRef"
+            lazy-rules
+            :rules="[val => val || 'Please type the Employee']"
+          >
+            <div v-if="fromtToToggle" class="text-red">* pick a date</div>
+            <div v-if="fromtToDaysExceedToggle" class="text-red">* Days exceeded the balance limit</div>
+            <div v-if="fromtToleavetypeDaysExceedToggle" class="text-red">* Days exceeded the Leave Type limit</div>
+          </q-date>
+        </div>
+        <div v-if="leaveType?.durationType === 'hours'" class="q-gutter-xs">
+          <q-input class="col-6" label="from:" :rules="['time']" @update:model-value="setdatetimeFrom" filled v-model="datetimeFrom">
+            <template v-slot:prepend>
+              <q-icon name="access_time" class="cursor-pointer">
+                <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                  <q-time now-btn @update:model-value="setdatetimeFrom" v-model="datetimeFrom" mask="HH:mm" format24h>
+                    <div class="row items-center justify-end">
+                      <q-btn v-close-popup label="Close" color="primary" flat />
+                    </div>
+                  </q-time>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+          </q-input>
+          <q-input class="col-6" label="to:" :rules="['time']" @update:model-value="setdatetimeTo" filled v-model="datetimeTo">
+            <template v-slot:prepend>
+              <q-icon name="access_time" class="cursor-pointer">
+                <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                  <q-time now-btn @update:model-value="setdatetimeTo" v-model="datetimeTo" mask="HH:mm" format24h>
+                    <div class="row items-center justify-end">
+                      <q-btn v-close-popup label="Close" color="primary" flat />
+                    </div>
+                  </q-time>
+                </q-popup-proxy>
+              </q-icon>
+            </template>
+          </q-input>
+
         </div>
         <q-input
           ref="descriptionRef"
@@ -106,9 +161,13 @@ export default {
       fromto: ref({from: null,to: null}),
       id: null,
       fromtToDaysExceedToggle: false,
+      datetimeDate: ref(moment().format('YYYY-MM-DD')),
+      datetimeFrom: ref(moment().format('HH:mm')),
+      datetimeTo: ref(moment().format('HH:mm')),
       fromtToleavetypeDaysExceedToggle: false,
       loading: false,
       fromtToToggle: false,
+      leaveTypeDuration: 'days',
       leaveTypeOptions: [],
       employeeOptions: [],
       employee: null,
@@ -118,6 +177,7 @@ export default {
       leaveTypeLoading: false,
       employeeLoading: false,
       remainBalance: ref(0),
+      remainBalanceHours: '',
       credentials : {
         description: null,
         from: null,
@@ -150,6 +210,24 @@ export default {
     toggleShow() {
       this.show = !this.show;
     },
+    setdatetimeDate(val) {
+      let fromValueDateTime = `${val} ${this.datetimeFrom}`
+      let toValueDateTime = `${val} ${this.datetimeTo}`
+      this.fromto = { from: fromValueDateTime, to: toValueDateTime }
+      this.setRemainingDays({from: fromValueDateTime, to: toValueDateTime })
+    },
+    setdatetimeTo(val) {
+      let fromValueDateTime = `${this.datetimeDate} ${this.datetimeFrom}`
+      let toValueDateTime = `${this.datetimeDate} ${val}`
+      this.fromto = { from: fromValueDateTime, to: toValueDateTime }
+      this.setRemainingDays({from: fromValueDateTime, to: toValueDateTime })
+    },
+    setdatetimeFrom(val) {
+      let fromValueDateTime = `${this.datetimeDate} ${val}`
+      let toValueDateTime = `${this.datetimeDate} ${this.datetimeTo}`
+      this.fromto = { from: fromValueDateTime, to: toValueDateTime }
+      this.setRemainingDays({from: fromValueDateTime, to: toValueDateTime })
+    },
     setCurrentBalance(val) {
       let difference = this.currentBalance - this.remainBalance
       this.currentBalance = Number(val?.leaveBalance)
@@ -158,23 +236,42 @@ export default {
     },
     setRemainingDays(val) {
       if (val === null) val = {}
-      console.log("typeof: ",typeof val, val)
+      console.log("typeof: ",typeof val, val, "leavetype: ",this.leaveType.durationType)
       if (typeof val === 'object' && !Object.values(val).includes(null) && Object.keys(val).includes('from')) {
         let vfrom = val?.from
         let vto = val?.to
-        this.remainBalance = (Number(new Date(vto)/ 86400000) - ( Number( new Date(vfrom) )/ 86400000 ) ) + 1
+        if (this.leaveType.durationType === "hours") {
+          this.remainBalance = (Number(new Date(vto)/ 86400000) - ( Number( new Date(vfrom) )/ 86400000 ) )
+        } else {
+          this.remainBalance = (Number(new Date(vto)/ 86400000) - ( Number( new Date(vfrom) )/ 86400000 ) ) + 1
+        }
         console.log("remaining balance in above: ",this.remainBalance)
         this.remainBalance = Number(this.currentBalance - this.remainBalance)
         this.credentials.from = val.from
         this.credentials.to = val.to
       } else if (typeof val === 'string' && val !== '') {
+        console.log("remaining balance in ----: ",this.currentBalance)
         this.credentials.from = val
         this.credentials.to = val
-        this.remainBalance = 1
+        if (this.leaveType.durationType === "hours") {
+          this.remainBalance = 0
+        } else {
+          this.remainBalance = 1
+        }
         this.remainBalance = this.currentBalance - this.remainBalance
       } else {
         this.credentials.from = null
         this.credentials.to = null
+      }
+      console.log("this remaining balance",this.remainBalance)
+      this.remainBalanceHours = this.currentBalance
+      if (typeof this.remainBalance === 'number') {
+        let currembals = this.remainBalance.toFixed(2)
+        let startRemain = `${currembals}`?.split(".")
+        let days = Number(startRemain[0])
+        let hours = ((currembals - days) * 24).toFixed(0)
+        console.log("remaininghours: ",hours, days,currembals)
+        this.remainBalanceHours = days + ' Days ' + hours + ' Hours'
       }
       this.fromtToleavetypeDaysExceedToggle = (Number(this.currentBalance) - Number(this.remainBalance)) > Number(this.leaveType?.days)
       this.fromtToDaysExceedToggle = (Number(this.remainBalance) < 0) && this.leaveType?.urgent != true
@@ -287,7 +384,7 @@ export default {
       this.leaveTypeLoading = true
       this.getValuesFromApiAsync(this.getLeaveTypes()).then(() => {
         for (let leaveType of this.leaveTypes) {
-          this.leaveTypeOptions.push({label: `${leaveType.name} - ${Number(leaveType.days)} days${leaveType.urgent ? ' - Urgent' : ""}`, id: leaveType.id,days: leaveType.days,urgent: leaveType.urgent})
+          this.leaveTypeOptions.push({label: `${leaveType.name} - ${Number(leaveType.days)} ${leaveType.durationType}${leaveType.urgent ? ' - Urgent' : ""}`, id: leaveType.id,days: leaveType.days,urgent: leaveType.urgent,durationType: leaveType.durationType})
         }
         this.leaveTypeLoading = false
       })
@@ -313,9 +410,9 @@ export default {
       this.leaveTypeLoading = true
       this.getValuesFromApiAsync(this.getLeaveTypes()).then(() => {
         for (let leaveType of this.leaveTypes) {
-          this.leaveTypeOptions.push({label: `${leaveType.name} - ${Number(leaveType.days)} days${leaveType.urgent ? ' - Urgent' : ""}`, id: leaveType.id,days: leaveType.days,urgent: leaveType.urgent})
+          this.leaveTypeOptions.push({label: `${leaveType.name} - ${Number(leaveType.days)} ${leaveType.durationType}${leaveType.urgent ? ' - Urgent' : ""}`, id: leaveType.id,days: leaveType.days,urgent: leaveType.urgent,durationType: leaveType.durationType})
         }
-        this.leaveType = {label: `${this.body.leaveType.name} - ${Number(this.body.leaveType.days)} days${this.body.leaveType.urgent ? ' - Urgent' : ""}`, id: this.body.leaveType.id,days: this.body.leaveType.days,urgent: this.body.leaveType.urgent};
+        this.leaveType = {label: `${this.body.leaveType.name} - ${Number(this.body.leaveType.days)} ${leaveType.durationType}${this.body.leaveType.urgent ? ' - Urgent' : ""}`, id: this.body.leaveType.id,days: this.body.leaveType.days,urgent: this.body.leaveType.urgent,durationType: leaveType.durationType};
         this.leaveTypeLoading = false
         this.employee = {label: this.currentUser.myEmployeeProfile.name, id: this.currentUser.myEmployeeProfile.id, leaveBalance: this.currentUser.myEmployeeProfile.leaveBalance}
         if (this.currentUser.myEmployeeProfile) {

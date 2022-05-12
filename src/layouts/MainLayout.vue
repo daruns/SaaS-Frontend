@@ -41,45 +41,26 @@
             </q-item-section>
             <q-item-section>Dashboard</q-item-section>
           </q-item> -->
-        <q-list :key="mindex" v-for="(mitem,mindex) in subSideBar.itemsArray" v-show="(subSideBar.title === 'Finance')" class="rounded-borders text-black">
-          <q-separator
-            class="bg-white"
-            v-if="mitem.name === 'separator'"
-          />
-          <q-item
-            v-else
-            :data-id="mitem"
-            :to="mitem.url "
-            clickable
-            @click="drawer = true"
-            class="text-grey"
-            active-class="hovered my-menu-link"
-          >
-            <q-item-section  avatar>
-              <q-icon :name="mitem.icon" />
-            </q-item-section>
-            <q-item-section >{{mitem.name}}</q-item-section>
-          </q-item>
-        </q-list>
-        <q-list v-if="subSideBar.title !== 'Finance'" class="rounded-borders text-black">
-          <q-item
-            :v-if="subSideBar.title !== ''"
-            v-for="(item,index) in subSideBar.itemsArray"
-            :key="index"
-            :data-id="item"
-            :to="item.url "
-            clickable
-            @click="drawer = true"
-            class="text-grey"
-            active-class="hovered my-menu-link"
-          >
-            <q-item-section  avatar>
-              <q-icon :name="item.icon" />
-            </q-item-section>
-            <q-item-section >{{item.name}}</q-item-section>
-          </q-item>
-
-        </q-list>
+          <q-list :key="mindex" v-for="(mitem,mindex) in subSideBar.itemsArray" class="rounded-borders text-black">
+            <q-separator
+              class="bg-white"
+              v-if="mitem.name === 'separator'"
+            />
+            <q-item
+              v-else
+              :data-id="mitem"
+              :to="mitem.url"
+              clickable
+              @click="drawer = true"
+              class="text-grey"
+              active-class="hovered my-menu-link"
+            >
+              <q-item-section  avatar>
+                <q-icon :name="mitem.icon" />
+              </q-item-section>
+              <q-item-section >{{mitem.name}}</q-item-section>
+            </q-item>
+          </q-list>
         </q-scroll-area>
       </q-drawer>
         <!-- @mouseover="miniState = falseminiState = false" -->
@@ -182,6 +163,20 @@
           </q-item-section>
 
           <q-item-section>HRM</q-item-section>
+        </q-item>
+        <q-item
+          :to="$route.path.split('/')[1] === 'payroll' ? $route.path : undefined"
+          exact
+          @click="sendSubSideBardData('payroll')"
+          clickable
+          class="text-grey"
+          active-class="hovered my-menu-link"
+        >
+          <q-item-section avatar>
+            <q-icon name="description" />
+          </q-item-section>
+
+          <q-item-section>Payroll</q-item-section>
         </q-item>
         <q-item
           :to="$route.path.split('/')[1] === 'projects' ? $route.path : undefined"
@@ -411,7 +406,7 @@ export default {
     },
     drawerState(evnt) {
       if (this.routePath) {
-        if(['hrm','finance','projects','social-media-management'].includes(this.routePath)) {
+        if(['payroll','hrm','finance','projects','social-media-management'].includes(this.routePath)) {
           if (evnt === "mount") {
             this.drawer = true
             this.sendSubSideBardData(this.routePath,true)
@@ -434,17 +429,8 @@ export default {
     },
     defaultValueSubSide() {
       let path = this.routePath
-      if (path == 'social-media-managemenet') {
-        this.sendSubSideBardData("social-media-managemenet",true)
-      }
-      if (path == 'finance') {
-        this.sendSubSideBardData("finance",true)
-      }
-      if (path == 'hrm') {
-        this.sendSubSideBardData("hrm",true)
-      }
-      if (path == 'projects') {
-        this.sendSubSideBardData("projects",true)
+      if (['social-media-managemenet','finance','hrm','payroll','projects'].includes(path)) {
+        this.sendSubSideBardData(path,true)
       }
       this.drawerState("mount")
     },
@@ -488,10 +474,27 @@ export default {
         this.subSideBar.itemsArray = [
           {name: "Employees", icon: "person", url: "/hrm/employees"},
           {name: "Leaves", icon: "description", url: "/hrm/leaves"},
+          {name: "Overtimes", icon: "history", url: "/hrm/overtimes"},
           {name: "Attendance", icon: "touch_app", url: "/hrm/attendances"},
+          {name: "separator", icon: "", url: ""},
           {name: "Leave Types", icon: "category", url: "/hrm/leaveTypes"},
+          {name: "Overtime Types", icon: "category", url: "/hrm/overtimeTypes"},
           {name: "Departments", icon: "groups", url: "/hrm/departments"},
           {name: "Designations", icon: "grid_view", url: "/hrm/designations"},
+        ]
+        if (mounted !== true) this.$router.push(this.subSideBar.itemsArray[0].url)
+        this.drawer = true
+        this.miniState = true
+        this.toggledM = true
+      } else if (payload === "payroll") {
+        this.subSideBar.title = "payroll"
+        this.subSideBar.itemsArray = [
+          {name: "Payslips", icon: "reciept", url: "/payroll/payslips"},
+          {name: "Earnings", icon: "money", url: "/payroll/earnings"},
+          {name: "Deductions", icon: "money", url: "/payroll/deductions"},
+          {name: "separator", icon: "", url: ""},
+          {name: "Earning Types", icon: "category", url: "/payroll/earningTypes"},
+          {name: "Deduction Types", icon: "category", url: "/payroll/deductionTypes"},
         ]
         if (mounted !== true) this.$router.push(this.subSideBar.itemsArray[0].url)
         this.drawer = true
@@ -550,13 +553,13 @@ export default {
       drawer,
     }
   },
- async mounted() {
-   console.log("started: ", this.subSideBar )
+  async mounted() {
+    console.log("started: ", this.subSideBar )
     this.defaultValueSubSide()
     console.log("ended: ", this.subSideBar )
     await this.getUser();
-   this.brandCodeName = this.user.brand?.name ? this.user.brand?.name : this.user.brand?.brandCodeName
-   this.brandLogo = this.user.brand?.logo
+    this.brandCodeName = this.user.brand?.name ? this.user.brand?.name : this.user.brand?.brandCodeName
+    this.brandLogo = this.user.brand?.logo
   }
 }
 </script>

@@ -69,7 +69,7 @@
 </q-layout>
 </template>
 <script>
-import { mapActions } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 import { VueTelInput } from 'vue-tel-input';
 import axios from 'axios';
 import myUpload from 'vue-image-crop-upload';
@@ -93,7 +93,6 @@ export default {
      loading: false,
       subdomain: null,
      credentials : {
-      username: null,
       phone: null,
       name: null,
       email: null,
@@ -106,9 +105,13 @@ export default {
      },
     }
   },
+  computed : {
+    ...mapState('example',['user']),
+  },
   events: {
     },
   methods: {
+    ...mapActions('example',['getUser']),
     phoneValidate(evt) {
       if(isNaN(Number(evt.data))) {
         this.credentials.phone = this.credentials.phone.substring(0, this.credentials.phone.length-1)
@@ -141,18 +144,19 @@ export default {
 
           this.loading = true
             let data = new FormData();
-            data.append('username', this.credentials.username);
-            data.append('phoneNumber', this.dialCode+this.credentials.phone);
-            data.append('name', this.credentials.name);
-            data.append('email', this.credentials.email);
-            data.append('subdomain', this.credentials.subdomain);
-            data.append('companySize', this.credentials.companySize);
-            data.append('owner', this.credentials.owner);
-            data.append('address', this.credentials.address);
-            data.append('occupation', this.credentials.occupation);
-            data.append('website', this.credentials.website);
+            data.append('id', this.credentials.id)
+            if (this.credentials.phone) data.append('phoneNumber', this.dialCode+this.credentials.phone);
+            if (this.credentials.name) data.append('name', this.credentials.name);
+            if (this.credentials.email) data.append('email', this.credentials.email);
+            if (this.credentials.subdomain) data.append('subdomain', this.credentials.subdomain);
+            if (this.credentials.companySize) data.append('companySize', this.credentials.companySize);
+            if (this.credentials.owner) data.append('owner', this.credentials.owner);
+            if (this.credentials.address) data.append('address', this.credentials.address);
+            if (this.credentials.occupation) data.append('occupation', this.credentials.occupation);
+            if (this.credentials.website) data.append('website', this.credentials.website);
          try{
           let res = await axios.post(process.env.OC_BACKEND_API + 'brands/update', data, {headers: {Authorization: localStorage.getItem('accessToken')}});
+          await this.getUser()
           }catch(e) {
                 console.log(e)
             }
@@ -171,6 +175,7 @@ export default {
    this.show = false
    console.log(this.body)
     this.imgParams.id = this.body.id
+    this.credentials.id = this.body.id
     this.credentials.username = this.body.username
     this.credentials.phone = this.body.phoneNumber
     this.credentials.name = this.body.name,

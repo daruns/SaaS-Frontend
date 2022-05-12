@@ -153,22 +153,21 @@
           <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 q-pa-sm">
             <q-input
               bg-color="white"
-              mask="#"
               :disable="invoice.currencyCode === defaultCurrency"
+              mask="#.##"
               fill-mask="0"
               reverse-fill-mask
-              model-value="Number"
-              outlined v-model="invoice.exchangeRate"
+              outlined
+              v-model="invoice.exchangeRate"
               label="Exchange rate"
             />
           </div>
           <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 q-pa-sm">
             <q-input
               bg-color="white"
-              mask="#"
+              mask="#.##"
               fill-mask="0"
               reverse-fill-mask
-              model-value="Number"
               outlined
               v-model="bankFee"
               label="Bank Fee"
@@ -210,9 +209,9 @@
                     @update:model-value="val => updateItem(val,i)"
                   >
                     <!-- bottom-slots -->
-                    <!-- <template v-slot:hint>
-                      <q-btn size="sm" dense no-caps flat color="primary" label="Add Item" @click="selectItemDialogue = true" />
-                    </template> -->
+                  <!-- <template v-slot:hint>
+                    <q-btn size="sm" dense no-caps flat color="primary" label="Add Item" @click="selectItemDialogue = true" />
+                  </template> -->
                   <template v-slot:option="scope">
                     <q-item v-bind="scope.itemProps">
                       <q-item-section>
@@ -235,31 +234,34 @@
                 <td style="width: 7rem !important;">
                   <q-input
                     style="width: 7rem !important;"
-                    mask="#"
-                    fill-mask="0"
-                    reverse-fill-mask
-                    model-value="Number"
                     bg-color="white"
-                    @input.capture="evaluate(i)" outlined v-model="invoice.items[i].unitPrice"
+                    @input.capture="() => evaluate(i)" outlined
+                    v-model="invoice.items[i].unitPrice"
                   />
                 </td>
                 <td style="width: 5rem !important;">
                   <q-input
                     style="width: 5rem !important;"
                     bg-color="white"
-                    mask="#"
-                    fill-mask="0"
-                    reverse-fill-mask
-                    model-value="Number"
-                    @input.capture="evaluate(i)"   outlined v-model="invoice.items[i].qty"
+                    @input.capture="evaluate(i)"
+                    outlined
+                    v-model="invoice.items[i].qty"
                   />
-                    <!-- :readonly="invoice.items[i].category !== 'inventoryItem' || invoice.items[i].category !== ''" -->
                 </td>
                 <td style="width: 7rem !important;"> 
-                  <q-input style="width: 7rem !important;" bg-color="white" readonly outlined v-model="invoice.items[i].amount" type="number" />
+                  <q-input
+                    mask="#.##"
+                    fill-mask="0"
+                    reverse-fill-mask
+                    style="width: 7rem !important;"
+                    bg-color="white"
+                    readonly
+                    outlined
+                    v-model="invoice.items[i].amount"
+                  />
                 </td>
                 <td style="width: 2rem !important;">
-                  <q-btn no-caps icon="add" flat color="primary" @click="addItemToInvoiceTable(i)" />
+                  <q-btn no-caps icon="add" flat color="primary" @click="addItemToInvoiceTable()" />
                   <q-btn flat icon="delete" size="md" color="negative" v-if="i !== 0" @click="invoice.items.splice(i, 1); findTotal()"/>
                 </td>
               </tr>
@@ -267,158 +269,35 @@
           </q-markup-table>
         </div>
 
-          <!-- <q-select
-            :loading="taxesLoading"
-            v-model="tax"
-            :update:modelValue="changeTaxRate"
-            :options="taxOptions"
-            :option-value="opt => Object(opt) === opt && 'value' in opt ? opt.value : 0"
-            :option-label="opt => Object(opt) === opt && 'label' in opt ? opt.label : null"
-            emit-value
-            map-options
-            bg-color="white"
-            class="col-lg-3 col-md-4 col-sm-6 col-xs-12 q-pa-sm"
-            outlined
-            label="Tax"
-          /> -->
-          <!-- <q-input 
-           ref="paymentRef"
-         :rules="[val => (val && val.length > 0) || 'This field is required']"
-          bg-color="white" class="col-lg-3 col-md-4 col-sm-6 col-xs-12 q-pa-sm" v-model="invoice.paymentMethod" outlined  label="Payment method" /> -->
-         <!-- <q-select
-          ref="statusRef"
-          :rules="[val => (val && val.length > 0) || 'This field is required']"
-          bg-color="white"  class="col-lg-3 col-md-4 col-sm-6 col-xs-12 q-pa-sm"  outlined v-model="invoice.status" :options="['Paid','Not paid', 'Sent']" label="Status" />
-          <q-input
-           ref="currencyCodeRef"
-           :rules="[val => (val && val.length > 0) || 'This field is required']"
-           bg-color="white" class="col-lg-3 col-md-4 col-sm-6 col-xs-12 q-pa-sm" outlined v-model="invoice.currencyCode" label="Currency code" /> -->
-          <!-- <q-input
-          bg-color="white"
-             class="col-lg-3 col-md-4 col-sm-6 col-xs-12 q-pa-sm" 
-             mask="#"
-              fill-mask="0"
-              reverse-fill-mask
-              model-value="Number"
-           outlined v-model="invoice.exchangeRate" label="Exchange rate" /> -->
-          <div>
-            <div class="q-pa-sm">
-            <!-- <q-markup-table flat bordered class="q-mt-xl">
-                  <thead>
-                    <tr>
-                      <th class="text-left">#</th>
-                      <th class="text-left">Item</th>
-                      <th class="text-left">Description</th>
-                      <th class="text-left">Unit price</th>
-                      <th class="text-left">Quantity</th>
-                      <th class="text-left">Amount</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(items, i) in invoice.items" :key="i">
-                      <td>{{i+1}}</td>
-                      <td>
-                      <q-select
-                      style="min-width: 10rem !important;"
-                        outlined
-                        label="item"
-                        v-model="invoice.items[i].label"
-                        :options="options1"
-                        :loading="joinedItemsLoading"
-                        bg-color="white"
-                        use-input
-                        input-debounce="10"
-                        @filter="filterItems"
-                    >
-                        <template v-slot:option="scope">
-                        <q-item @keypress.enter="invoice.items[i].description = scope.opt.description" @click="invoice.items[i].description = scope.opt.description" v-bind="scope.itemProps">
-                            <q-badge class="absolute-top-left  q-ma-xs" style="font-size:10px;">{{scope.opt.category === 'serviceItem' ? 'service' : 'item'}}</q-badge>
-                            <q-item-section>
-                            <q-item-label>{{ scope.opt.label }}</q-item-label>       
-                            </q-item-section>
-                        </q-item>
-                        </template>
-                    </q-select>
-                      </td>
-                    <td style="min-width: 20rem !important;">
-                      <q-input
-                        bg-color="white"
-                         outlined 
-                         v-model="invoice.items[i].description"
-                          />
-                      </td>
-                      <td style="width: 7rem !important;">
-                      <q-input
-                        style="width: 7rem !important;"
-                        mask="#"
-                        fill-mask="0"
-                        reverse-fill-mask
-                        model-value="Number"
-                        bg-color="white"
-                        @input.capture="evaluate(i)"  outlined v-model="invoice.items[i].unitPrice"/>
-                      </td>
-                      <td style="width: 5rem !important;">
-                        <q-input
-                        style="width: 5rem !important;"
-                        bg-color="white"
-                        mask="#"
-                        fill-mask="0"
-                        reverse-fill-mask
-                        model-value="Number"
-                        :readonly="invoice.items[i].label.category !== 'inventoryItem'"
-                        @input.capture="evaluate(i)"  outlined v-model="invoice.items[i].qty"/>
-                      </td>
-                      <td style="width: 7rem !important;"> 
-                          <q-input style="width: 7rem !important;" bg-color="white" readonly outlined v-model="invoice.items[i].amount" type="number" />
-                      </td>
-                      <td style="width: 2rem !important;">
-                        <q-btn no-caps icon="add" flat color="primary" @click="updateOptions" />
-                        <q-btn flat icon="delete" size="md" color="negative" v-if="i !== 0" @click="invoice.items.splice(i, 1); findTotal()"/></td>
-                    </tr>
-                  </tbody>
-                </q-markup-table> -->
-            </div>
-        </div>
-
         <div class="q-pa-sm col-12">
           <div class="row bg-white q-pa-lg" style="border-radius: 4px;">
             <div class="col-9"></div>
             <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 q-pb-md column q-gutter-sm">  
               <q-input
-                mask="#"
-                type="number"
-                model-value="Number"
-                fill-mask="0"
-                reverse-fill-mask
+                label="Subtotal"
+                fill-mask="0.00"
                 readonly
                 v-model="subtotal"
-                label="Subtotal"/>   
+              />   
               <q-input
-                mask="#"
-                model-value="Number"
+                label="Tax Rate%"
+                mask="##.##"
                 fill-mask="0"
-                reverse-fill-mask
                 @input.capture="updateValues"
                 v-model="invoice.taxRate"
-                label="Tax Rate%"/>
-              <q-input
-                mask="#"
-                model-value="Number"
-                fill-mask="0"
-                reverse-fill-mask
-                label="Discount%"
-                @input.capture="updateValues" v-model="invoice.discount"
               />
               <q-input
-                mask="#"
-                type="number"
-                model-value="Number"
+                label="Discount%"
+                mask="##.##"
                 fill-mask="0"
-                reverse-fill-mask
+                @input.capture="updateValues"
+                v-model="invoice.discount"
+              />
+              <q-input
+                label="Grand total"
+                fill-mask="0.00"
                 readonly
                 v-model="total"
-                label="Grand total"
               />
             </div>
           </div>
@@ -538,7 +417,7 @@ import Datepicker from 'vue3-date-time-picker';
 import 'vue3-date-time-picker/dist/main.css'
 const emptyInvoiceItem = {
   itemId: null,
-  qty: 0,
+  qty: 1,
   category: null,
   label: '',
   unitPrice: 0,
@@ -629,14 +508,15 @@ export default {
       this.invoice.taxRate = e?.rate
       this.updateValues()
     },
-    addItemToInvoiceTable(ind) {
+    addItemToInvoiceTable() {
       this.scndEmpty.itemId = null,
-      this.scndEmpty.qty = 0,
+      this.scndEmpty.qty = 1,
       this.scndEmpty.category = null,
       this.scndEmpty.label = '',
       this.scndEmpty.unitPrice = 0,
       this.scndEmpty.amount = 0
-      this.invoice.items.splice(ind+1,0,this.scndEmpty);
+      this.invoice.items.push({...this.scndEmpty});
+      this.scndEmpty = emptyInvoiceItem
     },
     updateItem(value,ind) {
       const prevObj = value
@@ -670,9 +550,9 @@ export default {
     async findTotal() {
       this.total = 0;      
       for(let i = 0; i < this.invoice.items.length; i++) {  
-        this.total += this.invoice.items[i].amount
+        this.total += Number(this.invoice.items[i].amount)
       }
-      this.subtotal = this.total
+      this.subtotal = Number(this.total.toFixed(2))
     },
     async retrievClientContacts(id, isImmediate) {
       this.clientContactsOptions = []
@@ -707,19 +587,23 @@ export default {
     async updateValues() {
       setTimeout(async () => {
         await this.findTotal();
-        let disCount = (Number(this.invoice.discount)/100) * this.total;
-        let tax = (Number(this.invoice.taxRate)/100) * this.total;
+        let disCount = (Number(this.invoice.discount)/100) * Number(this.total);
+        let tax = (Number(this.invoice.taxRate)/100) * Number(this.total);
         this.total = this.total + Number(tax);
         this.total = this.total - Number(disCount);
+        this.total = Number(this.total.toFixed(2))
       }, 100);
     },
     async evaluate(i) {
       setTimeout(async () => {
         if(Number(this.invoice.items[i].qty) === 0 && this.invoice.items[i].category !== 'inventoryItem'){
-          this.invoice.items[i].amount = Number(this.invoice.items[i].unitPrice) * 1;
+          this.invoice.items[i].amount = Number(this.invoice.items[i].unitPrice)?.toFixed(2) * 1;
         }else{
-          this.invoice.items[i].amount = Number(this.invoice.items[i].unitPrice) * Number(this.invoice.items[i].qty);
+          this.invoice.items[i].amount = Number(this.invoice.items[i].unitPrice)?.toFixed(2) * Number(this.invoice.items[i].qty);
         }
+        this.invoice.items[i].unitPrice = Number(this.invoice.items[i].unitPrice) || 0
+        this.invoice.items[i].qty = Number(this.invoice.items[i].qty) || 1
+        this.invoice.items[i].amount = Number(this.invoice.items[i].amount)?.toFixed(2) || 0
       }, 100);
       this.updateValues();
     },
@@ -776,22 +660,20 @@ export default {
         } else {
           response = await this.addInvoice(this.invoice)
         }
-        if (!response.data?.success) {
-          this.$q.notify({
-            type: 'negative',
-            message: 'something went wrong, Please try again or Check the table',
-            color: 'negative',
-            position: 'top',
-            timeout: '500'
-          })
-        }
+        this.$q.notify({
+          type: 'positive',
+          message: 'Invoice created',
+          color: 'positive',
+          position: 'top',
+          timeout: '500'
+        })
       } catch(er) {
         this.$q.notify({
           type: 'negative',
           message: 'something went wrong' + er,
           color: 'negative',
           position: 'top',
-          timeout: '500'
+          timeout: '1000'
         })
       }
 
@@ -816,7 +698,7 @@ export default {
       })
 
       this.taxes.forEach(e => {
-        this.taxOptions.push({label: e.name, id: e.id, rate: parseFloat(e.rate).toFixed(2)});
+        this.taxOptions.push({label: e.name, id: e.id, rate: Number(e.rate).toFixed(2)});
       })
       this.paymentMethods.forEach(e => {
         this.paymentOptions.push({label: e.name, id: e.id})
@@ -880,7 +762,7 @@ export default {
     },
   },
   async mounted() {
-    this.invoice.items.push(this.scndEmpty);
+    this.invoice.items.push({...this.scndEmpty});
     this.isLoaded = true
     this.clientsLoading = true
     this.currencyCodesLoading = true
@@ -958,7 +840,7 @@ export default {
         this.invoice.items[i].label.category = this.body.invoiceItems[i].category,
         this.invoice.items[i].label.label = this.body.invoiceItems[i].name,
         this.invoice.items[i].unitPrice = Number(this.body.invoiceItems[i].unitPrice),
-        this.invoice.items[i].amount = this.invoice.items[i].qty * this.invoice.items[i].unitPrice
+        this.invoice.items[i].amount = Number(this.invoice.items[i].qty * this.invoice.items[i].unitPrice).toFixed(2)
         this.invoice.items[i].description = this.body.invoiceItems[i].description
       }
       this.invoice.date = date.formatDate(new Date(this.body.date), 'YYYY-MM-DD HH:mm');

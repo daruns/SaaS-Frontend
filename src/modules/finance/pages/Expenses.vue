@@ -38,7 +38,7 @@
               {{ props.row.totalAmount }}
           </q-td>
           <q-td key="actions" :props="props">
-          <router-link :to="`/finance/expense1/${props.row.id}`">
+          <router-link :to="`/finance/expense/${props.row.id}`">
             <q-btn dense text-color="dark" round flat icon="visibility" />
           </router-link>
           <q-btn  :disable="props.row.status === 'Paid'" dense round flat icon="more_vert">

@@ -10,6 +10,10 @@ export function GET_LEAVE_TYPES (state, payload) {
   Object.assign(state.leaveTypes, payload.res);
 }
 
+export function GET_OVERTIME_TYPES (state, payload) {
+  Object.assign(state.overtimeTypes, payload.res);
+}
+
 export function GET_DESIGNATIONS (state, payload) {
   Object.assign(state.designations, payload.res);
 }
@@ -34,6 +38,10 @@ export function GET_LEAVE_TYPE (state, payload) {
   state.curentLeaveType = payload ;
 }
 
+export function GET_OVERTIME_TYPE (state, payload) {
+  state.curentOvertimeType = payload ;
+}
+
 export function GET_DESIGNATION (state, payload) {
   state.currentDesignation = payload ;
 }
@@ -45,12 +53,27 @@ export function GET_LEAVE_APPROVALS (state, payload) {
   state.leaveApprovals = payload.res ;
 }
 
+export function GET_OVERTIMES (state, payload) {
+  state.overtimes = payload.res;
+}
+export function GET_OVERTIME_APPROVALS (state, payload) {
+  state.overtimeApprovals = payload.res ;
+}
+
 export function GET_LEAVE (state, payload) {
   state.currenLeave = payload ;
 }
 
 export function GET_MY_LEAVES (state, payload) {
   state.myLeaves = payload.res ;
+}
+
+export function GET_OVERTIME (state, payload) {
+  state.currenOvertime = payload ;
+}
+
+export function GET_MY_OVERTIMES (state, payload) {
+  state.myOvertimes = payload.res ;
 }
 
 export function GET_MY_EMPLOYEE (state,payload) {

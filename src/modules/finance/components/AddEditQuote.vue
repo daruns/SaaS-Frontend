@@ -626,7 +626,7 @@ export default {
       }
     },
     updateTaxRateValue(e) {
-      this.invoice.taxRate = e?.rate
+      this.quote.taxRate = e?.rate
       this.updateValues()
     },
     addItemToQuoteTable(ind) {
@@ -636,7 +636,7 @@ export default {
       this.scndEmpty.label = '',
       this.scndEmpty.unitPrice = 0,
       this.scndEmpty.amount = 0
-      this.quote.items.splice(ind+1,0,this.scndEmpty);
+      this.quote.items.push(...this.scndEmpty)
     },
     updateItem(value,ind) {
       const prevObj = value

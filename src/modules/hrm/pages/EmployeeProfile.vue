@@ -77,6 +77,14 @@
             <p>Leave Balance (in days):</p>
             <p class="text-grey">{{currentEmployee.leaveBalance}}</p>
             </div>
+            <div class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+            <p>Overtime Balance (in days):</p>
+            <p class="text-grey">{{currentEmployee.overtimeBalance}}</p>
+            </div>
+            <div class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
+            <p>working hours per day:</p>
+            <p class="text-grey">{{currentEmployee.workingHours}}</p>
+            </div>
             <div v-if="currentEmployee.manager"  class="text-body1 text-weight-medium text-left full-width client-info flex q-gutter-sm">
             <p>Manager:</p>
             <p class="text-grey">{{currentEmployee.manager?.user?.name}}</p>

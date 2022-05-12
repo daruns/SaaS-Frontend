@@ -11,13 +11,25 @@ export async function getLeaves({commit}, type) {
   let response = await axios.get(process.env.OC_BACKEND_API + 'leaves', {headers: {Authorization: localStorage.getItem('accessToken')}})
   await commit('GET_LEAVES' ,{type: type, res: response.data.data})
 }
+export async function getOvertimes({commit}, type) {
+  let response = await axios.get(process.env.OC_BACKEND_API + 'overtimes', {headers: {Authorization: localStorage.getItem('accessToken')}})
+  await commit('GET_OVERTIMES' ,{type: type, res: response.data.data})
+}
 export async function getMyLeaves({commit}, type) {
   let response = await axios.get(process.env.OC_BACKEND_API + 'leaves/myLeaves', {headers: {Authorization: localStorage.getItem('accessToken')}})
   await commit('GET_MY_LEAVES' ,{type: type, res: response.data.data})
 }
+export async function getMyOvertimes({commit}, type) {
+  let response = await axios.get(process.env.OC_BACKEND_API + 'overtimes/myOvertimes', {headers: {Authorization: localStorage.getItem('accessToken')}})
+  await commit('GET_MY_OVERTIMES' ,{type: type, res: response.data.data})
+}
 export async function getLeaveApprovals({commit}, type) {
   let response = await axios.get(process.env.OC_BACKEND_API + 'leaves/allApprovals', {headers: {Authorization: localStorage.getItem('accessToken')}})
   await commit('GET_LEAVE_APPROVALS' ,{type: type, res: response.data.data})
+}
+export async function getOvertimeApprovals({commit}, type) {
+  let response = await axios.get(process.env.OC_BACKEND_API + 'overtimes/allApprovals', {headers: {Authorization: localStorage.getItem('accessToken')}})
+  await commit('GET_OVERTIME_APPROVALS' ,{type: type, res: response.data.data})
 }
 export async function getDepartments({commit}, type) {
   let response = await axios.get(process.env.OC_BACKEND_API + 'departments', {headers: {Authorization: localStorage.getItem('accessToken')}})
@@ -26,6 +38,10 @@ export async function getDepartments({commit}, type) {
 export async function getLeaveTypes({commit}, type) {
   let response = await axios.get(process.env.OC_BACKEND_API + 'leaveTypes', {headers: {Authorization: localStorage.getItem('accessToken')}})
   commit('GET_LEAVE_TYPES' ,{type: type, res: response.data.data})
+}
+export async function getOvertimeTypes({commit}, type) {
+  let response = await axios.get(process.env.OC_BACKEND_API + 'overtimeTypes', {headers: {Authorization: localStorage.getItem('accessToken')}})
+  commit('GET_OVERTIME_TYPES' ,{type: type, res: response.data.data})
 }
 export async function getDesignations({commit}, type) {
   let response = await axios.get(process.env.OC_BACKEND_API + 'designations', {headers: {Authorization: localStorage.getItem('accessToken')}})
@@ -49,6 +65,10 @@ export async function getOneLeave({commit, dispatch}, id) {
   let response = await axios.get(process.env.OC_BACKEND_API + `leaves/${id}`, {headers: {Authorization: localStorage.getItem('accessToken')}})
   await commit('GET_LEAVE', response.data.data);
 }
+export async function getOneOvertime({commit, dispatch}, id) {
+  let response = await axios.get(process.env.OC_BACKEND_API + `overtimes/${id}`, {headers: {Authorization: localStorage.getItem('accessToken')}})
+  await commit('GET_OVERTIME', response.data.data);
+}
 
 export async function getMyEmployee({commit, dispatch}) {
   let response = await axios.get(process.env.OC_BACKEND_API + `employees/me`, {headers: {Authorization: localStorage.getItem('accessToken')}})
@@ -63,6 +83,11 @@ export async function getOneDepartment({commit, dispatch}, id) {
 export async function getOneLeaveType({commit, dispatch}, id) {
   let response = await axios.get(process.env.OC_BACKEND_API + `leaveTypes/${id}`, {headers: {Authorization: localStorage.getItem('accessToken')}})
   await commit('GET_LEAVE_TYPE', response.data.data);
+}
+
+export async function getOneOvertimeType({commit, dispatch}, id) {
+  let response = await axios.get(process.env.OC_BACKEND_API + `overtimeTypes/${id}`, {headers: {Authorization: localStorage.getItem('accessToken')}})
+  await commit('GET_OVERTIME_TYPE', response.data.data);
 }
 
 export async function getOneDesignation({commit, dispatch}, id) {
@@ -82,6 +107,13 @@ export async function createLeave({commit, dispatch}, body) {
   await dispatch('getMyLeaves');
 }
 
+export async function createOvertime({commit, dispatch}, body) {
+  let response = await axios.post(process.env.OC_BACKEND_API + 'overtimes/create', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
+  await dispatch('getOvertimes');
+  await dispatch('getOvertimeApprovals');
+  await dispatch('getMyOvertimes');
+}
+
 export async function createDepartment({commit, dispatch}, body) {
   let response = await axios.post(process.env.OC_BACKEND_API + 'departments/create', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
   await dispatch('getDepartments');
@@ -95,6 +127,11 @@ export async function createAttendance({commit, dispatch}) {
 export async function createLeaveType({commit, dispatch}, body) {
   let response = await axios.post(process.env.OC_BACKEND_API + 'leaveTypes/create', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
   await dispatch('getLeaveTypes');
+}
+
+export async function createOvertimeType({commit, dispatch}, body) {
+  let response = await axios.post(process.env.OC_BACKEND_API + 'overtimeTypes/create', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
+  await dispatch('getOvertimeTypes');
 }
 
 export async function createDesignation({commit, dispatch}, body) {
@@ -111,16 +148,27 @@ export async function approveLeave({commit, dispatch}, body) {
   await dispatch('getLeaveApprovals');
 }
 
+export async function approveOvertime({commit, dispatch}, body) {
+  try{
+    let response = await axios.post(process.env.OC_BACKEND_API + 'overtimes/approveOvertime', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
+  }catch(e) {
+    console.log(e.response)
+  }
+  await dispatch('getOvertimes');
+  await dispatch('getOvertimeApprovals');
+}
+
 export async function updateApproval({commit, dispatch}, body) {
   try{
-    let response = await axios.post(process.env.OC_BACKEND_API + 'leaves/updateApproval', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
+    let response = await axios.post(process.env.OC_BACKEND_API + 'overtimes/updateApproval', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
   }catch(e) {
       console.log(e.response)
   }
-  await dispatch('getLeaves');
-  await dispatch('getLeaveApprovals');
+  await dispatch('getOvertimes');
+  await dispatch('getOvertimeApprovals');
 
 }
+
 export async function updateEmployee({commit, dispatch}, body) {
   try{
     let response = await axios.post(process.env.OC_BACKEND_API + 'employees/update', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
@@ -148,6 +196,15 @@ export async function updateLeaveType({commit, dispatch}, body) {
   await dispatch('getLeaveTypes');
 }
 
+export async function updateOvertimeType({commit, dispatch}, body) {
+  try{
+    let response = await axios.post(process.env.OC_BACKEND_API + 'overtimeTypes/update', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
+  }catch(e) {
+    console.log(e.response)
+  }
+  await dispatch('getOvertimeTypes');
+}
+
 export async function updateLeave({commit, dispatch}, body) {
   try{
     let response = await axios.post(process.env.OC_BACKEND_API + 'leaves/update', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
@@ -157,6 +214,17 @@ export async function updateLeave({commit, dispatch}, body) {
   await dispatch('getLeaves');
   await dispatch('getLeaveApprovals');
   await dispatch('getMyLeaves');
+}
+
+export async function updateOvertime({commit, dispatch}, body) {
+  try{
+    let response = await axios.post(process.env.OC_BACKEND_API + 'overtimes/update', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
+  }catch(e) {
+    console.log(e.response)
+  }
+  await dispatch('getOvertimes');
+  await dispatch('getOvertimeApprovals');
+  await dispatch('getMyOvertimes');
 }
 
 export async function updateDesignation({commit, dispatch}, body) {
@@ -223,6 +291,27 @@ export async function deleteLeaveType({commit, dispatch}, body) {
       Notify.create({
         type: 'warning',
         message: 'This leaveType has pending operations!',
+        textColor: 'white'
+      })
+    }
+  }
+}
+
+export async function deleteOvertimeType({commit, dispatch}, body) {
+  try{
+    let response = await axios.post(process.env.OC_BACKEND_API + 'overtimeTypes/delete', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
+    await dispatch('getOvertimeTypes');
+  }catch(e) {
+    if(e.response.data.message === 'Invalid url!'){
+      Notify.create({
+        type: 'warning',
+        message: 'This overtimeType has pending operations!',
+        textColor: 'white'
+      })
+    } else {
+      Notify.create({
+        type: 'danger',
+        message: `something went wrong while deleting overtime type! Error: ${e}`,
         textColor: 'white'
       })
     }

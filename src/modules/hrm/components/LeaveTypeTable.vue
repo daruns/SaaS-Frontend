@@ -17,8 +17,9 @@
           <q-td class="items-center justify-start" key="fund" :props="props">
             <p style="font-size: 20px;">{{props.row.fund}}</p>
           </q-td>
-          <q-td class="items-center justify-start" key="days" :props="props">
-            <p style="font-size: 20px;">{{props.row.days}}</p>
+          <q-td class="items-center justify-start" key="duration" :props="props">
+            <p v-if="props.row.durationType === 'days'" style="font-size: 20px;">{{props.row.days}} Days</p>
+            <p v-if="props.row.durationType === 'hours'" style="font-size: 20px;">{{props.row.hours}} Hours</p>
           </q-td>
           <q-td class="items-center justify-start" key="urgent" :props="props">
             <p v-if="props.row.urgent" style="font-size: 20px;"><q-icon name="done" /></p>
@@ -70,7 +71,7 @@ export default {
       columns : [
         { name: 'name', label: 'Name', align: 'left', field: 'name' },
         { name: 'fund', label: 'Salary Deduction', align: 'left', field: 'fund' },
-        { name: 'days', label: 'Days', align: 'left', field: 'days' },
+        { name: 'duration', label: 'Duration Limit', align: 'left', field: 'duration' },
         { name: 'urgent', label: 'Is Urgent', align: 'left', field: 'name' },
         { name: 'actions', label: 'Actions', align: 'right', field: 'actions'}
       ]

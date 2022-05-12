@@ -1,0 +1,122 @@
+<template>
+  <div>
+    <q-table
+      :rows="data"
+      :columns="columns"
+      row-key="id"
+      :loading="loading"
+      :rows-per-page-options="[20,50,100,0]"
+      flat
+      class="bg-secondary q-pa-md"
+    >
+      <template v-slot:body="props">
+        <q-tr :class="props.rowIndex%2 !== 0 && 'bg-white'" :props="props">
+          <q-td class="items-center justify-start" key="employee" :props="props">
+            <p style="font-size: 20px;">{{props.row.employee?.name}}</p>
+          </q-td>
+          <q-td class="items-center justify-start" key="earningType" :props="props">
+            <p style="font-size: 20px;">{{props.row.earningType?.name}}</p>
+          </q-td>
+          <q-td class="items-center justify-start" key="qty" :props="props">
+            <p style="font-size: 20px;">{{props.row.qty}}</p>
+          </q-td>
+          <q-td class="items-center justify-start" key="fund" :props="props">
+            <p style="font-size: 20px;">{{props.row.earningType?.fund}}</p>
+          </q-td>
+          <q-td class="items-center justify-start" key="total" :props="props">
+            <p style="font-size: 20px;">{{props.row.total}}</p>
+          </q-td>
+          <q-td class="items-center justify-start" key="date" :props="props">
+            <p style="font-size: 20px;">{{dateFunc.formatDate(new Date(props.row.date), 'YYYY-MM-DD HH:mm')}}</p>
+          </q-td>
+          <q-td class="items-center justify-start" key="description" :props="props">
+            <p style="font-size: 20px;">{{props.row.description}}</p>
+          </q-td>
+          <q-td class="text-right" key="actions" :props="props">
+            <q-btn dense round flat icon="more_vert">
+              <q-menu
+                transition-show="scale"
+                transition-hide="scale"
+              >
+                <q-list style="min-width: 75px">
+                  <q-item @click="deleteEarning({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
+                    <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
+                  </q-item>
+                  <q-separator />
+                  <q-item @click="editEarning(props.row)" clickable v-close-popup>
+                    <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-btn>
+          </q-td>
+        </q-tr>
+      </template>
+    </q-table>
+    <q-dialog @closeDialogue="dialogue = false" :inProfile="false" seamless position="right" v-model="dialogue">
+        <modal @closeDialogue="dialogue = false" :body="body" :id="id" actionType="Edit" />
+    </q-dialog>
+  </div>
+</template>
+
+<script>
+import { mapActions, mapState } from 'vuex'
+import AddEditEarning from './AddEditEarning.vue';
+import { date } from 'quasar';
+
+export default {
+  computed: {
+    ...mapState('payrollStore', ['earnings']),
+    data(){
+      return this.earnings
+    }
+  },
+
+  data() {
+    return {
+      body: null,
+      dateFunc: date,
+      id: null,
+      dialogue: false,
+      loading: false,
+      columns : [
+        { name: 'employee', label: 'Employee', align: 'left', field: 'employee' },
+        { name: 'earningType', label: 'Earning Type', align: 'left', field: 'earningType' },
+        { name: 'qty', label: 'Quantity', align: 'left', field: 'qty' },
+        { name: 'fund', label: 'Fund', align: 'left', field: 'fund' },
+        { name: 'total', label: 'Total', align: 'left', field: 'total' },
+        { name: 'date', label: 'Date', align: 'left', field: 'date' },
+        { name: 'description', label: 'Description', align: 'left', field: 'description' },
+        { name: 'actions', label: 'Actions', align: 'right', field: 'actions'}
+      ]
+    }
+  },
+  components: {
+    modal: AddEditEarning
+  },
+  methods: {
+    ...mapActions('payrollStore',['getEarnings','deleteEarning']),
+    editEarning(department) {
+        if(this.dialogue === true){
+          this.dialogue = false;
+          setTimeout(() => {
+             this.body = department
+            this.dialogue = true
+          }, 200);
+          return
+        }
+         this.body = department
+        this.dialogue = true
+    },
+     rowColor(props) {
+        if(props.rowIndex%2 !== 0 || props.rowIndex !== 0  )
+        return 'background: #fff;'
+      }
+  },
+ async mounted() {
+   this.loading = true
+   await this.getEarnings();
+   this.loading=false
+  }
+}
+</script>

@@ -10,6 +10,7 @@ import userStore from '../modules/Users/store'
 import chatStore from '../modules/chat/store'
 import socialMediaManagementStore from '../modules/socialMedia/store'
 import hrmStore from '../modules/hrm/store'
+import payrollStore from '../modules/payroll/store'
 /*
  * If not building with SSR mode, you can
  * directly export the Store instantiation;
@@ -17,7 +18,7 @@ import hrmStore from '../modules/hrm/store'
  * The function below can be async too; either use
  * async/await or return a Promise which resolves
  * with the Store instance.
- */
+*/
 
 export default store(function (/* { ssrContext } */) {
   const Store = createStore({
@@ -31,6 +32,7 @@ export default store(function (/* { ssrContext } */) {
       chatStore,
       socialMediaManagementStore,
       hrmStore,
+      payrollStore,
     },
 
     // enable strict mode (adds overhead!)

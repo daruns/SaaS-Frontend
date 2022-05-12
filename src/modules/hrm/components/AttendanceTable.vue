@@ -59,7 +59,7 @@
             <q-btn :loading="btnloading" class="q-pa-md text-h6" style="width: 100%" v-if="!lastAttend" label="Punch In" color="primary" @click="autoCloseDialogue()" />
             <q-btn :loading="btnloading" class="q-pa-md text-h6" style="width: 100%" v-else label="Punch Out" color="red" @click="autoCloseDialogue()" />
             <div class="q-py-lg row" style="width: 100%">
-              <span class="q-mr-xs rounded-borders text-h6 q-py-md col bg-grey text-center text-white">Break 0 hrs</span>
+              <span class="q-mr-xs rounded-borders text-h6 q-py-md col bg-grey text-center text-white">Break {{breakTime}} hrs</span>
               <span class="q-ml-xs rounded-borders text-h6 q-py-md col bg-grey text-center text-white">Over Time 0 hrs</span>
             </div>
           </div>
@@ -133,9 +133,16 @@ export default {
       if (this.myattends) {
         let finals = []
         let indx = 1
+        let breakTimeDuration = 0;
         let tempfinal = final.sort().reverse()
         if (tempfinal.length) {
           tempfinal.reduce((prev, cur) => {
+            if (prev.checkedIn !== 1 && cur.checkedIn === 1) {
+              let curat = Number(new Date(cur.createdAt)) / 3600000
+              let prevat = Number(new Date(prev.createdAt)) / 3600000
+              console.log("difff: ",curat,prevat,prev.createdAt,cur.createdAt)
+              breakTimeDuration += Number(curat - prevat)
+            }
             if (prev.checkedIn === 1 && prev.checkedIn !== cur.checkedIn) {
               let curat = Number(new Date(cur.createdAt)) / 3600000
               let prevat = Number(new Date(prev.createdAt)) / 3600000
@@ -153,8 +160,9 @@ export default {
         for (let cr of filteredFinals) {
           totalAmount += Number(cr.duration)
         }
+        this.breakTime = breakTimeDuration?.toFixed(2)
         this.todayHoursPercentage = totalAmount/8*100
-        this.todayHours = totalAmount
+        this.todayHours = totalAmount.toFixed(2)
         return finals
       }
       return []
@@ -168,6 +176,7 @@ export default {
       todayDateFull: moment().format('DD MMM YYYY'),
       todayHours: 0,
       todayHoursPercentage: 0,
+      breakTime: 0,
       todayDate: moment().format('DD, MMM'),
       myattends: false,
       btnloading: false,

@@ -23,7 +23,13 @@
         label="Salary to be Reduced per day"
         type="number"
       />
+      <div>Duration Limit Type:</div>
+      <div class="q-gutter-sm">
+        <q-radio v-model="credentials.durationType" val="days" label="Days" />
+        <q-radio v-model="credentials.durationType" val="hours" label="Hours" />
+      </div>
       <q-input
+        v-if="credentials.durationType == 'days'"
         ref="daysRef"
         outlined
         v-model.number="credentials.days"
@@ -31,6 +37,16 @@
         type="number"
         lazy-rules
         :rules="[val => (val && val > 0) || 'Please type the days']"
+      />
+      <q-input
+        v-if="credentials.durationType == 'hours'"
+        ref="hoursRef"
+        outlined
+        v-model.number="credentials.hours"
+        label="Hours per day"
+        type="number"
+        lazy-rules
+        :rules="[val => (val && val > 0) || 'Please type the hours']"
       />
       <q-checkbox
         ref="urgentRef"
@@ -48,6 +64,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import { VueTelInput } from 'vue-tel-input';
+import { ref } from 'vue'
 export default {
   components : {
     VueTelInput,
@@ -62,6 +79,8 @@ export default {
       name: null,
       fund: 0,
       days: 0,
+      hours: 0,
+      durationType: 'days',
       urgent: false,
      },
     }
@@ -76,11 +95,14 @@ export default {
     ...mapActions('hrmStore', ['createLeaveType', 'updateLeaveType','getLeaveTypes']),
    async submit() {
       this.$refs.nameRef.validate();
-      this.$refs.daysRef.validate();
+      if (this.credentials.durationType === "hours") this.$refs.hoursRef.validate();
+      if (this.credentials.durationType === "days") this.$refs.daysRef.validate();
       if (
         this.$refs.nameRef.hasError
         ||
-        this.$refs.daysRef.hasError
+        (this.credentials.durationType === "hours" && this.$refs.hoursRef.hasError)
+        ||
+        (this.credentials.durationType === "days" && this.$refs.daysRef.hasError)
       ) {
         return
       }else{
@@ -89,6 +111,8 @@ export default {
           name: this.credentials.name,
           fund: Number(this.credentials.fund),
           days: Number(this.credentials.days),
+          hours: Number(this.credentials.hours),
+          durationType: this.credentials.durationType,
           urgent: this.credentials.urgent,
         };
         try {
@@ -138,6 +162,8 @@ export default {
       this.credentials.name = this.body.name
       this.credentials.fund = Number(this.body.fund)
       this.credentials.days = Number(this.body.days)
+      this.credentials.hours = Number(this.body.hours)
+      this.credentials.durationType = this.body.durationType
       this.credentials.urgent = this.body.urgent === 1 || false
     }
   }

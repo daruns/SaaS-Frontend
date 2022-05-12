@@ -28,7 +28,7 @@
               {{ props.row.status }}
           </q-td>
           <q-td key="totalAmount" :props="props">
-              {{ total(props.row) }}
+              {{ props.row.totalAmount }}
           </q-td>
          <q-td key="actions" :props="props">
           <q-btn  :disable="props.row.status === 'Paid'" dense round flat icon="more_vert">

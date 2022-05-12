@@ -9,6 +9,8 @@ const routes = [
         { path: '/hrm/designations', component: () => import('../pages/Designations.vue')},
         { path: '/hrm/leaves', component: () => import('../pages/Leaves.vue')},
         { path: '/hrm/leaveTypes', component: () => import('../pages/LeaveTypes.vue')},
+        { path: '/hrm/overtimes', component: () => import('../pages/Overtimes.vue')},
+        { path: '/hrm/overtimeTypes', component: () => import('../pages/OvertimeTypes.vue')},
         { path: '/hrm/attendances', component: () => import('../pages/Attendances.vue')},
       ],
       meta: {needsAuth: true}

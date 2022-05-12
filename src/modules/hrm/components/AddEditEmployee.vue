@@ -70,7 +70,25 @@
         label="Leave Balance (in days)"
         type="number"
         lazy-rules
-        :rules="[val => (val && val > 0) || 'Please type the leave balance']"
+        :rules="[val => (val && val > 0 || val === 0 ) || 'Please type the leave balance']"
+      />
+      <q-input
+        ref="overtimeBalanceRef"
+        outlined
+        v-model.number="credentials.overtimeBalance"
+        label="Overtime Balance (in hours)"
+        type="number"
+        lazy-rules
+        :rules="[val => (val && val >= 0) || 'Please type the overtime balance']"
+      />
+      <q-input
+        ref="workingHoursRef"
+        outlined
+        v-model.number="credentials.workingHours"
+        label="Working Hours (in hours - max 24)"
+        type="number"
+        lazy-rules
+        :rules="[val => (val && val >= 1) || 'Please type the working hours from 1 to 24 hours']"
       />
       <q-select
         v-model="designation"
@@ -131,6 +149,8 @@ export default {
       passwordMatch: null,
       credentials : {
         leaveBalance: 0,
+        overtimeBalance: 0,
+        workingHours: 0,
         salary: 0,
         managerId: null,
         name: null,
@@ -155,6 +175,8 @@ export default {
       this.$refs.nameRef.validate();
       this.$refs.salaryRef.validate();
       this.$refs.leaveBalanceRef.validate();
+      this.$refs.workingHoursRef.validate();
+      this.$refs.overtimeBalanceRef.validate();
       this.$refs.designationRef.validate();
       if (this.actionType === 'Add') {
         this.$refs.emailRef.validate();
@@ -177,6 +199,10 @@ export default {
         ||
         this.$refs.leaveBalanceRef.hasError
         ||
+        this.$refs.workingHoursRef.hasError
+        ||
+        this.$refs.overtimeBalanceRef.hasError
+        ||
         this.$refs.designationRef.hasError
       ) {
         return
@@ -186,6 +212,8 @@ export default {
           name: this.credentials.name,
           designationId: Number(this.designation.id),
           leaveBalance: this.credentials.leaveBalance,
+          overtimeBalance: this.credentials.overtimeBalance / 8,
+          workingHours: this.credentials.workingHours / 8,
           salary: this.credentials.salary,
           managerId: this.credentials.managerId,
           hrMember: this.credentials.hrMember,
@@ -283,6 +311,8 @@ export default {
       this.credentials.hrMember = this.body.hrMember === 1 || false
       this.credentials.salary = this.body.salary
       this.credentials.leaveBalance = this.body.leaveBalance
+      this.credentials.overtimeBalance = this.body.overtimeBalance
+      this.credentials.workingHours = this.body.workingHours
       this.credentials.email = this.body.user.email
       this.credentials.username = this.body.user.username
     }

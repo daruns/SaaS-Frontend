@@ -6,6 +6,7 @@ import usersRoutes from '../modules/Users/routes';
 import chatRoutes from '../modules/chat/router';
 import socialMedias from '../modules/socialMedia/router'
 import hrmRoutes from '../modules/hrm/router'
+import payrollRoutes from '../modules/payroll/router'
 
 const routes = [
   {
@@ -39,6 +40,7 @@ const routes = [
   ...chatRoutes,
   ...socialMedias,
   ...hrmRoutes,
+  ...payrollRoutes,
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/Error404.vue')

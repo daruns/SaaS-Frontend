@@ -501,7 +501,8 @@ export default {
       this.scndEmpty.label = '',
       this.scndEmpty.unitPrice = 0,
       this.scndEmpty.amount = 0
-      this.invoice.items.splice(ind+1,0,this.scndEmpty);
+      this.invoice.items.push({...this.scndEmpty});
+      this.scndEmpty = emptyInvoiceItem
     },
     updateItem(value,ind) {
       const prevObj = value
@@ -610,7 +611,13 @@ export default {
           await this.addExpense({invoice: this.invoice,file: this.file});
           this.close = true
         } catch(er) {
-          alert("something went wrong: ", er)
+          this.$q.notify({
+            type: 'negative',
+            message: 'something went wrong',
+            color: 'negative',
+            position: 'top',
+            timeout: '500'
+          })
         }
       }
       this.$emit('closeDialogue')
@@ -705,7 +712,7 @@ export default {
     },
   },
   async mounted() {
-    this.invoice.items.push(this.scndEmpty);
+    this.invoice.items.push({...this.scndEmpty});
     this.isLoaded = true
     this.currencyCodesLoading = true
     this.categoryLoading = true
@@ -767,15 +774,24 @@ export default {
       await this.updateValues();
 
       for(let i = 0 ; i<this.body.expenseItems.length; i++){
+        if (i+1 !== this.body.expenseItems.length) {
+          this.invoice.items.push({
+            itemId: null,
+            qty: null,
+            category: null,
+            label: {label: '', itemId: null, category: null, description: ''},
+            unitPrice: null,
+            amount: 0,
+            description: ''
+          })
+        }
         this.invoice.items[i].itemId = this.body.expenseItems[i].itemId,
         this.invoice.items[i].qty = Number(this.body.expenseItems[i].qty),
         this.invoice.items[i].category = this.body.expenseItems[i].category,
         this.invoice.items[i].label = this.body.expenseItems[i].name,
         this.invoice.items[i].unitPrice = Number(this.body.expenseItems[i].unitPrice),
-        this.invoice.items[i].amount = this.invoice.items[i].qty * this.invoice.items[i].unitPrice
+        this.invoice.items[i].amount = Number(this.invoice.items[i].qty * this.invoice.items[i].unitPrice).toFixed(2)
         this.invoice.items[i].description = this.body.expenseItems[i].description
-        if(i+1 !== this.body.expenseItems.length)
-        this.invoice.items.push(this.scndEmpty)
       }
       await this.updateValues();
     }else{
