@@ -337,10 +337,10 @@ export default {
         },
         contact: {
           label: "Expense issued for:",
-          name: `${this?.oneExpense?.supplierName}`,
-          address: `${this?.oneExpense?.supplierAddress}`,
-          phone: `${this?.oneExpense?.supplierPhoneNumbers}`,
-          email: `${this?.oneExpense?.supplierEmail}`,
+          name: this?.oneExpense?.supplierName,
+          address: this?.oneExpense?.supplierAddress,
+          phone: this?.oneExpense?.supplierPhoneNumbers,
+          email: this?.oneExpense?.supplierEmail,
         },
         invoice: {
           label: "#",

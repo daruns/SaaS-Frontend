@@ -12,7 +12,8 @@
         <div class="row justify-between">
         <div class="column col-lg-6 col-md-6 col-sm-12 col-xs-12 q-gutter-lg">
         <q-avatar size="100px" font-size="52px">
-          <img src="~assets/one_logo_neat.png" />
+          <img v-if="user?.brand?.logo" :src="user?.brand?.logo" />
+          <img v-else src="~/assets/one_logo_neat.png" />
         </q-avatar>
         <div class="column">
         <p class="text-h6">{{oneQuote.client.name}}</p>
@@ -21,7 +22,8 @@
         <p class="text-subtitle2">{{oneQuote.client.email}}</p>
         </div>
         </div>
-        <div class="column col-lg-6 col-md-6 col-xs-12 col-sm-12 items-end q-mt-xl">
+        <div class="column col-lg-6 col-md-6 col-xs-12 col-sm-12 items-end">
+        <p><DownloadPDFButton :body="getJSPDFProps()" /></p>
         <p class="text-h6" style="padding-bottom:25px !important;">{{oneQuote.quoteNumber}}</p>
         <p class="text-subtitle2">Quote Date: {{dateConversion(oneQuote.date)}}</p>
         <p class="text-subtitle2">Due Date: {{dateConversion(oneQuote.dueDate)}}</p>
@@ -100,10 +102,13 @@
 </template>
 <script>
 import breadcrumps from 'src/components/globalComponents/BreadCrumps.vue'
+import DownloadPDFButton from 'src/components/DownloadPDFButton.vue';
+
 import { mapActions, mapState } from 'vuex'
 export default {
     components: {
-      breadcrumps
+      breadcrumps,
+      DownloadPDFButton
     },
     data() {
       return{
@@ -119,10 +124,12 @@ export default {
       }
     },
     computed : {
-        ...mapState('financeStore',['oneQuote'])
+        ...mapState('financeStore',['oneQuote']),
+        ...mapState('example',['user'])
     },
     methods : {
         ...mapActions('financeStore',['getQuote']),
+        ...mapActions('example',['getUser']),
         dateConversion(date) {
           console.log
             return ' '+date.split('T')[0]
@@ -131,9 +138,102 @@ export default {
         if(i%2 === 0)
         return 'background: #f2f2f2 !important;'
       },
+      getJSPDFProps() {
+        return {
+          outputType: 'save',
+          returnJsPDFDocObject: true,
+          fileName: "Invoice.pdf",
+          orientationLandscape: false,
+          compress: true,
+          logo: {
+            src: `${process.env.OC_BACKEND_API}readAsStream/?key=${this.user?.brand?.logo}`,
+            width: 26.66, //aspect ratio = width/height
+            height: 26.66,
+            margin: {
+              top: 0, //negative or positive num, from the current position
+              left: 0 //negative or positive num, from the current position
+            }
+          },
+          business: {
+            name: `${this.user?.brand?.name}`,
+            address: `${this.user?.brand?.address}`,
+            phone: `${this.user?.brand?.phoneNumber}`,
+            email: `${this.user?.brand?.email}`,
+            website: `${this.user?.brand?.website}`,
+          },
+          contact: {
+            label: "Invoice to",
+            name: `${this?.oneQuote?.clientName}`,
+            address: `${this?.oneQuote?.clientAddress}`,
+            phone: `${this?.oneQuote?.clientPhoneNumbers}`,
+            email: `${this?.oneQuote?.clientEmail}`,
+          },
+          invoice: {
+            label: "",
+            num: `${this.oneQuote?.quoteNumber}`,
+            invDate: `Date: ${this.dateConversion(this.oneQuote.date)}`,
+            invGenDate: `Due Date: ${this.dateConversion(this.oneQuote.dueDate)}`,
+            headerBorder: false,
+            tableBodyBorder: false,
+            header: [
+              {
+                title: "#",
+                style: {width: 10},
+              }, {
+                title: "Name",
+                style: {width: 30},
+              }, {
+                title: "Description",
+                style: {width: 80},
+              },
+              { title: "Unit Price" },
+              { title: "Quantity" },
+              { title: "Total Amount" },
+            ],
+            table: Array.from(this.oneQuote?.quoteItems, (item, index)=>([
+              `${index + 1}`,
+              `${item.name}`,
+              `${item.description}`,
+              `${item.unitPrice}`,
+              `${item.qty}`,
+              `${item.qty * item.unitPrice}`,
+            ])),
+            invSubTotalLabel: "Sub Total:",
+            invSubTotal: `${this.stotal}`,
+            invTotalLabel: "Total:",
+            invTotal: `${this.total}`,
+            invCurrency: "USD",
+            row1: {
+              col1: 'Tax:',
+              col2: `${this.taxRatio}`,
+              col3: '%',
+              style: {
+                fontFamily: 'serif',
+                fontSize: 10 //optional, default 12
+              }
+            },
+            row2: {
+              col1: 'Discount:',
+              col2: `${this.discount}`,
+              col3: '%',
+              style: {
+                fontSize: 10 //optional, default 12
+              }
+            },
+            invDescLabel: "Note",
+            invDesc: this.oneQuote?.description,
+          },
+          footer: {
+            text: "",
+          },
+          pageEnable: true,
+          pageLabel: "page ",
+        }
+      },
     },
     async mounted() {
         await this.getQuote(this.$route.params.id);
+        await this.getUser();
         this.isLoaded = true;
         this.discount = Number(this.oneQuote.discount)
         this.taxRatio = Number(this.oneQuote.taxRate);

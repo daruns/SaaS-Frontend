@@ -94,13 +94,17 @@ export default {
   },
   methods: {
     downloadPdf() {
-      this.jsPDFInvoiceTemplate = window.jsPDFInvoiceTemplate;
-      const {jsPDF ,OutputType} = window.jsPDFInvoiceTemplate;
-      this.payload.outputType = 'save'
-
-      console.log("---- pfCreated: ", jsPDF)
-      var omwmw = this.jsPDFInvoiceTemplateCstm(this.payload,jsPDF)
-      console.log("---- omwmw: ", omwmw)
+      try {
+        this.jsPDFInvoiceTemplate = window.jsPDFInvoiceTemplate;
+        const {jsPDF ,OutputType} = window.jsPDFInvoiceTemplate;
+        this.payload.outputType = 'save'
+  
+        console.log("---- pfCreated: ", jsPDF)
+        var omwmw = this.jsPDFInvoiceTemplateCstm(this.payload,jsPDF)
+        console.log("---- omwmw: ", omwmw)
+      } catch(err) {
+        console.log("Something went wrong while creating the pdf!. ",err)
+      }
     },
     jsPDFInvoiceTemplateCstm(props,JsPdfobj) {
       const param = {

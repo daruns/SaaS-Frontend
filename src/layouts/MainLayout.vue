@@ -489,7 +489,7 @@ export default {
       } else if (payload === "payroll") {
         this.subSideBar.title = "payroll"
         this.subSideBar.itemsArray = [
-          {name: "Payslips", icon: "reciept", url: "/payroll/payslips"},
+          {name: "Payslips", icon: "receipt", url: "/payroll/payslips"},
           {name: "Earnings", icon: "money", url: "/payroll/earnings"},
           {name: "Deductions", icon: "money", url: "/payroll/deductions"},
           {name: "separator", icon: "", url: ""},

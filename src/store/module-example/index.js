@@ -40,6 +40,15 @@ async signUp ({commit}, payload) {
   }
 },
 
+async editBrand({commit}, payload) {
+  let response = await axios.post(process.env.OC_BACKEND_API + 'brands/update', payload, {headers: {Authorization: localStorage.getItem('accessToken')}});
+  if(response.data.success){
+    return true
+  } else {
+    return false
+  }
+},
+
 async editProfile({commit}, payload) {
   let response = await axios.post(process.env.OC_BACKEND_API + 'auth/editProfile', payload, {headers: {Authorization: localStorage.getItem('accessToken')}});
   if(response.data.success){

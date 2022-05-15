@@ -20,7 +20,7 @@
             field="logo"
             lang-type="en"
             :url="imgUrl"
-            :value.sync="show"
+            :v-model:propName="show"
             :params="imgParams"
             :headers="imgHeaders"
             v-model="show"
@@ -111,7 +111,7 @@ export default {
   events: {
     },
   methods: {
-    ...mapActions('example',['getUser']),
+    ...mapActions('example',['getUser','editBrand']),
     phoneValidate(evt) {
       if(isNaN(Number(evt.data))) {
         this.credentials.phone = this.credentials.phone.substring(0, this.credentials.phone.length-1)
@@ -155,11 +155,11 @@ export default {
             if (this.credentials.occupation) data.append('occupation', this.credentials.occupation);
             if (this.credentials.website) data.append('website', this.credentials.website);
          try{
-          let res = await axios.post(process.env.OC_BACKEND_API + 'brands/update', data, {headers: {Authorization: localStorage.getItem('accessToken')}});
+           this.editBrand(data)
           await this.getUser()
           }catch(e) {
-                console.log(e)
-            }
+            console.log(e)
+          }
           this.$q.notify({
               type: 'positive',
               message: 'Brand edit successfully',
@@ -173,7 +173,6 @@ export default {
   },
  async mounted() {
    this.show = false
-   console.log(this.body)
     this.imgParams.id = this.body.id
     this.credentials.id = this.body.id
     this.credentials.username = this.body.username
