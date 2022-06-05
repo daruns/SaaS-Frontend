@@ -25,34 +25,14 @@
         lazy-rules
         :rules="[val => (val && val.length > 0) || 'Please type the Email']"
       />
-      <q-input
-        ref="usernameRef"
+      <q-select
+        v-model="user"
+        ref="userRef"
+        no-caps
+        label="Connect with User"
+        :loading="userLoading"
         outlined
-        v-model="credentials.username"
-        v-if="actionType === 'Add'"
-        label="Username"
-        lazy-rules
-        :rules="[val => (val && val.length > 0) || 'Please type the username']"
-      />
-      <q-input
-        ref="passwordRef"
-        outlined
-        v-model="credentials.password"
-        v-if="actionType === 'Add'"
-        label="Password"
-        type="password"
-        lazy-rules
-        :rules="[val => (val && val.length > 0) || 'Please type the password']"
-      />
-      <q-input
-        ref="passwordMatchRef"
-        outlined
-        v-if="actionType === 'Add'"
-        v-model="passwordMatch"
-        label="Repeat Password"
-        type="password"
-        lazy-rules
-        :rules="[val => (val && val.length > 0 && passwordMatch === credentials.password) || 'Password Mismatch!']"
+        :options="userOptions"
       />
       <q-input
         ref="salaryRef"
@@ -98,6 +78,7 @@
         :loading="designationLoading"
         outlined
         :options="designationOptions"
+        :rules="[val => (val) || 'Please select a designation']"
       />
       <q-select
         v-model="manager"
@@ -140,37 +121,38 @@ export default {
       show: true,
       id: null,
       loading: false,
+      userLoading: false,
       manager: null,
+      user: null,
       designation: null,
       managerOptions: [],
       designationOptions: [],
+      userOptions: [],
       designationLoading: false,
       managerLoading: false,
       passwordMatch: null,
       credentials : {
         leaveBalance: 0,
         overtimeBalance: 0,
-        workingHours: 0,
+        workingHours: 8,
         salary: 0,
         managerId: null,
         name: null,
         hrMember: false,
         isManager: false,
-        username: null,
-        email: null,
-        password: null,
+        userId: null,
         designationId: null,
       },
     }
 },
   computed: {
-    ...mapState('hrmStore', ['designations', 'allEmployees']),
+    ...mapState('hrmStore', ['designations', 'allEmployees','allUsers']),
   },
   methods: {
     toggleShow() {
       this.show = !this.show;
     },
-    ...mapActions('hrmStore', ['getEmployees', 'createEmployee', 'updateEmployee','getDesignations']),
+    ...mapActions('hrmStore', ['getEmployees', 'getUsers', 'createEmployee', 'updateEmployee','getDesignations']),
    async submit() {
       this.$refs.nameRef.validate();
       this.$refs.salaryRef.validate();
@@ -178,20 +160,6 @@ export default {
       this.$refs.workingHoursRef.validate();
       this.$refs.overtimeBalanceRef.validate();
       this.$refs.designationRef.validate();
-      if (this.actionType === 'Add') {
-        this.$refs.emailRef.validate();
-        this.$refs.usernameRef.validate();
-        this.$refs.passwordMatchRef.validate();
-        if (
-          this.$refs.usernameRef.hasError
-          ||
-          this.$refs.emailRef.hasError
-          ||
-          this.$refs.passwordMatchRef.hasError
-        ) {
-          return
-        }
-      }
       if (
         this.$refs.nameRef.hasError
         ||
@@ -210,7 +178,6 @@ export default {
         this.loading = true
         let data = {
           name: this.credentials.name,
-          designationId: Number(this.designation.id),
           leaveBalance: this.credentials.leaveBalance,
           overtimeBalance: this.credentials.overtimeBalance / 8,
           workingHours: this.credentials.workingHours / 8,
@@ -218,14 +185,17 @@ export default {
           managerId: this.credentials.managerId,
           hrMember: this.credentials.hrMember,
         };
+        if (this.designation) {
+          data['designationId'] = Number(this.designation?.id)
+        }
         if (this.actionType === "Add") {
           data["isManager"] = this.credentials.isManager
-          data['username'] = this.credentials.username
-          data["email"] = this.credentials.email
-          data["password"] = this.credentials.password
         }
         if (this.manager) {
           data['managerId'] = Number(this.manager.id)
+        }
+        if (this.user) {
+          data['userId'] = this.user.id
         }
         if (this.designation) {
           data['designationId'] = Number(this.designation.id)
@@ -293,6 +263,17 @@ export default {
       }
       this.designationLoading = false
     })
+    this.userLoading = true
+    this.getValuesFromApiAsync(this.getUsers()).then((res) => {
+      for (let user of this.allUsers) {
+        if (!user.myEmployeeProfile) this.userOptions.push({label: `${user?.name} - ${user.name}`, id: user.id})
+      }
+      if (this.actionType === 'Edit') {
+        if (this.body.user) this.user = {label: this.body.user?.name , id: this.body.user?.id};
+      }
+      this.userLoading = false
+    })
+
     this.managerLoading = true
     this.getValuesFromApiAsync(this.getEmployees()).then((res) => {
       for (let manager of this.allEmployees) {
@@ -304,7 +285,6 @@ export default {
       this.managerLoading = false
     })
     if (this.actionType === 'Edit') {
-      console.log("body:    ",this.body)
       this.credentials.isManager = (this.body.user && this.body.user?.userType === 'admin')
       this.id = this.body.id
       this.credentials.name = this.body.name

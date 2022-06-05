@@ -11,6 +11,7 @@ import chatStore from '../modules/chat/store'
 import socialMediaManagementStore from '../modules/socialMedia/store'
 import hrmStore from '../modules/hrm/store'
 import payrollStore from '../modules/payroll/store'
+import auth from './auth'
 /*
  * If not building with SSR mode, you can
  * directly export the Store instantiation;
@@ -23,6 +24,7 @@ import payrollStore from '../modules/payroll/store'
 export default store(function (/* { ssrContext } */) {
   const Store = createStore({
     modules: {
+      auth,
       example,
       crmStore,
       accountingStore,

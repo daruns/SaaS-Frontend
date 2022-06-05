@@ -86,7 +86,7 @@
             />
           </div>
           <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 q-pa-sm">
-            <div class="q-ma-none absolute q-ml-sm text-grey-7" style="z-index:10;font-size:12px;line-height:20px;font-weight:400;">Expense date</div>
+            <div class="q-ma-none absolute q-ml-sm text-grey-7" style="z-index:10;font-size:12px;line-height:20px;font-weight:400;">Invoice date</div>
             <Datepicker autoApply v-model="invoice.date" showNowButton></Datepicker>
           </div>
           <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 q-pa-sm">

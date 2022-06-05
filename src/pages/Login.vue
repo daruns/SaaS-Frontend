@@ -39,15 +39,25 @@
       </div>
     </div>
       </q-card-section>
+      <div id="google-signin-button"></div>
+      <div class="signup-buttons">
+        <!-- <router-link v-if="isLoggedIn" to="/protected">
+          Go to Protected Page
+        </router-link> -->
+        <button @click="googleLogIn">
+          Log In with Google
+        </button>
+      </div>
       <p class="text-center">You don`t have an account?<router-link to="/signup" style="color: #1976D2;"> Sign up</router-link></p>
     </q-card>
 </div>
 </template>
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 export default {
    data()  { 
    return {
+     gapi: window.gapi,
      credentials : {
       username: '',
       password: ''
@@ -55,7 +65,15 @@ export default {
      loading: false,
     }
   },
+  computed: {
+    ...mapState('auth',['isLoggedIn'])
+  },
   methods : {
+    onSignIn () {
+      const profile = this.gapi.auth
+      console.log("google api oauth: ", profile)
+    },
+    ...mapActions('auth',['googleLogIn']),
     ...mapActions('example', ['logIn']),
     async login() {
       this.$refs.nameRef.validate();
@@ -86,6 +104,10 @@ export default {
       this.loading=false
     }
   },
+  mounted() {
+    this.gapi = window.gapi
+    this.onSignIn()
+  }
 }
 </script>
 <style lang="sass" scoped>

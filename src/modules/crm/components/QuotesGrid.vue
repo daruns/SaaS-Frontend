@@ -40,12 +40,12 @@
               transition-hide="scale"
               
             >
-              <q-list style="min-width: 75px">
-                <q-item @click="deleteQuote(props.row.id)" style="padding 0 !important" clickable v-close-popup>
+              <q-list style="min-width: 75px" v-if="canActivate('subject_finance','delete') || canActivate('subject_finance','update')">
+                <q-item  v-if="canActivate('subject_finance','delete')" @click="deleteQuote(props.row.id)" style="padding 0 !important" clickable v-close-popup>
                   <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                 </q-item>
-                <q-separator />
-                <q-item @click="edit(props.row)" clickable v-close-popup>
+                <q-separator  v-if="canActivate('subject_finance','delete') && canActivate('subject_finance','update')"  />
+                <q-item v-if="canActivate('subject_finance','update')" @click="edit(props.row)" clickable v-close-popup>
                  <q-item-section  class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                 </q-item>
               </q-list>
@@ -59,7 +59,7 @@
       </template> -->
     </q-table>
     <q-dialog seamless position="right" v-model="prompt" persistent>
-        <modal @closeDialogue="prompt = false" :action="action" :body="body" />
+      <modal @closeDialogue="prompt = false" :action="action" :body="body" />
     </q-dialog>
   </div>
 </template>
@@ -71,6 +71,7 @@ import modal from '../../finance/components/AddEditQuote.vue'
 export default {
   data() {
     return {
+      canActivate: this.$canActivate,
     invoicesShow: [],
     prompt: false,
     loading: false,
@@ -115,7 +116,7 @@ export default {
      dateConversion(dt) {
       let dtObj = new Date(dt);
       dtObj.setHours(dtObj.getHours() - 3)
-       return date.formatDate(dtObj, 'YYYY-MM-DD HH:mm');
+      return date.formatDate(dtObj, 'YYYY-MM-DD HH:mm');
     },
     edit(payload) {
         this.body = payload;
@@ -124,8 +125,8 @@ export default {
     }
   },
 async mounted() {
-  console.log("bodyData---- ",this.bodyData)
-      this.invoicesShow = this.bodyData?.map(e => e) || []
+    if (!this.canActivate('subject_finance','read')) return
+    this.invoicesShow = this.bodyData?.map(e => e) || []
   }
 }
 </script>

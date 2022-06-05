@@ -1,76 +1,76 @@
 <template>
-    <q-page v-if="isLoaded" class="flex flex-center">
-      <q-spinner color="primary" size="md" />
-    </q-page>
-    <q-page v-else class="q-py-none q-my-none">
+  <q-page v-if="!canActivate('subject_payroll','read')"><Forbidden /></q-page>
+  <q-page v-else-if="isLoaded" class="flex flex-center">
+    <q-spinner color="primary" size="md" />
+  </q-page>
+  <q-page v-else class="q-py-none q-my-none">
     <div class="full-width flex justify-between items-center q-px-md header-height-standard" style="border-bottom: 1px solid lightgrey;">
       <div class="text-h4">Payslip</div>
     </div>
     <div class="q-px-md">
-    <q-card class="q-pa-lg">
+      <q-card class="q-pa-lg">
         <div class="row justify-between">
-        <div v-if="user" class="column col-lg-6 col-md-6 col-sm-12 col-xs-12 q-gutter-lg">
-          <q-avatar square size="100px" font-size="52px">
-            <img :src="user.brand?.logo" />
-          </q-avatar>
-          <div class="column">
-            <p class="text-h6">{{user?.brand?.name}}</p>
-            <p class="text-subtitle2">{{user?.brand?.email}}</p>
-            <p class="text-subtitle2 text-grey">{{user?.brand?.phoneNumber}}</p>
-            <p class="text-subtitle2 text-grey">{{user?.brand?.address}}</p>
+          <div v-if="user" class="column col-lg-6 col-md-6 col-sm-12 col-xs-12 q-gutter-lg">
+            <q-avatar square size="100px" font-size="52px">
+              <img :src="user.brand?.logo" />
+            </q-avatar>
+            <div class="column">
+              <p class="text-h6">{{user?.brand?.name}}</p>
+              <p class="text-subtitle2">{{user?.brand?.email}}</p>
+              <p class="text-subtitle2 text-grey">{{user?.brand?.phoneNumber}}</p>
+              <p class="text-subtitle2 text-grey">{{user?.brand?.address}}</p>
+            </div>
           </div>
-        </div>
-        <div class="column col-lg-6 col-md-6 col-xs-12 col-sm-12 items-end">
-          <p>
-            <DownloadPDFButton :body="getJSPDFProps()" />
-          </p>
-          <p v-if="currentPayslip?.fromDate" class="text-subtitle2">Payslip Date: {{dateConversion(currentPayslip?.fromDate)}}</p>
-        </div>
+          <div class="column col-lg-6 col-md-6 col-xs-12 col-sm-12 items-end">
+            <p>
+              <DownloadPDFButton :body="getJSPDFProps()" />
+            </p>
+            <p v-if="currentPayslip?.fromDate" class="text-subtitle2">Payslip Date: {{dateConversion(currentPayslip?.fromDate)}}</p>
+          </div>
         </div>
         <div style="justify-content: start !important;" class="row q-mt-xl">
           <div class="column">
-          <p>Payslip to:</p>
-          <p class="text-bold">{{currentPayslip?.employee?.name}}</p>
-          <p>{{currentPayslip?.employee?.email}}</p>
+            <p>Payslip to:</p>
+            <p class="text-bold">{{currentPayslip?.employee?.name}}</p>
+            <p>{{currentPayslip?.employee?.email}}</p>
 
           </div>
         </div>
         <div class="q-mt-xl row ">
-            <q-markup-table class="col-6" flat bordered>
-                  <thead>
-                    <tr>
-                      <th class="text-left">Earnings</th>
-                    </tr>
-                  </thead>
+          <q-markup-table class="col-6" flat bordered>
+            <thead>
+              <tr>
+                <th class="text-left">Earnings</th>
+              </tr>
+            </thead>
             <tbody>
-                <tr>
-                  <td class="text-left">Basic Salary</td>
-                  <td class="text-left">{{currentPayslip.basicSalary}}</td>
-                </tr>
-                <tr :style="rowColor(i)" v-for="(item, i) in currentPayslip.payslipEarnings" :key="i">
-                  <td class="text-left">{{item?.name}}</td>
-                  <td class="text-left">{{item?.amount}}</td>
-                </tr>
+              <tr>
+                <td class="text-left">Basic Salary</td>
+                <td class="text-left">{{currentPayslip.basicSalary}}</td>
+              </tr>
+              <tr :style="rowColor(i)" v-for="(item, i) in currentPayslip.payslipEarnings" :key="i">
+                <td class="text-left">{{item?.name}}</td>
+                <td class="text-left">{{item?.amount}}</td>
+              </tr>
             </tbody>
-            </q-markup-table>
-            <q-markup-table class="col-6" flat bordered>
-                  <thead>
-                    <tr>
-                      <th class="text-left">Deductions</th>
-                    </tr>
-                  </thead>
+          </q-markup-table>
+          <q-markup-table class="col-6" flat bordered>
+            <thead>
+              <tr>
+                <th class="text-left">Deductions</th>
+              </tr>
+            </thead>
             <tbody>
-                <tr :style="rowColor(i)" v-for="(item, i) in currentPayslip.payslipDeductions" :key="i">
-                  <td class="text-left">{{item.name}}</td>
-                  <td class="text-left">{{item.amount}}</td>
-                </tr>
+              <tr :style="rowColor(i)" v-for="(item, i) in currentPayslip.payslipDeductions" :key="i">
+                <td class="text-left">{{item.name}}</td>
+                <td class="text-left">{{item.amount}}</td>
+              </tr>
             </tbody>
-            </q-markup-table>
-
+          </q-markup-table>
         </div>
-          <div class="row q-mt-xl">
-            <div class="col-9"></div>
-            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 column q-gutter-sm">   
+        <div class="row q-mt-xl">
+          <div class="col-9"></div>
+          <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 column q-gutter-sm">   
             <q-input
               mask="#"
               fill-mask="0"
@@ -94,19 +94,23 @@
               v-model="netSalary" label="Net Salary" />
             </div>
          </div>
-    </q-card>
-    </div>
+        </q-card>
+      </div>
     </q-page>
-</template>
+  </template>
 <script>
 import { mapActions, mapState } from 'vuex'
 import DownloadPDFButton from 'src/components/DownloadPDFButton.vue';
+import Forbidden from 'src/components/globalComponents/Forbidden.vue';
+
 export default {
   components: {
-    DownloadPDFButton
+    DownloadPDFButton,
+    Forbidden
   },
   data() {
     return{
+      canActivate: this.$canActivate,
       jsPDFInvoiceTemplate: null,
       isLoaded: false,
       netSalary: 0,
@@ -257,6 +261,7 @@ export default {
     },
   },
   async mounted() {
+    if (!this.canActivate('subject_payroll','read')) return
     this.isLoaded = true;
     await this.getUser();
     await this.getOnePayslip(this.$route.params.id);

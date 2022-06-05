@@ -3,10 +3,11 @@
     <div class="full-width flex justify-between items-center q-px-md  header-height-standard" style="border-bottom: 1px solid lightgrey;">
       <div class="text-h4">Tasks</div>
       <div class="flex items-center">
-        <q-btn @click="this.action = 'Add'; dialogue = true" color="primary" label="Create Board" unelevated rounded no-caps />
+        <q-btn v-if="canActivate('subject_projects','create')" @click="this.action = 'Add'; dialogue = true" color="primary" label="Create Board" unelevated rounded no-caps />
       </div>
     </div>
-    <q-scroll-area class="q-px-md" v-if="!isLoaded" :thumb-style="thumbStyle" :bar-style="barStyle" style="height: 70vh; width: 100% !important;">
+    <div v-if="!canActivate('subject_projects','read')"><Forbidden /></div>
+    <q-scroll-area class="q-px-md" v-else-if="!isLoaded" :thumb-style="thumbStyle" :bar-style="barStyle" style="height: 70vh; width: 100% !important;">
       <q-markup-table class="flex q-mt-md tasks-table bg-secondary" flat>
           <thead>
             <tr>
@@ -15,18 +16,17 @@
                <div style='border-radius:6px !important;' :style="`background-color: ${column.boardAttribute.color}`"
                class="q-pa-sm q-ma-none flex items-center justify-between">
                 <div class="q-mb-none text-white">{{column.name}}</div>
-                <q-btn color="white" dense round flat icon="more_vert">
+                <q-btn v-if="canActivate('subject_projects','update') || canActivate('subject_projects','delete')" color="white" dense round flat icon="more_vert">
                   <q-menu
                     transition-show="scale"
                     transition-hide="scale"
-
                   >
                     <q-list style="min-width: 75px">
-                      <q-item @click="delBoard(column.id)" style="padding 0 !important" clickable v-close-popup>
+                      <q-item v-if="canActivate('subject_projects','delete')" @click="delBoard(column.id)" style="padding 0 !important" clickable v-close-popup>
                         <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                       </q-item>
-                      <q-separator />
-                      <q-item @click="body = column; action = 'Edit'; dialogue = true;"  clickable v-close-popup>
+                      <q-separator v-if="canActivate('subject_projects','update') && canActivate('subject_projects','delete')" />
+                      <q-item v-if="canActivate('subject_projects','update')" @click="body = column; action = 'Edit'; dialogue = true;"  clickable v-close-popup>
                         <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                       </q-item>
                     </q-list>
@@ -49,9 +49,9 @@
             @start="start"
             :component-data="{ tag: 'div' }"
             @change="change"
-           :list="column.tasks" 
-           @clone="clone"
-           item-key="id">
+            :list="column.tasks" 
+            @clone="clone"
+            item-key="id">
             <template #item="{element}">
                 <div class="bg-white relative-position q-pa-sm q-mb-xs q-ml-xs q-mr-xs rounded-borders" style="border: 0.25px solid lightgrey;">
                   <div class="flex row items-center justify-between">
@@ -59,18 +59,17 @@
                       {{element.name}}
                       <q-chip square style="height:6px;width:100px" :class="priority(element.priority) + ' q-px-none q-mx-none'" size="xs"></q-chip>
                     </p>
-                    <q-btn dense round flat color="grey" icon="edit">
+                    <q-btn v-if="canActivate('subject_projects','delete') || canActivate('subject_projects','update')" dense round flat color="grey" icon="edit">
                       <q-menu
                         transition-show="scale"
                         transition-hide="scale"
-
                       >
                         <q-list style="min-width: 75px">
-                          <q-item @click="delTask({id: element.id})" style="padding 0 !important" clickable v-close-popup>
+                          <q-item v-if="canActivate('subject_projects','delete')" @click="delTask({id: element.id})" style="padding 0 !important" clickable v-close-popup>
                             <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                           </q-item>
                           <q-separator />
-                          <q-item @click="openDialogue(element, column.id)" clickable v-close-popup>
+                          <q-item v-if="canActivate('subject_projects','update')" @click="openDialogue(element, column.id)" clickable v-close-popup>
                             <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                           </q-item>
                         </q-list>
@@ -89,7 +88,7 @@
                     <div class="flex">
                       <div class=" flex-end q-mr-xs q-mt-xs q-mb-xs" v-for="(member,i) in element.memberUsers" :key="member.id">
                         <q-avatar  size="40px">
-                          <q-btn round size="5px" @click="delMember({id:element.id,members: [member.userId]})" icon="close" color="negative" class="absolute-top-right"/>
+                          <q-btn v-if="canActivate('subject_projects','delete')" round size="5px" @click="delMember({id:element.id,members: [member.userId]})" icon="close" color="negative" class="absolute-top-right"/>
                             <img v-if="member.avatar" :src="member.avatar">
                             <img v-else src="~/assets/one_logo_neat.png">
                           <!-- <q-tooltip>
@@ -99,10 +98,9 @@
                       </div>
                     </div>
                     <div class="flex items-start q-mt-xs q-ml-xs">
-                    <q-btn @click="getUserOptions(element)" round size="11px" text-color="black" unelevated color="grey-4" icon="add">
+                    <q-btn v-if="canActivate('subject_projects','create')" @click="getUserOptions(element)" round size="11px" text-color="black" unelevated color="grey-4" icon="add">
                         <q-popup-edit v-model="members" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
                         <q-select
-                            ref="clientRef"
                             :rules="[val => (val !== null) || 'This field is required']"
                             bg-color="white"
                             outlined
@@ -144,6 +142,7 @@
             text-color="grey"
             label="Add new task..."
             class="text-left col"
+            v-if="canActivate('subject_projects','create')" 
             @click="bId = column.id;allBoards = columns; actiont = 'Add'; dialoguet = true"
             unelevated
             no-caps
@@ -174,16 +173,19 @@ import axios from 'axios';
 import modal from '../components/AddEditBoard.vue'
 import modalt from '../components/AddEditTask'
 import task from '../components/TaskDialogue.vue'
+import Forbidden from 'src/components/globalComponents/Forbidden.vue';
 export default {
   components : {
-      breadcrmps,
-      draggable,
-      modal,
-      modalt,
-      task
-  },
+    breadcrmps,
+    draggable,
+    modal,
+    modalt,
+    task,
+    Forbidden
+},
   data() {
     return{
+      canActivate: this.$canActivate,
       taskBody: null,
       taskDialogue: false,
       loading: false,

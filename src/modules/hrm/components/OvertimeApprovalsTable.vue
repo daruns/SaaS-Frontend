@@ -67,6 +67,7 @@
           <q-td class="text-right" key="actions" :props="props">
             <div v-if="currentUser?.myEmployeeProfile?.hrMember === 1" class="row" style="min-width: 75px">
               <q-btn
+                v-if="canActivate('subject_hrm','update')" 
                 class="col"
                 size="sm"
                 :loading="approveLoading === props.row.id"
@@ -77,6 +78,7 @@
                 <q-icon class="text-bold" name="done" :color="(props.row.isRejectCompleted || props.row.overtimeApprovals.some(ee => ee.status === 'rejected') || props.row.status === 'rejected') ? 'grey' : 'primary'" size="xs"></q-icon>Approve hr
               </q-btn>
               <q-btn
+                v-if="canActivate('subject_hrm','update')" 
                 class="col"
                 :loading="rejectLoading === props.row.id"
                 @click="approveOvertime({id: props.row.id, status: 'rejected'})"
@@ -89,6 +91,7 @@
             </div>
             <div v-else class="flex align-items-center">
               <q-btn
+                v-if="canActivate('subject_hrm','update')" 
                 class="col"
                 :loading="approveLoading === props.row.id"
                 @click="updateApprovalMiddle({id: props.row.id, status: 'completed'})"
@@ -99,6 +102,7 @@
                 <q-icon class="text-bold" name="done" :color="props.row.isRejectCompleted ? 'grey' : 'primary'" size="xs"></q-icon>Approve
               </q-btn>
               <q-btn
+                v-if="canActivate('subject_hrm','update')" 
                 :loading="rejectLoading === props.row.id"
                 class="col"
                 @click="updateApprovalMiddle({id: props.row.id, status: 'rejected'})"
@@ -153,6 +157,8 @@
 import { mapActions, mapState } from 'vuex'
 import AddEditOvertime from './AddEditOvertime.vue';
 import { date } from 'quasar';
+import Forbidden from 'src/components/globalComponents/Forbidden.vue';
+
 export default {
   computed: {
     ...mapState('hrmStore', ['overtimeApprovals']),
@@ -193,6 +199,7 @@ export default {
   props: ['currentUser'],
   data() {
     return {
+      canActivate: this.$canActivate,
       body: null,
       id: null,
       approveLoading: null,
@@ -215,7 +222,8 @@ export default {
     }
   },
   components: {
-    modal: AddEditOvertime
+    modal: AddEditOvertime,
+    Forbidden
   },
   methods: {
     ...mapActions('hrmStore',['getOvertimeApprovals','updateApproval','approveOvertime']),

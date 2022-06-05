@@ -23,8 +23,8 @@
         :rules="[val => (val !== null) || 'This field is required']"
         v-model="client" 
         :options="clientOptions"
-            label="Choose client"
-            :loading="isLoaded"
+        label="Choose client"
+        :loading="isLoaded"
         />
         <q-select
             ref="leaderRef"
@@ -220,14 +220,10 @@ export default {
     }
   },
   computed: {
-      ...mapState('crmStore', ['allClients']),
-      ...mapState('userStore', ['users']),
-
+      ...mapState('projectStore', ['allProjectClients','allProjectUsers']),
   },
   methods : {
-    ...mapActions('projectStore',['addProject','editProject', 'getProjects','addFiles']),
-    ...mapActions('crmStore',['getClients']),
-    ...mapActions('userStore',['getUsers']),
+    ...mapActions('projectStore',['addProject','editProject', 'getProjectClients', 'getProjectUsers']),
     saveFiles(files) {
       this.file = files[0]
     },
@@ -279,15 +275,16 @@ export default {
   },
  async mounted() {
     this.isLoaded = true;
-    await this.getClients();
-    await this.getUsers();
-    for(let i  = 0; i<this.allClients.length; i++) {
-      if(this.allClients[i].clientType !== 'Blacklist')
-      this.clientOptions.push({label: this.allClients[i].name, id: this.allClients[i].id})
+    await this.getProjectClients();
+    for(let i  = 0; i<this.allProjectClients.length; i++) {
+      if(this.allProjectClients[i].clientType !== 'Blacklist')
+      this.clientOptions.push({label: this.allProjectClients[i].name, id: this.allProjectClients[i].id})
     }
-    for(let i  = 0; i<this.users.length; i++) {
-      this.memberOptions.push({label: this.users[i].name, id: this.users[i].id})
-      this.leaderOptions.push({label: this.users[i].name, id: this.users[i].id})
+    await this.getProjectUsers();
+    console.log("clients", JSON.parse(JSON.stringify(this.allProjectClients)))
+    for(let i  = 0; i<this.allProjectUsers.length; i++) {
+      this.memberOptions.push({label: this.allProjectUsers[i].name, id: this.allProjectUsers[i].id})
+      this.leaderOptions.push({label: this.allProjectUsers[i].name, id: this.allProjectUsers[i].id})
     }
     this.isLoaded = false;
     if(this.actionType === 'Edit'){

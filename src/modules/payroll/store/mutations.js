@@ -1,5 +1,5 @@
 export function GET_PAYSLIPS (state, payload) {
-  Object.assign(state.payslips, payload.res);
+  state.payslips = payload.res;
 }
 
 export function GET_EARNING_TYPES (state, payload) {

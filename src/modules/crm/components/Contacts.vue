@@ -34,18 +34,18 @@
               {{ props.row.status }}
           </q-td>
          <q-td key="actions" :props="props">
-          <q-btn dense round flat icon="more_vert">
+          <q-btn v-if="canActivate('subject_crm','delete') || canActivate('subject_crm','update')" dense round flat icon="more_vert">
             <q-menu
               transition-show="scale"
               transition-hide="scale"
               
             >
               <q-list style="min-width: 75px">
-                <q-item @click="deleteClientContact({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
+                <q-item  v-if="canActivate('subject_crm','delete')" @click="deleteClientContact({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
                   <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                 </q-item>
-                <q-separator />
-                <q-item @click="openModal(props.row, 'Edit')" clickable v-close-popup>
+                <q-separator  v-if="canActivate('subject_crm','delete') && canActivate('subject_crm','update')" />
+                <q-item v-if="canActivate('subject_crm','update')" @click="openModal(props.row, 'Edit')" clickable v-close-popup>
                  <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                 </q-item>
               </q-list>
@@ -54,7 +54,7 @@
           </q-td>
         </q-tr>
       </template>
-      <template v-slot:top-right>
+      <template v-if="canActivate('subject_crm','create')" v-slot:top-right>
          <q-btn @click="openModal($route.params.id, 'Add')" label="Create Record" no-caps color="primary" unelevated rounded />
       </template>
     </q-table>
@@ -70,6 +70,7 @@ import { mapActions, mapState } from 'vuex'
 export default {
   data() {
     return {
+      canActivate: this.$canActivate,
       body: null,
       id: null,
       dialogue: false,
@@ -103,6 +104,7 @@ export default {
   },
   methods: {
     ...mapActions('crmStore',['getOneClient','deleteContact']),
+
     deleteClientContact(payload) {
       this.loading = true
         this.deleteContact({...payload, clientId: this.$route.params.id})
@@ -120,6 +122,7 @@ export default {
       }
   },
  async mounted() {
+    if (!this.canActivate('subject_crm','read')) return
    this.loading = true
    await this.getOneClient(this.$route.params.id);
    this.loading=false

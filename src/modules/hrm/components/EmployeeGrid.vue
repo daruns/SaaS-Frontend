@@ -3,17 +3,17 @@
     <div class="row items-center q-pa-sm" >
       <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-xs-12 q-pa-sm" v-for="(employee, i) in data" :key="i">
       <q-card flat bordered style="position: relative !important;" class="my-card">
-        <q-btn style="z-index:2;" class="absolute-top-right" dense round flat icon="more_vert">
+        <q-btn  v-if="canActivate('subject_hrm','delete') || canActivate('subject_hrm','update')" style="z-index:2;" class="absolute-top-right" dense round flat icon="more_vert">
           <q-menu
             transition-show="scale"
             transition-hide="scale"
           >
             <q-list style="min-width: 75px">
-              <q-item @click="deleteEmployee({id: employee.id})" style="padding 0 !important" clickable v-close-popup>
+              <q-item  v-if="canActivate('subject_hrm','delete')"  @click="deleteEmployee({id: employee.id})" style="padding 0 !important" clickable v-close-popup>
                 <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
               </q-item>
-              <q-separator />
-              <q-item @click="editEmployee(employee)" clickable v-close-popup>
+              <q-separator  v-if="canActivate('subject_hrm','delete') && canActivate('subject_hrm','update')"  />
+              <q-item  v-if="canActivate('subject_hrm','update')"  @click="editEmployee(employee)" clickable v-close-popup>
                 <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
               </q-item>
             </q-list>
@@ -62,6 +62,7 @@ export default {
   },
   data() {
     return {
+        canActivate: this.$canActivate,
       loading: false,
       dialogue: false,
       id: '',
@@ -72,39 +73,40 @@ export default {
   methods: {
     ...mapActions('hrmStore',['getEmployees', 'deleteEmployee']),
     editEmployee(employee) {
-        if(this.dialogue === true){
-          this.dialogue = false;
-          setTimeout(() => {
-             this.body = employee
-            this.dialogue = true
-          }, 200);
-          return
-        }
-         this.body = employee
-        this.dialogue = true
+      if(this.dialogue === true){
+        this.dialogue = false;
+        setTimeout(() => {
+          this.body = employee
+          this.dialogue = true
+        }, 200);
+        return
+      }
+      this.body = employee
+      this.dialogue = true
     },
-      getUserOptions(payload) {
+    getUserOptions(payload) {
       let optionsA = [];
       let optionsB = [];
       this.options = [];
       setTimeout(() => {
-      if(!payload) return
-      for(let i = 0; i<this.users.length; i++) {
-      for(let j = 0; j<payload.members.length; j++) {
-        if(Number(payload.members[j].memberId) === Number(this.users[i].id)){
-          optionsB.push({id:this.users[i].id, label: this.users[j].name});
-        }
-      }
+        if(!payload) return
+        for(let i = 0; i<this.users.length; i++) {
+          for(let j = 0; j<payload.members.length; j++) {
+            if(Number(payload.members[j].memberId) === Number(this.users[i].id)){
+              optionsB.push({id:this.users[i].id, label: this.users[j].name});
+            }
+          }
           optionsA.push({id:this.users[i].id, label: this.users[i].name});
-      }
-      this.options = optionsA.filter(({ id: id1 }) => !optionsB.some(({ id: id2 }) => id2 === id1));
+        }
+        this.options = optionsA.filter(({ id: id1 }) => !optionsB.some(({ id: id2 }) => id2 === id1));
       }, 200);
     },
   },
- async mounted() {
-   this.loading = true
-   await this.getEmployees();
-   this.loading = false
+  async mounted() {
+    if (!this.canActivate('subject_hrm','read') ) return
+    this.loading = true
+    await this.getEmployees();
+    this.loading = false
   }
 }
 </script>

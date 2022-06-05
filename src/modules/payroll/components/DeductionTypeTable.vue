@@ -21,17 +21,17 @@
             <p style="font-size: 20px;">{{props.row.fund}}</p>
           </q-td>
           <q-td class="text-right" key="actions" :props="props">
-            <q-btn dense round flat icon="more_vert">
+            <q-btn v-if="canActivate('subject_payroll','delete') || canActivate('subject_payroll','update')" dense round flat icon="more_vert">
               <q-menu
                 transition-show="scale"
                 transition-hide="scale"
               >
                 <q-list style="min-width: 75px">
-                  <q-item @click="deleteDeductionType({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
+                  <q-item  v-if="canActivate('subject_payroll','delete')" @click="deleteDeductionType({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
                     <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                   </q-item>
-                  <q-separator />
-                  <q-item @click="editDeductionType(props.row)" clickable v-close-popup>
+                  <q-separator  v-if="canActivate('subject_payroll','delete') && canActivate('subject_payroll','update')" />
+                  <q-item  v-if="canActivate('subject_payroll','update')" @click="editDeductionType(props.row)" clickable v-close-popup>
                     <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                   </q-item>
                 </q-list>
@@ -61,6 +61,7 @@ export default {
 
   data() {
     return {
+      canActivate: this.$canActivate,
       body: null,
       id: null,
       dialogue: false,

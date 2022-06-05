@@ -162,6 +162,7 @@ export default {
   props: ['currentUser'],
   data() {
     return {
+      canActivate: this.$canActivate,
       body: null,
       id: null,
       dateFunc: date,

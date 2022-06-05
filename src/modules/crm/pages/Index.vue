@@ -7,11 +7,12 @@
           <q-btn class="q-mr-xs" @click="table=true" outline style="color: goldenrod;" :color="table ? 'primary' : 'grey'" icon="view_headline" />
           <q-btn @click="table=false" outline style="color: goldenrod;" :color="!table ? 'primary' : 'grey'" icon="apps" />
         </div>
-        <q-btn @click="dialogue = true" color="primary" :label="'Add '+tab[0].toUpperCase()+tab.substr(1, tab.length)" unelevated rounded no-caps />
+        <q-btn v-if="canActivate('subject_crm','create')" @click="dialogue = true" color="primary" :label="'Add '+tab[0].toUpperCase()+tab.substr(1, tab.length)" unelevated rounded no-caps />
       </div>
     </div>
     <breadcrmps class="q-pa-md full-width" :map="crumps" />
-    <q-scroll-area style="max-height:auto !important;min-height:auto !important;height: calc(100vh - 131px);" class="q-px-md">
+    <div v-if="!canActivate('subject_crm','read')"><Forbidden /></div>
+    <q-scroll-area v-else style="max-height:auto !important;min-height:auto !important;height: calc(100vh - 131px);" class="q-px-md">
         <div class="q-pr-md q-pl-md">
           <q-tabs
           bordered
@@ -52,32 +53,36 @@
 </template>
 <script>
 import breadcrumps from '../../../components/globalComponents/BreadCrumps.vue';
+import Forbidden from '../../../components/globalComponents/Forbidden.vue';
 import table from '../components/ClientTable.vue';
 import { ref } from 'vue';
 import grid from '../components/ClientGrid.vue'
 import AddEditClient from '../components/AddEditClient.vue'
+import { mapActions, mapState } from 'vuex';
 export default {
     components: {
         breadcrmps: breadcrumps,
         tbl: table,
         grid,
-        modal: AddEditClient
+        modal: AddEditClient,
+        Forbidden
     },
     data() {
-        return {
-            table: false,
-            crumps: [
-                {id:1,name:'OneConnect',icon: 'home',path: '/'},
-                {id:2,name:'CRM',icon: 'groups',path: '/crm'}
-                ],
-                dialogue: false
-        }
+      return {
+        canActivate: this.$canActivate,
+        table: false,
+        crumps: [
+          {id:1,name:'OneConnect',icon: 'home',path: '/'},
+          {id:2,name:'CRM',icon: 'groups',path: '/crm'}
+        ],
+        dialogue: false
+      }
     },
     setup() {
-        return {
+      return {
         tab: ref('client'),
-        }
-    }
+      }
+    },
 }
 </script>
 

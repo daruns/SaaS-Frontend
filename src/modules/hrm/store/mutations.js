@@ -2,6 +2,10 @@ export function GET_EMPLOYEES (state, payload) {
   Object.assign(state.allEmployees, payload.res);
 }
 
+export function GET_EMPLOYEE_USERS (state, payload) {
+  Object.assign(state.allUsers, payload.res);
+}
+
 export function GET_DEPARTMENTS (state, payload) {
   Object.assign(state.departments, payload.res);
 }

@@ -67,6 +67,7 @@
           <q-td class="text-right" key="actions" :props="props">
             <div v-if="currentUser?.myEmployeeProfile?.hrMember === 1" class="row" style="min-width: 75px">
               <q-btn
+               v-if="canActivate('subject_hrm','update')" 
                 class="col"
                 size="sm"
                 :loading="approveLoading === props.row.id"
@@ -77,6 +78,7 @@
                 <q-icon class="text-bold" name="done" :color="(props.row.isRejectCompleted || props.row.leaveApprovals.some(ee => ee.status === 'rejected') || props.row.status === 'rejected') ? 'grey' : 'primary'" size="xs"></q-icon>Approve hr
               </q-btn>
               <q-btn
+               v-if="canActivate('subject_hrm','update')" 
                 class="col"
                 :loading="rejectLoading === props.row.id"
                 @click="approveLeave({id: props.row.id, status: 'rejected'})"
@@ -89,6 +91,7 @@
             </div>
             <div v-else class="flex align-items-center">
               <q-btn
+               v-if="canActivate('subject_hrm','update')" 
                 class="col"
                 :loading="approveLoading === props.row.id"
                 @click="updateApprovalMiddle({id: props.row.id, status: 'completed'})"
@@ -101,6 +104,7 @@
               <q-btn
                 :loading="rejectLoading === props.row.id"
                 class="col"
+               v-if="canActivate('subject_hrm','update')" 
                 @click="updateApprovalMiddle({id: props.row.id, status: 'rejected'})"
                 size="sm"
                 flat
@@ -193,6 +197,7 @@ export default {
   props: ['currentUser'],
   data() {
     return {
+      canActivate: this.$canActivate,
       body: null,
       id: null,
       approveLoading: null,

@@ -25,17 +25,17 @@
             <p v-if="props.row.urgent" style="font-size: 20px;"><q-icon name="done" /></p>
           </q-td>
           <q-td class="text-right" key="urgent" :props="props">
-            <q-btn dense round flat icon="more_vert">
+            <q-btn v-if="canActivate('subject_hrm','update') || canActivate('subject_hrm','delete')" dense round flat icon="more_vert">
               <q-menu
                 transition-show="scale"
                 transition-hide="scale"
               >
                 <q-list style="min-width: 75px">
-                  <q-item @click="deleteLeaveType({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
+                  <q-item v-if="canActivate('subject_hrm','delete')"  @click="deleteLeaveType({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
                     <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                   </q-item>
                   <q-separator />
-                  <q-item @click="editLeaveType(props.row)" clickable v-close-popup>
+                  <q-item  v-if="canActivate('subject_hrm','update')" @click="editLeaveType(props.row)" clickable v-close-popup>
                     <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                   </q-item>
                 </q-list>
@@ -64,6 +64,7 @@ export default {
 
   data() {
     return {
+      canActivate: this.$canActivate,
       body: null,
       id: null,
       dialogue: false,

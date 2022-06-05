@@ -3,10 +3,13 @@
     <div class="full-width flex justify-between items-center header-height-standard q-px-md" style="border-bottom: 1px solid lightgrey;">
       <div class="text-h4">Overtimes</div>
       <div class="flex items-center">
-        <q-btn @click="dialogue = true" color="primary" :label="'Add '+tab[0].toUpperCase()+tab.substr(1, tab.length)" unelevated rounded no-caps />
+        <q-btn v-if="canActivate('subject_hrm','create')" @click="dialogue = true" color="primary" :label="'Add '+tab[0].toUpperCase()+tab.substr(1, tab.length)" unelevated rounded no-caps />
       </div>
     </div>
-    <q-scroll-area style="max-height:auto !important;min-height:auto !important;height: calc(100vh - 131px);" class="q-px-md">
+    <div v-if="!canActivate('subject_hrm','read')">
+      <Forbidden />
+    </div>
+    <q-scroll-area v-else style="max-height:auto !important;min-height:auto !important;height: calc(100vh - 131px);" class="q-px-md">
       <overtimesTable :currentUser="user" v-if="overtimesView" />
       <overtimeApprovalsTable :currentUser="user" v-if="overtimeApprovalsView" />
       <myOvertimesTable :currentUser="user" v-if="myOvertimesView"/>
@@ -23,18 +26,21 @@ import myOvertimesTable from '../components/MyOvertimesTable.vue';
 import { ref } from 'vue';
 import AddEditOvertime from '../components/AddEditOvertime.vue'
 import { mapActions, mapState } from 'vuex';
+import Forbidden from 'src/components/globalComponents/Forbidden.vue';
 export default {
   components: {
     modal: AddEditOvertime,
     overtimesTable,
     overtimeApprovalsTable,
     myOvertimesTable,
-  },
+    Forbidden
+},
   computed: {
     ...mapState('example', ['user'])
   },
   data() {
     return {
+      canActivate: this.$canActivate,
       myOvertimesView: false,
       overtimeApprovalsView: false,
       overtimesView: false,

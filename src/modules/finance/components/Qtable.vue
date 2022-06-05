@@ -28,18 +28,18 @@
               {{ props.row.status }}
           </q-td>
          <q-td key="actions" :props="props">
-          <q-btn style="z-index:10;" dense round flat icon="more_vert">
+          <q-btn  v-if="canActivate('subject_finance','update') || canActivate('subject_finance','delete')" style="z-index:10;" dense round flat icon="more_vert">
             <q-menu
               transition-show="scale"
               transition-hide="scale"
               
             >
               <q-list style="min-width: 75px">
-                <q-item @click="deleteQuote(props.row.id)" style="padding 0 !important" clickable v-close-popup>
+                <q-item  v-if="canActivate('subject_finance','delete')" @click="deleteQuote(props.row.id)" style="padding 0 !important" clickable v-close-popup>
                   <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                 </q-item>
-                <q-separator />
-                <q-item v-if="props.row.status !== 'Paid'" @click="edit(props.row)" clickable v-close-popup>
+                <q-separator  v-if="canActivate('subject_finance','update') && canActivate('subject_finance','delete')" />
+                <q-item  v-if="canActivate('subject_finance','update') && props.row.status !== 'Paid'" @click="edit(props.row)" clickable v-close-popup>
                  <q-item-section  class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                 </q-item>
               </q-list>
@@ -63,6 +63,7 @@ export default {
   props: ['type'],
   data() {
     return {
+      canActivate: this.$canActivate,
     prompt: false,
     loading: false,
     action: '',
@@ -110,7 +111,8 @@ export default {
     }
   },
 async mounted() {
-     await this.getQuotes();
+    if (!this.canActivate('subject_finance','read')) return
+    await this.getQuotes();
   }
 }
 </script>

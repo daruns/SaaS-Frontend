@@ -4,7 +4,10 @@
       <div class="text-h4">CRM</div>
     </div>
     <div class="q-px-md">
-      <q-card v-if="isloading">
+    <div v-if="!canActivate('subject_hrm','read')">
+      <Forbidden />
+    </div>
+      <q-card v-else-if="isloading">
       <q-skeleton class="row items-center q-pa-md">
         <div class="flex items-center col-md-6 col-sm-12 q-pb-md avatar">
           <q-avatar size="120px" font-size="52px" color="grey" text-color="white" icon="person" />
@@ -170,6 +173,7 @@ export default {
   },
   data() {
     return {
+        canActivate: this.$canActivate,
       dialogue: false,
       close: false,
       isloading: ref(false),

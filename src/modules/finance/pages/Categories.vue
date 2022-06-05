@@ -3,11 +3,12 @@
     <div class="full-width flex justify-between items-center q-px-md header-height-standard" style="border-bottom: 1px solid lightgrey;">
       <div class="text-h4">Category</div>
       <div class="flex items-center">
-        <q-btn @click="action = 'Add';prompt = true" color="primary" label="Create Record" unelevated rounded no-caps />
+        <q-btn  v-if="canActivate('subject_finance','create')" @click="action = 'Add';prompt = true" color="primary" label="Create Record" unelevated rounded no-caps />
       </div>
     </div>
     <breadcrumps class="q-pa-md full-width" :map="crumps" />
-    <div class="q-px-md full-width justify-stretch column inline" style="max-height:auto !important;min-height:auto !important;height: calc(100vh - 131px);">
+    <div v-if="!canActivate('subject_finance','read')"><Forbidden /></div>
+    <div v-else class="q-px-md full-width justify-stretch column inline" style="max-height:auto !important;min-height:auto !important;height: calc(100vh - 131px);">
       <q-scroll-area
         class="col-12 items-start flex column"
       >
@@ -48,17 +49,17 @@
               <q-td key="description" v-html="props.row.description" :props="props">
               </q-td>
               <q-td key="actions" :props="props">
-                <q-btn dense round flat icon="more_vert">
+                <q-btn v-if="canActivate('subject_finance','delete') || canActivate('subject_finance','update')" dense round flat icon="more_vert">
                   <q-menu
                     transition-show="scale"
                     transition-hide="scale"
                   >
                     <q-list style="min-width: 75px">
-                      <q-item  @click="deleteCategory({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
+                      <q-item  v-if="canActivate('subject_finance','delete')"  @click="deleteCategory({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
                         <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                       </q-item>
-                      <q-separator />
-                      <q-item @click="edit(props.row)" clickable v-close-popup>
+                      <q-separator  v-if="canActivate('subject_finance','delete') && canActivate('subject_finance','update')"  />
+                      <q-item  v-if="canActivate('subject_finance','update')" @click="edit(props.row)" clickable v-close-popup>
                       <q-item-section  class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                       </q-item>
                     </q-list>
@@ -68,12 +69,12 @@
             </q-tr>
               <q-tr v-show="props.expand && expandSubId === props.row.id" :props="props">
               <q-td colspan="100%">
-                <div class="flex">
-                <p class="text-h6 col">Sub categories</p>
-                <!-- <q-btn color="primary" icon="add" no-caps flat> -->
-                <!-- </q-btn> -->
-                </div>
-                <div class="q-py-sm col">
+              <div class="flex">
+              <p class="text-h6 col">Sub categories</p>
+              <!-- <q-btn color="primary" icon="add" no-caps flat> -->
+              <!-- </q-btn> -->
+              </div>
+              <div v-if="canActivate('subject_finance','create')" class="q-py-sm col">
                   <q-input dense filled v-model="sub">
                     <template v-slot:append>
                       <q-btn size="sm" no-caps :disable="sub === ''" flat @click="addSubCateg(props.row.id,props.rowIndex)" class="bg-primary" color="white" v-close-popup >
@@ -114,7 +115,7 @@
                               :icon="expandChildSubCat && expandChildSubCat[0] && expandChildSubCat[1] === index ? 'remove' : 'add'"
                             />
                           </template>
-                          <template v-slot:append>
+                          <template v-if="canActivate('subject_finance','update')" v-slot:append>
                             <q-spinner-tail v-if="i === index"/>
                             <q-btn
                               dense
@@ -130,7 +131,7 @@
                             />
                           </template>
                           <template v-slot:after>
-                            <q-btn
+                            <q-btn v-if="canActivate('subject_finance','update')"
                               dense
                               no-caps
                               flat
@@ -138,16 +139,18 @@
                               color="amber"
                               icon="edit"
                             />
-                            <q-spinner-tail v-if="loadingDeleteSubCat === expenseSubCategory.id"/>
-                            <q-btn
-                              v-else
-                              no-caps
-                              flat
-                              dense
-                              icon="delete"
-                              @click="deleteSubCateg(expenseSubCategory.id)"
-                              color="negative"
-                            />
+                            <div v-if="canActivate('subject_finance','delete')">
+                              <q-spinner-tail v-if="loadingDeleteSubCat === expenseSubCategory.id"/>
+                              <q-btn
+                                v-else
+                                no-caps
+                                flat
+                                dense
+                                icon="delete"
+                                @click="deleteSubCateg(expenseSubCategory.id)"
+                                color="negative"
+                              />
+                            </div>
                           </template>
                         </q-input>
                     </div>
@@ -160,7 +163,7 @@
                         <!-- <q-btn color="primary" icon="add" no-caps flat> -->
                         <!-- </q-btn> -->
                       <div class="q-py-sm col-12">
-                        <q-input dense filled v-model="childSub">
+                        <q-input v-if="canActivate('subject_finance','create')" dense filled v-model="childSub">
                           <template v-slot:append>
                             <q-btn size="sm" no-caps :disable="childSub === ''" flat @click="addChildSubCateg(props.row.expenseSubCategories[index].id,props.row.expenseSubCategories[index].id)" class="bg-primary" color="white" v-close-popup >
                               <q-spinner-tail v-if="childSubLoading && childSubLoading[0] === true && childSubLoading[1] === props.row.expenseSubCategories[index].id" color="white"/>
@@ -188,7 +191,7 @@
                                 class="q-mr-sm"
                               />
                             </template>
-                            <template v-slot:append>
+                            <template v-if="canActivate('subject_finance','update')" v-slot:append>
                               <q-spinner-tail v-if="iChild === index1"/>
                               <q-btn
                                 dense
@@ -205,6 +208,7 @@
                             </template>
                             <template v-slot:after>
                               <q-btn
+                                v-if="canActivate('subject_finance','update')"
                                 dense
                                 no-caps
                                 flat
@@ -212,16 +216,18 @@
                                 color="amber"
                                 icon="edit"
                               />
-                              <q-spinner-tail v-if="loadingDeleteChildSubCat === expenseChildSubCategory.id"/>
-                              <q-btn
-                                v-else
-                                no-caps
-                                flat
-                                dense
-                                icon="delete"
-                                @click="deleteChildSubCat(expenseChildSubCategory.id)"
-                                color="negative"
-                              />
+                              <div v-if="canActivate('subject_finance','delete')" >
+                                <q-spinner-tail v-if="loadingDeleteChildSubCat === expenseChildSubCategory.id"/>
+                                <q-btn
+                                  v-else
+                                  no-caps
+                                  flat
+                                  dense
+                                  icon="delete"
+                                  @click="deleteChildSubCat(expenseChildSubCategory.id)"
+                                  color="negative"
+                                />
+                              </div>
                             </template>
                           </q-input>
                         </div>
@@ -245,9 +251,11 @@
 import { mapActions, mapState } from 'vuex'
 import modal from '../components/AddEditCategories.vue'
 import breadcrumps from '../../../components/globalComponents/BreadCrumps.vue';
+import Forbidden from 'src/components/globalComponents/Forbidden.vue';
 export default {
   data() {
     return {
+      canActivate: this.$canActivate,
       editingChildSubCat: null,
       editingSubCat: null,
       loadingDeleteChildSubCat: null,
@@ -281,8 +289,9 @@ export default {
   },
   components: {
     breadcrumps,
-    modal
-  },
+    modal,
+    Forbidden
+},
   computed : {
       ...mapState('financeStore', ['categories'])
   },
@@ -329,6 +338,8 @@ export default {
     }
   },
   async mounted() {
+    if (!this.canActivate('subject_finance','read')) return
+
     await this.getCategories();
   }
 }

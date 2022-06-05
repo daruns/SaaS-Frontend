@@ -86,7 +86,7 @@
             />
           </div>
           <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 q-pa-sm">
-            <div class="q-ma-none absolute q-ml-sm text-grey-7" style="z-index:10;font-size:12px;line-height:20px;font-weight:400;">Expense date</div>
+            <div class="q-ma-none absolute q-ml-sm text-grey-7" style="z-index:10;font-size:12px;line-height:20px;font-weight:400;">Quote date</div>
             <Datepicker autoApply v-model="quote.date" showNowButton></Datepicker>
           </div>
           <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 q-pa-sm">
@@ -549,6 +549,7 @@ export default {
   props: ['action','body','quoteType'],
   data() {
     return {
+      canActivate: this.$canActivate,
       defaultCurrency: DefCur,
       scndEmpty: emptyQuoteItem,
       joinedItemsLoading: false,
@@ -640,7 +641,6 @@ export default {
     },
     updateItem(value,ind) {
       const prevObj = value
-      console.log("updateitems: ------ ",value)
       if (typeof prevObj === 'object') {
         this.quote.items[ind] = prevObj
       }
@@ -726,6 +726,7 @@ export default {
     ...mapActions('financeStore',['getTaxes', 'addQuote', 'editQuote', 'deleteQuote', 'getCurrencyCodes','getPaymentMethods']),
     ...mapActions('accountingStore',['getJoinedItems']),
     ...mapActions('crmStore',['getClients']),
+    ...mapActions('example',['getUser']),
     async submit() {
       this.$refs.clientRef.validate();
       this.$refs.paymentRef.validate();

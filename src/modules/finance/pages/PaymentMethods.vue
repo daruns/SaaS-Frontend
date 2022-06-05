@@ -3,11 +3,12 @@
     <div class="full-width flex justify-between items-center q-px-md header-height-standard" style="border-bottom: 1px solid lightgrey;">
       <div class="text-h4">Payment Types</div>
       <div class="flex items-center">
-        <q-btn @click="body =null; action= 'Add'; dialogue = true" color="primary" label="Create Record" unelevated rounded no-caps />
+        <q-btn  v-if="canActivate('subject_finance','create')" @click="body =null; action= 'Add'; dialogue = true" color="primary" label="Create Record" unelevated rounded no-caps />
       </div>
     </div>
     <breadcrumps class="q-pa-md full-width" :map="crumps" />
-    <div class="q-px-md">
+    <div v-if="!canActivate('subject_finance','read')"><Forbidden /></div>
+    <div v-else class="q-px-md">
     <q-table
       :rows="paymentMethods"
       :columns="columns"
@@ -45,18 +46,18 @@
               {{ dateConversion(props.row.expireDate) }}
           </q-td> -->
          <q-td key="actions" :props="props">
-          <q-btn dense round flat icon="more_vert">
+          <q-btn  v-if="canActivate('subject_finance','delete') || canActivate('subject_finance','update')" dense round flat icon="more_vert">
             <q-menu
               transition-show="scale"
               transition-hide="scale"
               
             >
               <q-list style="min-width: 75px">
-                <q-item @click="deletePaymentMethod({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
+                <q-item v-if="canActivate('subject_finance','delete')"  @click="deletePaymentMethod({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
                   <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                 </q-item>
-                <q-separator />
-                <q-item @click="body = props.row; action = 'Edit'; dialogue = true" clickable v-close-popup>
+                <q-separator v-if="canActivate('subject_finance','delete') && canActivate('subject_finance','update')" />
+                <q-item v-if="canActivate('subject_finance','update')"  @click="body = props.row; action = 'Edit'; dialogue = true" clickable v-close-popup>
                   <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                 </q-item>
               </q-list>
@@ -68,7 +69,7 @@
     </q-table>
     </div>
     <q-dialog @closeDialogue="dialogue = false" seamless position="right" v-model="dialogue">
-        <modal :id="id" @closeDialogue="dialogue = false" :action="action" :body="body" />
+      <modal :id="id" @closeDialogue="dialogue = false" :action="action" :body="body" />
     </q-dialog>
   </q-page>
 </template>
@@ -77,6 +78,7 @@
 import { mapActions, mapState } from 'vuex';
 import modal from '../components/AddEditPaymentMethod.vue'
 import breadcrumps from '../../../components/globalComponents/BreadCrumps.vue';
+import Forbidden from 'src/components/globalComponents/Forbidden.vue';
 import { date } from 'quasar'
 export default {
   computed: {
@@ -84,6 +86,7 @@ export default {
   },
   data() {
     return {
+      canActivate: this.$canActivate,
       id: null,
       dialogue: false,
       loading: false,
@@ -112,7 +115,8 @@ export default {
   },
   components: {
     modal,
-    breadcrumps
+    breadcrumps,
+    Forbidden
   },
   methods: {
     ...mapActions('financeStore',['getPaymentMethods', 'deletePaymentMethod']),
@@ -131,6 +135,7 @@ export default {
     },
   },
  async mounted() {
+    if (!this.canActivate('subject_finance','read')) return
    this.loading = true
    await this.getPaymentMethods();
    this.loading=false

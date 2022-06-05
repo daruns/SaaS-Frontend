@@ -7,6 +7,19 @@ export async function getProjects({commit}) {
   await commit('GET_PROJECTS' ,response.data.data);
 }
 
+export async function getProject({commit},id) {
+  let response = await axios.get(process.env.OC_BACKEND_API + `projects/${id}`, {headers: {Authorization: localStorage.getItem('accessToken')}});
+  await commit('GET_PROJECT' ,response.data.data);
+}
+export async function getProjectClients({commit}) {
+  let response = await axios.get(process.env.OC_BACKEND_API + `projects/clients`, {headers: {Authorization: localStorage.getItem('accessToken')}});
+  await commit('GET_PROJECT_CLIENTS' ,response.data.data);
+}
+export async function getProjectUsers({commit}) {
+  let response = await axios.get(process.env.OC_BACKEND_API + `projects/users`, {headers: {Authorization: localStorage.getItem('accessToken')}});
+  await commit('GET_PROJECT_USERS' ,response.data.data);
+}
+
 export async function addProject({dispatch}, payload) {
   let response = await axios.post(process.env.OC_BACKEND_API + 'projects/create', payload.data, {headers: {Authorization: localStorage.getItem('accessToken')}});
   await dispatch('getProjects');
@@ -35,6 +48,10 @@ export async function editProject({dispatch}, payload) {
   await dispatch('getProjects');
 }
 
+export async function deleteProjectFile({dispatch}, payload) {
+  await axios.post(process.env.OC_BACKEND_API + 'projects/removeFile', payload, {headers: {Authorization: localStorage.getItem('accessToken')}});
+  await dispatch('getProject',payload.id)
+}
 export async function deleteProject({dispatch}, payload) {
   let response = await axios.post(process.env.OC_BACKEND_API + 'projects/delete', payload, {headers: {Authorization: localStorage.getItem('accessToken')}})
   await dispatch('getProjects');

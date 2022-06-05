@@ -46,17 +46,17 @@
           <router-link :to="`/client/${props.row.id}`">
           <q-btn dense text-color="dark" round flat icon="visibility" />
           </router-link>
-          <q-btn dense round flat icon="more_vert">
+          <q-btn  v-if="canActivate('subject_hrm','delete') || canActivate('subject_hrm','update')" dense round flat icon="more_vert">
             <q-menu
               transition-show="scale"
               transition-hide="scale"
             >
               <q-list style="min-width: 75px">
-                <q-item @click="deleteClient({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
+                <q-item  v-if="canActivate('subject_hrm','delete')" @click="deleteClient({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
                   <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                 </q-item>
-                <q-separator />
-                <q-item @click="editClient(props.row)" clickable v-close-popup>
+                <q-separator  v-if="canActivate('subject_hrm','delete') && canActivate('subject_hrm','update')" />
+                <q-item v-if="canActivate('subject_hrm','update')" @click="editClient(props.row)" clickable v-close-popup>
                   <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                 </q-item>
               </q-list>
@@ -77,7 +77,7 @@
 
     </q-table>
     <q-dialog @closeDialogue="dialogue = false" :inProfile="false" seamless position="right" v-model="dialogue">
-        <modal :type="type" :body="body" :id="id" actionType="Edit" />
+      <modal :type="type" :body="body" :id="id" actionType="Edit" />
     </q-dialog>
   </div>
 </template>
@@ -103,6 +103,7 @@ export default {
 
   data() {
     return {
+        canActivate: this.$canActivate,
       body: null,
       id: null,
       dialogue: false,
@@ -158,6 +159,7 @@ export default {
       }
   },
  async mounted() {
+    if (!this.canActivate('subject_hrm','read') ) return
    this.loading = true
    await this.getClients(this.type);
    this.loading=false

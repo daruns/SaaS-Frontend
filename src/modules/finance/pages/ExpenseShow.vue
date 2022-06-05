@@ -1,5 +1,8 @@
 <template>
-    <q-page v-if="!isLoaded" class="flex flex-center">
+    <q-page  v-if="!canActivate('subject_finance','read')">
+      <Forbidden />
+    </q-page>
+    <q-page v-else-if="!isLoaded" class="flex flex-center">
       <q-spinner  color="primary" size="md" />
     </q-page>
 
@@ -8,6 +11,7 @@
         <div class="text-h4">Expenses</div>
       </div>
       <breadcrumps class="q-pa-md full-width" :map="crumps" />
+
       <q-scroll-area class="q-px-md" style="height: calc(100vh - 93px)">
         <q-card class="q-pa-xl">
           <!-- <div class="column">
@@ -148,10 +152,10 @@
         <q-card class="q-pa-md q-mt-md">
         <p v-show="images.length === 0" class="text-subtitle1 text-grey-5">No images has been uploaded.</p>
         <div v-show="images.length !== 0"  class="row q-pb-xl">
-          <div v-for="(file, i) in images" :key="file.id" >
+          <div v-for="(file) in images" :key="file.id" >
             <div class="flex column flex-center q-pr-md q-pt-md">
           <q-avatar square size="100px">
-            <q-badge style="background: transparent !important;" transparent floating>
+            <q-badge  v-if="canActivate('subject_finance','delete')" style="background: transparent !important;" transparent floating>
               <q-btn @click="fileId = file.id, confirm = true" round size="7.5px" icon="delete" color="negative" class="absolute-top-right"/>
             </q-badge>
             <img :src="file.url" />
@@ -163,7 +167,7 @@
           </div>
         </div>
         </div>
-          <q-btn label="Upload images" icon="backup" color="grey" no-caps push flat unelevated class="absolute-bottom-right q-mr-sm q-mb-sm">
+          <q-btn  v-if="canActivate('subject_finance','create')" label="Upload images" icon="backup" color="grey" no-caps push flat unelevated class="absolute-bottom-right q-mr-sm q-mb-sm">
             <q-popup-proxy>
               <q-banner>
                 <q-file :filter="checkType" @rejected="onRejectedImage" clearable label="Image" outlined v-model="image">
@@ -180,11 +184,11 @@
         <q-card class="q-pa-md q-mt-md">
         <p v-show="files.length === 0" class="text-subtitle1 text-grey-5">No files has been uploaded.</p>
         <div v-show="files.length !== 0" class="row q-pb-xl">
-          <div v-for="(file, i) in files" :key="file.id">
+          <div v-for="(file) in files" :key="file.id">
           <div  class="flex column flex-center q-pr-md q-pt-md">
           <q-avatar square size="100px"> 
            <q-badge style="background: transparent !important;" transparent floating>
-              <q-btn @click="fileId = file.id, confirm = true" round size="7.5px" icon="delete" color="negative" class="absolute-top-right"/>
+              <q-btn  v-if="canActivate('subject_finance','delete')"  @click="fileId = file.id, confirm = true" round size="7.5px" icon="delete" color="negative" class="absolute-top-right"/>
             </q-badge>
             <q-icon  color="grey" name="attach_file" />
           </q-avatar>
@@ -195,32 +199,32 @@
           </div>
           </div>
         </div>
-          <q-btn label="Upload files" icon="backup" color="grey" no-caps push flat unelevated class="absolute-bottom-right q-mr-sm q-mb-sm">
-              <q-popup-proxy>
-                    <q-banner>
-                      <q-file :filter="checkFileType" @rejected="onRejectedFile" clearable label="File" outlined v-model="file">
-                        <template v-slot:prepend>
-                          <q-icon name="attach_file" />
-                        </template>
-                      </q-file>
-                      <q-btn v-close-popup label="Upload" @click="addExpFile('file'); file = null" no-caps :disable="!file" flat color="primary" class="q-mt-sm" size="md" />
-                    </q-banner>
-                  </q-popup-proxy>
+          <q-btn  v-if="canActivate('subject_finance','create')" label="Upload files" icon="backup" color="grey" no-caps push flat unelevated class="absolute-bottom-right q-mr-sm q-mb-sm">
+            <q-popup-proxy>
+              <q-banner>
+                <q-file :filter="checkFileType" @rejected="onRejectedFile" clearable label="File" outlined v-model="file">
+                  <template v-slot:prepend>
+                    <q-icon name="attach_file" />
+                  </template>
+                </q-file>
+                <q-btn v-close-popup label="Upload" @click="addExpFile('file'); file = null" no-caps :disable="!file" flat color="primary" class="q-mt-sm" size="md" />
+              </q-banner>
+            </q-popup-proxy>
           </q-btn>
         </q-card>
     </q-scroll-area>
-          <q-dialog v-model="confirm" persistent>
-            <q-card style="width:300px;">
-              <q-card-section>
-                <div class="text-h6">Are you sure?</div>
-              </q-card-section>
+      <q-dialog v-model="confirm" persistent>
+        <q-card style="width:300px;">
+          <q-card-section>
+            <div class="text-h6">Are you sure?</div>
+          </q-card-section>
 
-              <q-card-actions align="right">
-                <q-btn flat label="Cancel" color="negative" v-close-popup />
-                <q-btn flat label="Delete" @click="deleteExpenseFile" color="primary" v-close-popup />
-              </q-card-actions>
-            </q-card>
-          </q-dialog>
+          <q-card-actions align="right">
+            <q-btn flat label="Cancel" color="negative" v-close-popup />
+            <q-btn flat label="Delete" @click="deleteExpenseFile" color="primary" v-close-popup />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </q-page>
 </template>
 <script>
@@ -228,15 +232,19 @@ import { mapActions, mapState } from 'vuex';
 import axios from 'axios'
 import BreadCrumpsVue from 'src/components/globalComponents/BreadCrumps.vue';
 import DownloadPDFButton from 'src/components/DownloadPDFButton.vue';
+import Forbidden from 'src/components/globalComponents/Forbidden.vue';
 export default {
   components: {
     BreadCrumpsVue,
-    DownloadPDFButton
-  },
+    DownloadPDFButton,
+    Forbidden
+},
   data() {
     return{
       crumps: [],
       files: [],
+                  canActivate: this.$canActivate,
+
       file: null,
       image: null,
       images: [],
@@ -407,6 +415,7 @@ export default {
   },
   async mounted() {
     await this.getUser()
+    if (!this.canActivate('subject_finance','read')) return
     await this.getExpense(this.$route.params.id);
     this.discount = Number(this.oneExpense.discount) * 100;
     this.taxRate = Number(this.oneExpense.taxRate) * 100;

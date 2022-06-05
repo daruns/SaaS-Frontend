@@ -17,11 +17,11 @@ export async function getDeductions({commit}, type) {
 }
 export async function getEarningTypes({commit}, type) {
   let response = await axios.get(process.env.OC_BACKEND_API + 'earningTypes', {headers: {Authorization: localStorage.getItem('accessToken')}})
-  commit('GET_EARNING_TYPES' ,{type: type, res: response.data.data})
+  await commit('GET_EARNING_TYPES' ,{type: type, res: response.data.data})
 }
 export async function getDeductionTypes({commit}, type) {
   let response = await axios.get(process.env.OC_BACKEND_API + 'deductionTypes', {headers: {Authorization: localStorage.getItem('accessToken')}})
-  commit('GET_DEDUCTION_TYPES' ,{type: type, res: response.data.data})
+  await commit('GET_DEDUCTION_TYPES' ,{type: type, res: response.data.data})
 }
 export async function getOnePayslip({commit, dispatch}, id) {
   let response = await axios.get(process.env.OC_BACKEND_API + `payslips/${id}`, {headers: {Authorization: localStorage.getItem('accessToken')}})
@@ -124,7 +124,7 @@ export async function deletePayslip({commit, dispatch}, body) {
     if(e.response.data.message === 'Invalid url!'){
       Notify.create({
         type: 'warning',
-        message: 'This has pending operations!',
+        message: 'Something went wrong!',
         textColor: 'white'
       })
     }
@@ -164,7 +164,6 @@ export async function deleteDeduction({commit, dispatch}, body) {
 export async function deleteEarningType({commit, dispatch}, body) {
   try{
   let response = await axios.post(process.env.OC_BACKEND_API + 'earningTypes/delete', body, {headers: {Authorization: localStorage.getItem('accessToken')}})
-  await dispatch('getEarningTypes');
   }catch(e) {
     if(e.response.data.message === 'Invalid url!'){
       Notify.create({
@@ -174,6 +173,7 @@ export async function deleteEarningType({commit, dispatch}, body) {
       })
     }
   }
+  await dispatch('getEarningTypes');
 }
 
 export async function deleteDeductionType({commit, dispatch}, body) {

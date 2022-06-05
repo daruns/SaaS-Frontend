@@ -55,17 +55,17 @@
             <p style="font-size: 17px;">{{dateFunc.formatDate(new Date(props.row.createdAt), 'YYYY-MM-DD')}}</p>
           </q-td>
           <q-td class="text-right" key="actions" :props="props">
-            <q-btn dense round flat icon="more_vert">
+            <q-btn v-if="canActivate('subject_hrm','delete') || canActivate('subject_hrm','update')" dense round flat icon="more_vert">
               <q-menu
                 transition-show="scale"
                 transition-hide="scale"
               >
                 <q-list style="min-width: 75px">
-                  <q-item @click="deleteOvertime({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
+                  <q-item v-if="canActivate('subject_hrm','delete')"  @click="deleteOvertime({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
                     <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                   </q-item>
                   <q-separator />
-                  <q-item @click="editOvertime(props.row)" clickable v-close-popup>
+                  <q-item  v-if="canActivate('subject_hrm','update')" @click="editOvertime(props.row)" clickable v-close-popup>
                     <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                   </q-item>
                 </q-list>
@@ -153,6 +153,7 @@ export default {
   props: ['currentUser'],
   data() {
     return {
+              canActivate: this.$canActivate,
       body: null,
       id: null,
       dateFunc: date,

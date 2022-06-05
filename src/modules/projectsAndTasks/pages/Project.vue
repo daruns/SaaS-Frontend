@@ -1,22 +1,27 @@
 <template>
   <q-page class="q-py-none q-my-none">
     <div class="full-width flex justify-between items-center q-px-md header-height-standard" style="border-bottom: 1px solid lightgrey;">
-      <div v-if="project.name" class="text-h4">{{project.name}}</div>
-      <div v-else><q-skeleton class="q-pa-sm" style="width:200px" /></div>
+      <div class="text-h4">Project</div>
       <div class="flex items-center">
-        <q-btn @click="dialogue = true" color="grey-5" flat icon="edit" round/>
+        <q-btn v-if="canActivate('subject_projects','update')" @click="dialogue = true" color="grey-5" flat icon="edit" round/>
         <q-separator color="grey-5"/>
-        <q-btn @click="allowQuickEdit = !allowQuickEdit" :color="allowQuickEdit ? 'primary' : 'grey-5'" flat label="Quick Edit" />
+        <q-btn v-if="canActivate('subject_projects','update')" @click="allowQuickEdit = !allowQuickEdit" :color="allowQuickEdit ? 'primary' : 'grey-5'" flat label="Quick Edit" />
       </div>
     </div>
-    <q-scroll-area v-if="!loading" style="max-height:auto !important;min-height:auto !important;height: calc(100vh - 131px);" class="q-px-md">
+    <div v-if="!canActivate('subject_projects','read')"><Forbidden /></div>
+    <q-scroll-area v-else-if="!loading" style="max-height:auto !important;min-height:auto !important;height: calc(100vh - 131px);" class="q-px-md">
       <div class="col-12 row flex q-my-sm">
         <div class="q-mb-sm row flex col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <div class="col-lg-12 flex row col-md-6 col-sm-6 col-xs-12 q-pr-md q-py-md">
+            <q-card class="col-6 q-pa-md">
+              <div class="text-h4">Title: {{project?.name}}</div>
+            </q-card>
+          </div>
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 q-pr-sm">
             <q-card class="q-pa-md">
-            <p v-if="project.leaderUsers.length !== 0" class="text-h6">Assigned Team Leaders</p>
-            <p v-if="project.leaderUsers.length === 0" class="text-subtitle1 text-grey-5">No leaders assigned.</p>
-            <q-btn :disable="!allowQuickEdit" @click="getLeaderOptions(project)" class="absolute-bottom-right q-mr-sm q-mb-sm" size="10px" color="primary" round icon="add" unelevated rounded no-caps>
+              <p v-if="project.leaderUsers?.length !== 0" class="text-h6">Assigned Team Leaders</p>
+              <p v-if="project.leaderUsers?.length === 0" class="text-subtitle1 text-grey-5">No leaders assigned.</p>
+            <q-btn v-if="canActivate('subject_projects','update')" :disable="!allowQuickEdit" @click="getLeaderOptions(project)" class="absolute-bottom-right q-mr-sm q-mb-sm" size="10px" color="primary" round icon="add" unelevated rounded no-caps>
               <q-popup-edit v-model="leaders" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
                 <q-select
                     :rules="[val => (val !== null) || 'This field is required']"
@@ -61,7 +66,7 @@
             <q-card class="q-pa-md">
             <p v-if="project.memberUsers.length !== 0" class="text-h6">Assigned Team Members</p>
             <p v-if="project.memberUsers.length === 0" class="text-subtitle1 text-grey-5">No members assigned.</p>
-            <q-btn :disable="!allowQuickEdit" @click="getUserOptions(project)" class="absolute-bottom-right q-mr-sm q-mb-sm" size="10px" color="primary" round icon="add" unelevated rounded no-caps>
+            <q-btn v-if="canActivate('subject_projects','update')" :disable="!allowQuickEdit" @click="getUserOptions(project)" class="absolute-bottom-right q-mr-sm q-mb-sm" size="10px" color="primary" round icon="add" unelevated rounded no-caps>
               <q-popup-edit v-model="members" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
                 <q-select
                   ref="clientRef"
@@ -93,7 +98,7 @@
               </q-popup-edit>
             </q-btn>
             <div v-if="project.memberUsers.length !== 0" class="row">
-              <q-chip @remove="memberId = member.userId; deleteMemberConfirm = true;" v-for="(member,i) in project.memberUsers" :key="member.userId" :removable="allowQuickEdit">
+              <q-chip @remove="memberId = member.userId; deleteMemberConfirm = true;" v-for="(member,i) in project.memberUsers" :key="member.userId" :removable="allowQuickEdit && canActivate('subject_projects','delete')">
               <q-avatar>
                 <img v-if="member.avatar" :src="member.avatar">
                 <img v-else src="~/assets/one_logo_neat.png">
@@ -120,11 +125,11 @@
             <p v-show="images.length !== 0" class="text-h6 text-grey q-mt-lg">Uploaded images</p>
             <p v-show="images.length === 0" class="text-subtitle1 text-grey-5">No images has been uploaded.</p>
             <div v-show="images.length !== 0"  class="row q-pb-xl">
-              <div v-for="(file, i) in images" :key="file.id" >
+              <div v-for="(file) in images" :key="file.attachId" >
                 <div class="flex column flex-center q-pr-md q-pt-md">
                   <q-avatar square size="100px">
-                    <q-badge style="background: transparent !important;" transparent floating>
-                      <q-btn @click="fileId = file.id, confirm = true" round size="7.5px" icon="delete" color="negative" class="absolute-top-right"/>
+                    <q-badge v-if="canActivate('subject_projects','delete')" style="background: transparent !important;" transparent floating>
+                      <q-btn  :disabled="!allowQuickEdit" @click="fileId = file.attachId; confirm = true" round size="7.5px" icon="delete" color="negative" class="absolute-top-right"/>
                     </q-badge>
                     <img :src="file.url" />
                   </q-avatar>
@@ -135,7 +140,7 @@
                 </div>
               </div>
             </div>
-            <q-btn :disable="!allowQuickEdit" label="Upload images" icon="backup" color="grey" no-caps push flat unelevated class="absolute-bottom-right q-mr-sm q-mb-sm">
+            <q-btn v-if="canActivate('subject_projects','update')" :disable="!allowQuickEdit" label="Upload images" icon="backup" color="grey" no-caps push flat unelevated class="absolute-bottom-right q-mr-sm q-mb-sm">
               <q-popup-proxy>
                 <q-banner>
                   <q-file :filter="checkType" @rejected="onRejectedImage" clearable label="Image" outlined v-model="image">
@@ -154,11 +159,11 @@
             <p v-show="files.length !== 0" class="text-h6 text-grey q-mt-lg">Uploaded files</p>
             <p v-show="files.length === 0" class="text-subtitle1 text-grey-5">No files has been uploaded.</p>
             <div v-show="files.length !== 0" class="row q-pb-xl">
-              <div v-for="(file, i) in files" :key="file.id">
+              <div v-for="(file) in files" :key="file.attachId">
                 <div  class="flex column flex-center q-pr-md q-pt-md">
                   <q-avatar square size="100px"> 
-                    <q-badge v-if="allowQuickEdit" style="background: transparent !important;" transparent floating>
-                      <q-btn :disable="!allowQuickEdit" @click="fileId = file.id, confirm = true" round size="7.5px" icon="delete" color="negative" class="absolute-top-right"/>
+                    <q-badge  v-if="canActivate('subject_projects','delete')" style="background: transparent !important;" transparent floating>
+                      <q-btn :disable="!allowQuickEdit" @click="fileId = file.attachId; confirm = true" round size="7.5px" icon="delete" color="negative" class="absolute-top-right"/>
                     </q-badge>
                     <q-icon  color="grey" name="attach_file" />
                   </q-avatar>
@@ -169,7 +174,7 @@
                 </div>
               </div>
             </div>
-            <q-btn :disable="!allowQuickEdit" label="Upload files" icon="backup" color="grey" no-caps push flat unelevated class="absolute-bottom-right q-mr-sm q-mb-sm">
+            <q-btn v-if="canActivate('subject_projects','update')" :disable="!allowQuickEdit" label="Upload files" icon="backup" color="grey" no-caps push flat unelevated class="absolute-bottom-right q-mr-sm q-mb-sm">
               <q-popup-proxy>
                 <q-banner>
                   <q-file :filter="checkFileType" @rejected="onRejectedFile" clearable label="File" outlined v-model="file">
@@ -177,7 +182,7 @@
                       <q-icon name="attach_file" />
                     </template>
                   </q-file>
-                  <q-btn v-close-popup label="Upload" @click="addProjectFile('file'); file = null" no-caps :disable="!file" flat color="primary" class="q-mt-sm" size="md" />
+                  <q-btn v-if="canActivate('subject_projects','update')" v-close-popup label="Upload" @click="addProjectFile('file'); file = null" no-caps :disable="!file" flat color="primary" class="q-mt-sm" size="md" />
                 </q-banner>
               </q-popup-proxy>
             </q-btn>
@@ -194,7 +199,7 @@
 
     </div>
     <q-dialog v-model="confirm" persistent>
-      <confirm @confirm="deleteProjectFile" />
+      <confirm @confirm="deleteProjectFileFun" />
     </q-dialog>
     <q-dialog v-model="deleteLeaderConfirm" persistent>
       <confirm @confirm="deleteLeader({id: project.id, leaders: [leaderId]})" />
@@ -203,7 +208,7 @@
       <confirm @confirm="deleteMember({id: project.id, members: [memberId]})" />
     </q-dialog>
     <q-dialog seamless position="right" v-model="dialogue">
-      <modal @closeDialogue="getProject(); dialogue = false" actionType="Edit" :body="project" />
+      <modal @closeDialogue="getProjectRefresh(); dialogue = false" actionType="Edit" :body="project" />
     </q-dialog>
     <!-- <p class="text-caption text-grey-7 q-ma-none" v-show="project.leaderUsers.length !== 0">Assigned Leaders:</p> -->
   </q-page>
@@ -214,71 +219,68 @@ import breadcrmps from '../../../components/globalComponents/BreadCrumps.vue';
 import modal from '../components/AddEditProject.vue';
 import confirm from '../../../components/DeleteDialogue.vue'
 import { mapActions, mapState } from 'vuex';
+import Forbidden from 'src/components/globalComponents/Forbidden.vue';
 export default {
 components :{
     breadcrmps,
     modal,
-    confirm
- },
+    confirm,
+    Forbidden
+},
  data() {
    return {
-     allowQuickEdit: false,
-     project: {
-       leaderUsers: [],
-       memberUsers: [],
-     },
-     members: [],
-     leaders: [],
-     options: [],
-     confirm: false,
-     deleteMemberConfirm: false,
-     deleteLeaderConfirm: false,
-     dialogue: false,
-     loading: false,
-     memberId: null,
-     leaderId: null,
-     files: [],
-     images: [],
-     fileId: null,
-      crumps: [
-        {id:1,name:'OneConnect',icon: 'home',path: '/'},
-        {id:2,name:'Project',icon: undefined,path: '/projects'}
-      ],
-      file: null,
-      image: null
-      
+    canActivate: this.$canActivate,
+    allowQuickEdit: false,
+    members: [],
+    leaders: [],
+    options: [],
+    confirm: false,
+    deleteMemberConfirm: false,
+    deleteLeaderConfirm: false,
+    dialogue: false,
+    loading: false,
+    memberId: null,
+    leaderId: null,
+    files: [],
+    images: [],
+    fileId: null,
+    crumps: [
+      {id:1,name:'OneConnect',icon: 'home',path: '/'},
+      {id:2,name:'Project',icon: undefined,path: '/projects'}
+    ],
+    file: null,
+    image: null
    }
  },
- computed: {
-   ...mapState('userStore', ['users'])
- },
- methods: {
-   ...mapActions('projectStore',['addFiles','addProjectMember','deleteProjectMember','addProjectLeader','deleteProjectLeader']),
-   ...mapActions('userStore',['getUsers']),
-   async deleteProjectFile() {
-    let response = await axios.post(process.env.OC_BACKEND_API + 'projects/removeFile',
-     {id: this.project.id, attachId:this.fileId}, 
-     {headers: {Authorization: localStorage.getItem('accessToken')}});
-     this.getProject();
-   },
+  computed: {
+    ...mapState('userStore', ['users']),
+    ...mapState('projectStore', ['project'])
+  },
+  methods: {
+    ...mapActions('projectStore',['addFiles','addProjectMember','deleteProjectMember','addProjectLeader','deleteProjectLeader','getProject','deleteProjectFile']),
+    ...mapActions('userStore',['getUsers']),
+    async deleteProjectFileFun() {
+      await this.deleteProjectFile({id: this.project.id, attachId:this.fileId})
+      await this.getProjectRefresh();
+    },
     checkType (files) {
-        return files.filter(file => file.type.includes('image'))
+      return files.filter(file => file.type.includes('image'))
     },
     checkFileType (files) {
-        return files.filter(file => !file.type.includes('image'))
+      return files.filter(file => !file.type.includes('image'))
     },
     onRejectedImage() {
-        this.$q.notify({
-          type: 'negative',
-          message: 'Only images are allowed!'
-        })
-      },
+      this.$q.notify({
+        type: 'negative',
+        message: 'Only images are allowed!'
+      })
+    },
     onRejectedFile() {
-        this.$q.notify({
-          type: 'negative',
-          message: 'Only files are allowed!'
-        })
-      },
+      this.$q.notify({
+        type: 'negative',
+        message: 'Only files are allowed!'
+      })
+    },
     async addProjectMembers(id) {
       let membersToAdd = []
       for(let i = 0; i<this.members.length; i++) {
@@ -286,14 +288,13 @@ components :{
       }
       await this.addProjectMember({id:id, members: membersToAdd});
       this.members = [];
-      await this.getProject();
+      await this.getProjectRefresh();
     },
     async deleteMember(payload) {
-      console.log(payload);
       await this.deleteProjectMember(payload);
-      await this.getProject();
+      await this.getProjectRefresh();
     },
-     getUserOptions(payload) {
+    getUserOptions(payload) {
       let optionsA = [];
       let optionsB = [];
       this.options = [];
@@ -317,12 +318,12 @@ components :{
       }
       await this.addProjectLeader({id:id, leaders: leadersToAdd});
       this.leaders = [];
-      await this.getProject();
+      await this.getProjectRefresh();
 
     },
     async deleteLeader(payload) {
       await this.deleteProjectLeader(payload);
-      await this.getProject();
+      await this.getProjectRefresh();
     },
     getLeaderOptions(payload) {
       let optionsA = [];
@@ -341,39 +342,40 @@ components :{
       this.options = optionsA.filter(({ id: id1 }) => !optionsB.some(({ id: id2 }) => id2 === id1));
       }, 200);
     },
-   async addProjectFile(type) {
-     let data = new FormData();
-     data.append('id', this.project.id);
-     if(type === 'file')
-     data.append('files', this.file);
-     else
-     data.append('files', this.image);
+    async addProjectFile(type) {
+      let data = new FormData();
+      data.append('id', this.project.id);
+      if(type === 'file')
+      data.append('files', this.file);
+      else
+      data.append('files', this.image);
 
-     await this.addFiles(data);
-     this.getProject();
-   },
-   async getProject() {
-      let response = await axios.get(process.env.OC_BACKEND_API + `projects/${this.$route.params.id}`, {headers: {Authorization: localStorage.getItem('accessToken')}});
-      this.project = response.data.data;
-      this.crumps[1].name = response.data.data.name;
+      await this.addFiles(data);
+      await this.getProjectRefresh();
+    },
+    async getProjectRefresh() {
+      await this.getProject(this.$route.params.id)
+      this.crumps[1].name = this.project?.name;
       this.fileAndImages()
-   },
-   fileAndImages() {
-     this.files = [];
-     this.images = [];
-     for(let i = 0; i<this.project.attachments.length; i++) {
-       if(this.project.attachments[i].contentType?.includes('image'))
-       this.images.push(this.project.attachments[i]);
-       else
-       this.files.push(this.project.attachments[i]);
-     }
-   }
- },
- async mounted() {
-      this.loading = true;
-      await this.getProject();
-      await this.getUsers();
-      this.loading = false;
+    },
+    fileAndImages() {
+      this.files = [];
+      this.images = [];
+      for(let i = 0; i<this.project.attachments?.length; i++) {
+        if(this.project.attachments[i].contentType?.includes('image'))
+        this.images.push(this.project.attachments[i]);
+        else
+        this.files.push(this.project.attachments[i]);
+      }
+    }
+  },
+  async mounted() {
+    await this.getProject(this.$route.params.id)
+    if (!this.canActivate('subject_projects','read')) return
+    this.loading = true;
+    await this.getProjectRefresh();
+    await this.getUsers();
+    this.loading = false;
   }
 }
 </script>

@@ -16,3 +16,11 @@ export async function deleteUser({dispatch}, payload) {
     dispatch('getUsers');
 }
 
+export async function createPermission({dispatch}, payload) {
+    try {
+    let response = await axios.post(process.env.OC_BACKEND_API + 'users/delete', payload, {headers: {Authorization: localStorage.getItem('accessToken')}})
+    }catch(e) {
+        console.log(e.response)
+    }
+    dispatch('getUsers');
+}

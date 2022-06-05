@@ -1,6 +1,6 @@
 <template>
-  <div>
-          <!-- :title="type === 'blacklist' ? type[0].toUpperCase()+type.substr(1, type.length): type[0].toUpperCase()+type.substr(1, type.length)+'s'" -->
+  <div v-if="canActivate('subject_crm','read')">
+    <!-- :title="type === 'blacklist' ? type[0].toUpperCase()+type.substr(1, type.length): type[0].toUpperCase()+type.substr(1, type.length)+'s'" -->
     <q-table
       :rows="data"
       :columns="columns"
@@ -21,50 +21,50 @@
           </q-td>
           <q-td class="flex items-center justify-start" key="name" :props="props">
             <router-link class="text-black" :to="`/client/${props.row.id}`">
-            <p style="font-size: 20px;">{{props.row.name}}</p>
+              <p style="font-size: 20px;">{{props.row.name}}</p>
             </router-link>
           </q-td>
           <q-td key="phoneNumber1" :props="props">
-              {{ props.row.phoneNumber1 }}
+            {{ props.row.phoneNumber1 }}
           </q-td>
           <q-td key="businessType" :props="props">
-              {{ props.row.businessType }}
+            {{ props.row.businessType }}
           </q-td>
           <q-td key="email" :props="props">
-              {{ props.row.email }}
+            {{ props.row.email }}
           </q-td>
           <q-td key="website" :props="props">
-              {{ props.row.website }}
+            {{ props.row.website }}
           </q-td>
           <q-td key="address" :props="props">
-              {{ props.row.address }}
+            {{ props.row.address }}
           </q-td>
-            <q-td key="rate" :props="props">
-              {{ props.row.rate }}
+          <q-td key="rate" :props="props">
+            {{ props.row.rate }}
           </q-td>
           <q-td key="zipCode" :props="props">
-              {{ props.row.zipCode }}
-            </q-td>
-          <q-td class="row flex text-center" key="zipCode" :props="props">
-          <router-link :to="`/client/${props.row.id}`">
-          <q-btn dense text-color="dark" round flat icon="visibility" />
-          </router-link>
-          <q-btn dense round flat icon="more_vert">
-            <q-menu
-              transition-show="scale"
-              transition-hide="scale"
-            >
-              <q-list style="min-width: 75px">
-                <q-item @click="deleteClient({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
-                  <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
-                </q-item>
-                <q-separator />
-                <q-item @click="editClient(props.row)" clickable v-close-popup>
-                  <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
-          </q-btn>
+            {{ props.row.zipCode }}
+          </q-td>
+          <q-td class="row flex-justify-between text-center" key="zipCode" :props="props" width="100">
+            <router-link class="col" v-if="canActivate('subject_crm','read')" :to="`/client/${props.row.id}`">
+              <q-btn dense text-color="dark" round flat icon="visibility" />
+            </router-link>
+            <q-btn class="col" v-if="canActivate('subject_crm','delete') || canActivate('subject_crm','update')" dense round flat icon="more_vert">
+              <q-menu
+                transition-show="scale"
+                transition-hide="scale"
+              >
+                <q-list>
+                  <q-item v-if="canActivate('subject_crm','delete')" @click="deleteClient({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
+                    <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
+                  </q-item>
+                  <q-separator v-if="canActivate('subject_crm','update')&&canActivate('subject_crm','delete')" />
+                  <q-item v-if="canActivate('subject_crm','update')" @click="editClient(props.row)" clickable v-close-popup>
+                    <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-btn>
           </q-td>
         </q-tr>
       </template>
@@ -106,6 +106,7 @@ export default {
 
   data() {
     return {
+      canActivate: this.$canActivate,
       body: null,
       id: null,
       dialogue: false,
@@ -161,6 +162,7 @@ export default {
       }
   },
  async mounted() {
+    if (!this.canActivate('subject_finance','read')) return
    this.loading = true
    await this.getClients(this.type);
    this.loading=false

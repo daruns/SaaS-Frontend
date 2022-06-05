@@ -6,6 +6,7 @@
         <q-btn @click="dialogue = true" color="primary" label="Create Project"  unelevated rounded no-caps />
       </div>
     </div>
+    <div v-if="!canActivate('subject_projects','read')"><Forbidden /></div>
     <projects />
     <q-dialog seamless position="right" v-model="dialogue">
         <modal @closeDialogue="dialogue = false" actionType="Add"  />
@@ -15,15 +16,18 @@
 <script>
 import breadcrmps from '../../../components/globalComponents/BreadCrumps.vue';
 import Projects from '../components/ProjectGrid.vue';
+import Forbidden from 'src/components/globalComponents/Forbidden.vue';
 import modal from '../components/AddEditProject.vue'
 export default {
 components : {
     breadcrmps,
     Projects,
-    modal
+    modal,
+    Forbidden
 },
 data() {
   return {
+    canActivate: this.$canActivate,
     dialogue: false,
   }
 },

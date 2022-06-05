@@ -8,18 +8,18 @@
             <p class="text-h6 q-mr-none" style="min-width:80% !important;white-space: nowrap;overflow:hidden !important;text-overflow: ellipsis !important;">{{project.name}}</p>
             </router-link>
             <q-space/>
-            <q-btn class="" dense round flat icon="more_vert">
+            <q-btn v-if="canActivate('subject_projects','delete') || canActivate('subject_projects','update')" class="" dense round flat icon="more_vert">
               <q-menu
                 transition-show="scale"
                 transition-hide="scale"
                 
               >
                 <q-list style="min-width: 75px">
-                  <q-item @click="deleteProject({id: project.id})" style="padding 0 !important" clickable v-close-popup>
+                  <q-item v-if="canActivate('subject_projects','delete')" @click="deleteProject({id: project.id})" style="padding 0 !important" clickable v-close-popup>
                     <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                   </q-item>
-                  <q-separator />
-                  <q-item @click="body = project; dialogue = true" clickable v-close-popup>
+                  <q-separator  v-if="canActivate('subject_projects','delete') && canActivate('subject_projects','update')" />
+                  <q-item v-if="canActivate('subject_projects','update')" @click="body = project; dialogue = true" clickable v-close-popup>
                     <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                   </q-item>
                 </q-list>
@@ -37,7 +37,7 @@
               <div class="row q-mb-lg">
                 <div class="q-mr-xs q-mt-xs q-mb-xs" v-for="leader in project.leaderUsers.slice(0,2)" :key="leader.id">
                   <q-avatar size="40px">
-                  <q-btn @click="deleteProjectLeader({id:project.id, leaders: [leader.userId]})" round size="5px" icon="close" color="negative" class="absolute-top-right"/>
+                  <q-btn v-if="canActivate('subject_projects','delete')"  @click="deleteProjectLeader({id:project.id, leaders: [leader.userId]})" round size="5px" icon="close" color="negative" class="absolute-top-right"/>
                   <img v-if="leader.avatar" :src="leader.avatar">
                   <img v-else src="~/assets/one_logo_neat.png">
                   <q-tooltip>
@@ -46,7 +46,7 @@
                   </q-avatar>
                 </div>
                 <p v-if="project.leaderUsers.length > 2" class="text-subtitle1 q-pt-xs q-ma-none text-grey">....+{{project.leaderUsers.length - 2}}</p>
-                <div class="flex justify-center items-start q-mt-xs" :class="project.leaderUsers.length > 2 && 'q-ml-xs'">
+                <div v-if="canActivate('subject_projects','create')" class="flex justify-center items-start q-mt-xs" :class="project.leaderUsers.length > 2 && 'q-ml-xs'">
                           <q-btn @click="getLeaderOptions(project)" round size="15px" text-color="black" unelevated color="grey-4" icon="add">
                               <q-popup-edit v-model="leaders" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
                               <q-select
@@ -81,14 +81,14 @@
               <p class="text-subtitle2 q-mb-sm">Project Team:</p>
               <div class="row">
                   <q-avatar class="q-mr-xs" v-for="member in project.memberUsers" :key="member.id" size="40px">
-                  <q-btn @click="deleteProjectMember({id:project.id, members: [member.userId]})" round size="5px" icon="close" color="negative" class="absolute-top-right"/>
+                  <q-btn v-if="canActivate('subject_projects','delete')" @click="deleteProjectMember({id:project.id, members: [member.userId]})" round size="5px" icon="close" color="negative" class="absolute-top-right"/>
                   <img v-if="member.avatar" :src="member.avatar">
                   <img v-else src="~/assets/one_logo_neat.png">
                   <q-tooltip>
                       {{member.name}}
                       </q-tooltip>
                   </q-avatar>
-                        <div class="flex justify-center items-start" :class="project.memberUsers.length > 2 && 'q-ml-xs'">
+                        <div v-if="canActivate('subject_projects','create')" class="flex justify-center items-start" :class="project.memberUsers.length > 2 && 'q-ml-xs'">
                           <q-btn @click="getUserOptions(project)" round size="15px" text-color="black" unelevated color="grey-4" icon="add">
                               <q-popup-edit v-model="members" style="min-width: 15rem !important;" :cover="false" :offset="[0, 10]" v-slot="scope">
                               <q-select
@@ -169,6 +169,7 @@ export default {
   props: ['bodyData'],
   data() {
     return {
+      canActivate: this.$canActivate,
       projects: [],
       loading: false,
       dialogue: false,
@@ -234,10 +235,9 @@ export default {
     },
   },
  async mounted() {
-   this.loading = true
-  //  await this.getProjects();
+    if (!this.canActivate('subject_projects','read')) return
+  this.loading = true
    await this.getUsers();
-   console.log('projects"""""""""""""""""""""', this.bodyData)
    this.projects = this.bodyData?.map(e => e) || []
    this.loading = false
 
@@ -245,7 +245,7 @@ export default {
 }
 </script>
 <style scoped>
-@media (max-width: 652px) { 
+  @media (max-width: 652px) { 
   .row1 {
     justify-content: center !important;
   }

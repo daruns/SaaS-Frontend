@@ -4,7 +4,7 @@ export function GET_INVOICES (state, payload) {
   state.sentInvoices = []
   state.paidInvoices = []
   state.notPaidInvoices = []
-  
+
   for (let i = 0; i<state.invoices.length; i++) {
     if(state.invoices[i].status === 'Sent'){
     state.sentInvoices.push(state.invoices[i])
@@ -20,7 +20,6 @@ export function GET_INVOICES (state, payload) {
 export function GET_INVOICE (state, payload) {
   state.oneInvoice = payload
 }
-
 
 export function GET_QUOTES (state, payload) {
   state.quotes = []

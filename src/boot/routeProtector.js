@@ -12,15 +12,18 @@ export default boot(async ({ app, router }) => {
     } catch(err) {
       localStorage.removeItem('tab')
       localStorage.removeItem('isLoggedIn')
+      localStorage.removeItem('myUserDetails')
+      localStorage.removeItem('myUserPermission')
       localStorage.removeItem('accessToken')
       console.log('error:    sxscsc  ', err)
+      router.push('/login')
     }
     return authed
   }
 
   router.beforeEach((to, from, next) => {
     if(to.meta.needsAuth){
-      if(localStorage.getItem('accessToken'))
+      if(localStorage.getItem('accessToken') && checkAuth(localStorage.getItem('accessToken')))
       next()
       else{
         next('/login')

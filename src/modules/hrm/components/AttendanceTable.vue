@@ -171,6 +171,7 @@ export default {
   props: ['currentUser'],
   data() {
     return {
+      canActivate: this.$canActivate,
       filter: ref(""),
       attends: false,
       todayDateFull: moment().format('DD MMM YYYY'),

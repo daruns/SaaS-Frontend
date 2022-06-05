@@ -84,9 +84,6 @@ export default {
      imgUrl: (process.env.OC_BACKEND_API + 'brands/update'),
      imgHeaders: {Authorization: localStorage.getItem('accessToken')},
      imgDataUrl: null,
-     imgParams: {
-       id: null
-     },
      show: true,
      phone: '',
      dialCode:'',
@@ -144,7 +141,6 @@ export default {
 
           this.loading = true
             let data = new FormData();
-            data.append('id', this.credentials.id)
             if (this.credentials.phone) data.append('phoneNumber', this.dialCode+this.credentials.phone);
             if (this.credentials.name) data.append('name', this.credentials.name);
             if (this.credentials.email) data.append('email', this.credentials.email);
@@ -173,8 +169,6 @@ export default {
   },
  async mounted() {
    this.show = false
-    this.imgParams.id = this.body.id
-    this.credentials.id = this.body.id
     this.credentials.username = this.body.username
     this.credentials.phone = this.body.phoneNumber
     this.credentials.name = this.body.name,

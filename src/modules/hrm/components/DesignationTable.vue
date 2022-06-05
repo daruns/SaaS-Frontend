@@ -56,6 +56,7 @@ export default {
 
   data() {
     return {
+      canActivate: this.$canActivate,
       body: null,
       id: null,
       dialogue: false,

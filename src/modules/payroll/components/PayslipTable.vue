@@ -34,8 +34,8 @@
             <p style="font-size: 17px;">{{dateFunc.formatDate(new Date(props.row.createdAt), 'YYYY-MM-DD')}}</p>
           </q-td>
           <q-td class="justify-end text-right" key="actions" :props="props">
-            <q-btn flat :to="'/payroll/payslip/' + props.row.id" style="padding 0 !important" class="q-mx-sm bg-warning text-white" clickable v-close-popup>Generate Slip</q-btn>
-            <q-btn round flat color="red" icon="delete" @click="deletePayslip({id: props.row.id})" style="padding 0 !important" class="q-mx-sm" clickable v-close-popup />
+            <q-btn v-if="canActivate('subject_payroll','create')" flat :to="'/payroll/payslip/' + props.row.id" style="padding 0 !important" class="q-mx-sm bg-warning text-white" clickable v-close-popup>Generate Slip</q-btn>
+            <q-btn v-if="canActivate('subject_payroll','delete')" round flat color="red" icon="delete" @click="deletePayslip({id: props.row.id})" style="padding 0 !important" class="q-mx-sm" clickable v-close-popup />
           </q-td>
         </q-tr>
       </template>
@@ -61,6 +61,7 @@ export default {
   props: ['currentUser'],
   data() {
     return {
+      canActivate: this.$canActivate,
       body: null,
       id: null,
       dateFunc: date,

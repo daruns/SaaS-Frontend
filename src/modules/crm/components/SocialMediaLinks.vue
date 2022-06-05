@@ -23,18 +23,18 @@
               {{ props.row.status }}
           </q-td>
          <q-td key="actions" :props="props">
-          <q-btn dense round flat icon="more_vert">
+          <q-btn v-if="canActivate('subject_social_media_studios','update') || canActivate('subject_social_media_studios','delete')" dense round flat icon="more_vert">
             <q-menu
               transition-show="scale"
               transition-hide="scale"
               
             >
               <q-list style="min-width: 75px">
-                <q-item @click="deleteSocialLink(props.row.id)" style="padding 0 !important" clickable v-close-popup>
+                <q-item  v-if="canActivate('subject_social_media_studios','delete')" @click="deleteSocialLink(props.row.id)" style="padding 0 !important" clickable v-close-popup>
                   <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                 </q-item>
                 <q-separator />
-                <q-item  @click="openModal(props.row, 'Edit')" clickable v-close-popup>
+                <q-item  v-if="canActivate('subject_social_media_studios','update')"  @click="openModal(props.row, 'Edit')" clickable v-close-popup>
                  <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                 </q-item>
               </q-list>
@@ -44,11 +44,11 @@
         </q-tr>
       </template>
       <template v-slot:top-right>
-         <q-btn @click="openModal({}, 'Add')" label="Create Record" no-caps color="primary" unelevated rounded />
+         <q-btn  v-if="canActivate('subject_social_media_studios','create')" @click="openModal({}, 'Add')" label="Create Record" no-caps color="primary" unelevated rounded />
       </template>
     </q-table>
     <q-dialog seamless position="right" v-model="prompt" persistent>
-        <modal @closeDialogue="prompt = false" :body="body" :action="action" />
+      <modal @closeDialogue="prompt = false" :body="body" :action="action" />
     </q-dialog>
   </div>
 </template>
@@ -59,6 +59,7 @@ import modal from '../components/AddEditSocial.vue'
 export default {
   data() {
     return {
+      canActivate: this.$canActivate,
     prompt: false,
     loading: false,
     action: '',
@@ -96,7 +97,9 @@ export default {
       }
   },
  async mounted() {
-   this.loading = true
+
+    if (!this.canActivate('subject_crm','read')) return
+    this.loading = true
    await this.getOneClient(this.$route.params.id);
    this.loading=false
   }

@@ -22,17 +22,17 @@
             <p v-if="props.row.durationType === 'hours'" style="font-size: 20px;">{{props.row.hours}} Hours</p>
           </q-td>
           <q-td class="text-right" key="duration" :props="props">
-            <q-btn dense round flat icon="more_vert">
+            <q-btn  v-if="canActivate('subject_hrm','delete') || canActivate('subject_hrm','update')"  dense round flat icon="more_vert">
               <q-menu
                 transition-show="scale"
                 transition-hide="scale"
               >
                 <q-list style="min-width: 75px">
-                  <q-item @click="deleteOvertimeType({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
+                  <q-item  v-if="canActivate('subject_hrm','delete')"  @click="deleteOvertimeType({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
                     <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                   </q-item>
                   <q-separator />
-                  <q-item @click="editOvertimeType(props.row)" clickable v-close-popup>
+                  <q-item  v-if="canActivate('subject_hrm','update')" @click="editOvertimeType(props.row)" clickable v-close-popup>
                     <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                   </q-item>
                 </q-list>
@@ -51,6 +51,8 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import AddEditOvertimeType from './AddEditOvertimeType.vue';
+import Forbidden from 'src/components/globalComponents/Forbidden.vue';
+
 export default {
   computed: {
     ...mapState('hrmStore', ['overtimeTypes']),
@@ -61,6 +63,7 @@ export default {
 
   data() {
     return {
+      canActivate: this.$canActivate,
       body: null,
       id: null,
       dialogue: false,
@@ -74,26 +77,27 @@ export default {
     }
   },
   components: {
-    modal: AddEditOvertimeType
+    modal: AddEditOvertimeType,
+    Forbidden
   },
   methods: {
     ...mapActions('hrmStore',['getDesignations', 'getOvertimeTypes','deleteOvertimeType']),
     editOvertimeType(department) {
-        if(this.dialogue === true){
-          this.dialogue = false;
-          setTimeout(() => {
-             this.body = department
-            this.dialogue = true
-          }, 200);
-          return
-        }
-         this.body = department
-        this.dialogue = true
-    },
-     rowColor(props) {
-        if(props.rowIndex%2 !== 0 || props.rowIndex !== 0  )
-        return 'background: #fff;'
+      if (this.dialogue === true) {
+        this.dialogue = false;
+        setTimeout(() => {
+          this.body = department
+          this.dialogue = true
+        }, 200);
+        return
       }
+      this.body = department
+      this.dialogue = true
+    },
+    rowColor(props) {
+      if(props.rowIndex%2 !== 0 || props.rowIndex !== 0  )
+      return 'background: #fff;'
+    }
   },
  async mounted() {
    this.loading = true

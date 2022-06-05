@@ -41,7 +41,7 @@
             </q-item-section>
             <q-item-section>Dashboard</q-item-section>
           </q-item> -->
-          <q-list :key="mindex" v-for="(mitem,mindex) in subSideBar.itemsArray" class="rounded-borders text-black">
+          <q-list :key="mindex" v-for="(mitem,mindex) in subSideBar.itemsArray" class="rounded-borders text-black" v-show="mitem?.canShow">
             <q-separator
               class="bg-white"
               v-if="mitem.name === 'separator'"
@@ -110,6 +110,7 @@
           <q-item-section>Dashboard</q-item-section>
         </q-item> -->
         <q-item
+          v-if="canActivate('subject_crm','all')"
           to='/crm'
           clickable
           @click="sendSubSideBardData('crm')"
@@ -123,6 +124,7 @@
           <q-item-section>CRM</q-item-section>
         </q-item>
         <q-item
+          v-if="canActivate('subject_suppliers','all')"
           to="/suppliers"
           @click="sendSubSideBardData('suppliers')"
           exact
@@ -137,6 +139,7 @@
           <q-item-section>Suppliers</q-item-section>
         </q-item>
         <q-item
+          v-if="canActivate('subject_finance','all')"
           :to="$route.path.split('/')[1] === 'finance' && $route.path.split('/')[2] !== 'suppliers' ? $route.path : undefined"
           exact
           @click="sendSubSideBardData('finance')"
@@ -151,6 +154,7 @@
           <q-item-section>Finance</q-item-section>
         </q-item>
         <q-item
+          v-if="canActivate('subject_hrm','all') && (user.userType === 'owner' || user?.myEmployeeProfile)"
           :to="$route.path.split('/')[1] === 'hrm' ? $route.path : undefined"
           exact
           @click="sendSubSideBardData('hrm')"
@@ -165,6 +169,7 @@
           <q-item-section>HRM</q-item-section>
         </q-item>
         <q-item
+          v-if="canActivate('subject_payroll','all')"
           :to="$route.path.split('/')[1] === 'payroll' ? $route.path : undefined"
           exact
           @click="sendSubSideBardData('payroll')"
@@ -179,6 +184,7 @@
           <q-item-section>Payroll</q-item-section>
         </q-item>
         <q-item
+          v-if="canActivate('subject_projects','all')"
           :to="$route.path.split('/')[1] === 'projects' ? $route.path : undefined"
           exact
           @click="sendSubSideBardData('projects')"
@@ -193,6 +199,7 @@
           <q-item-section>Projects</q-item-section>
         </q-item>
         <q-item
+          v-if="canActivate('subject_social_media_studios','all')"
           :to="$route.path.split('/')[1] === 'social-media-management' ? $route.path : undefined"
           exact
           @click="sendSubSideBardData('social-media-management')"
@@ -233,6 +240,7 @@
           <q-item-section>Profile</q-item-section>
         </q-item>
         <q-item
+          v-if="canActivate('subject_user','all')"
           to='/users'
           clickable
           @click="sendSubSideBardData('users')"
@@ -254,7 +262,7 @@
         <router-view class="full-height" />
       </q-page-container>
       <!-- <q-page-sticky position="bottom-right" :offset="[18, 18]">
-              <chat :props="showChat" @morph="show" />
+        <chat :props="showChat" @morph="show" />
       </q-page-sticky> -->
       <q-drawer
         :v-model="true"
@@ -367,7 +375,6 @@
           </q-item-section>
 
         </q-item>
-
       </q-list>
         </q-scroll-area>
       </q-drawer>
@@ -390,15 +397,27 @@ export default {
       toggledM: false,
       routePath: this.$router.currentRoute._value.path.split("/")[1],
       subSideBar: {
-        itemsArray: [{name:"",icon:"",url:""}],
+        itemsArray: [{name:"",icon:"",url:"",canShow: true}],
         title: ""
       },
     }
   },
   computed : {
-    ...mapState('example', ['user']),
+    ...mapState('example', ['user','permissions']),
   },
   methods: {
+    canActivate(subject,action) {
+      if (this.user && this.user.userType === 'owner') {
+        return true
+      }
+      if (this.permissions) {
+        let actionCond = (action === 'all') ? true : e.action === action
+        if (this.permissions?.some(e => {return (e.subject.includes(subject) || subject.includes(e.subject)) && actionCond }) ) {
+          return true
+        }
+      }
+      return false
+    },
     openedSideBar() {
       this.toggledM = this.miniState = !this.miniState
       if (this.miniState === false) { this.fixedState = true }
@@ -438,14 +457,14 @@ export default {
       if (payload === "social-media-management") {
         this.subSideBar.title = "SMM"
         this.subSideBar.itemsArray = [
-          {name: "Drafts", icon: "mode_edit", url: "/social-media-management/drafts"},
-          {name: "Calendar", icon: "far fa-calendar-alt", url: "/social-media-management/calendar"},
-          {name: "Posts", icon: "send", url: "/social-media-management/posts"},
-          {name: "productions", icon: "precision_manufacturing", url: "/social-media-management/productions"},
-          {name: "Reviews", icon: "remove_red_eye", url: "/social-media-management/reviews"},
-          {name: "Rejecteds", icon: "youtube_searched_for", url: "/social-media-management/rejecteds"},
-          {name: "Completeds", icon: "assignment_turned_in", url: "/social-media-management/completeds"},
-          {name: "Connect Profile", icon: "fas fa-plus-square", url: "/social-media-management/accounts"},
+          {name: "Drafts", icon: "mode_edit", url: "/social-media-management/drafts", canShow: this.canActivate("subject_social_media_studios",'all')},
+          {name: "Calendar", icon: "far fa-calendar-alt", url: "/social-media-management/calendar",canShow: this.canActivate("subject_social_media_studios",'all')},
+          {name: "Posts", icon: "send", url: "/social-media-management/posts",canShow: this.canActivate("subject_social_media_studios",'all')},
+          {name: "productions", icon: "precision_manufacturing", url: "/social-media-management/productions",canShow: this.canActivate("subject_social_media_studios",'all')},
+          {name: "Reviews", icon: "remove_red_eye", url: "/social-media-management/reviews",canShow: this.canActivate("subject_social_media_studios",'all')},
+          {name: "Rejecteds", icon: "youtube_searched_for", url: "/social-media-management/rejecteds",canShow: this.canActivate("subject_social_media_studios",'all')},
+          {name: "Completeds", icon: "assignment_turned_in", url: "/social-media-management/completeds",canShow: this.canActivate("subject_social_media_studios",'all')},
+          {name: "Connect Profile", icon: "fas fa-plus-square", url: "/social-media-management/accounts",canShow: this.canActivate("subject_social_media_studios",'all')},
         ]
         if (mounted !== true) this.$router.push(this.subSideBar.itemsArray[0].url)
         this.drawer = true
@@ -454,16 +473,15 @@ export default {
       } else if (payload === "finance") {
         this.subSideBar.title = "Finance"
         this.subSideBar.itemsArray = [
-          {name: "Invoice", icon: "receipt", url: "/finance/invoice"},
-          {name: "Quotation", icon: "request_quote", url: "/finance/quotation"},
-          {name: "separator", icon: "", url: ""},
-          {name: "Expenses", icon: "savings", url: "/finance/expenses"},
-          {name: "separator", icon: "", url: ""},
-          {name: "Products & Services", icon: "category", url: "/finance/accounting"},
-          // {name: "Suppliers", icon: "badge", url: "/finance/suppliers"},
-          {name: "Expense categories", icon: "grid_view", url: "/finance/categories"},
-          {name: "Payment Types", icon: "fas fa-credit-card", url: "/finance/payment"},
-          {name: "Tax Types", icon: "receipt_long", url: "/finance/taxes"},
+          {name: "Invoice", icon: "receipt", url: "/finance/invoice",canShow: this.canActivate("subject_finance_invoices",'all')},
+          {name: "Quotation", icon: "request_quote", url: "/finance/quotation",canShow: this.canActivate("subject_finance_quotes",'all')},
+          {name: "separator", icon: "", url: "",canShow: true},
+          {name: "Expenses", icon: "savings", url: "/finance/expenses",canShow: this.canActivate("subject_finance_expenses",'all')},
+          {name: "separator", icon: "", url: "",canShow: true},
+          {name: "Products & Services", icon: "category", url: "/finance/accounting",canShow: this.canActivate("subject_finance",'all')},
+          {name: "Expense categories", icon: "grid_view", url: "/finance/categories",canShow: this.canActivate("subject_finance_joined_expense_categories",'all')},
+          {name: "Payment Types", icon: "fas fa-credit-card", url: "/finance/payment",canShow: this.canActivate("subject_finance_payment_methods",'all')},
+          {name: "Tax Types", icon: "receipt_long", url: "/finance/taxes",canShow: this.canActivate("subject_finance_taxes",'all')},
         ]
         if (mounted !== true) this.$router.push(this.subSideBar.itemsArray[0].url)
         this.drawer = true
@@ -471,17 +489,24 @@ export default {
         this.toggledM = true
       } else if (payload === "hrm") {
         this.subSideBar.title = "HRM"
+        let checkOwnerHrMember = this.user.userType === 'owner' || (this.user.myEmployeeProfile && this.user.myEmployeeProfile.hrMember == true)
         this.subSideBar.itemsArray = [
-          {name: "Employees", icon: "person", url: "/hrm/employees"},
-          {name: "Leaves", icon: "description", url: "/hrm/leaves"},
-          {name: "Overtimes", icon: "history", url: "/hrm/overtimes"},
-          {name: "Attendance", icon: "touch_app", url: "/hrm/attendances"},
-          {name: "separator", icon: "", url: ""},
-          {name: "Leave Types", icon: "category", url: "/hrm/leaveTypes"},
-          {name: "Overtime Types", icon: "category", url: "/hrm/overtimeTypes"},
-          {name: "Departments", icon: "groups", url: "/hrm/departments"},
-          {name: "Designations", icon: "grid_view", url: "/hrm/designations"},
+          {name: "Leaves", icon: "description", url: "/hrm/leaves",canShow: this.canActivate("subject_hrm_leaves",'all') && (checkOwnerHrMember) },
+          {name: "Overtimes", icon: "history", url: "/hrm/overtimes",canShow: this.canActivate("subject_hrm_overtimes",'all') && (checkOwnerHrMember) },
+          {name: "Attendance", icon: "touch_app", url: "/hrm/attendances",canShow: this.canActivate("subject_hrm_attendances",'all') && (checkOwnerHrMember) },
+          {name: "separator", icon: "", url: "",canShow: true},
+          {name: "Leave Types", icon: "category", url: "/hrm/leaveTypes",canShow: this.canActivate("subject_hrm_leave_types",'all') && (checkOwnerHrMember) },
+          {name: "Overtime Types", icon: "category", url: "/hrm/overtimeTypes",canShow: this.canActivate("subject_hrm_overtime_types",'all') && (checkOwnerHrMember) },
+          {name: "Departments", icon: "groups", url: "/hrm/departments",canShow: this.canActivate("subject_hrm_departments",'all') && (checkOwnerHrMember) },
+          {name: "Designations", icon: "grid_view", url: "/hrm/designations",canShow: this.canActivate("subject_hrm_designations",'all') && (checkOwnerHrMember) },
         ]
+
+        if (this.user.userType === 'owner' || (this.user.myEmployeeProfile && this.user.myEmployeeProfile.hrMember != true) ) {
+          this.subSideBar.itemsArray.unshift(
+            {name: "Employees", icon: "person", url: "/hrm/employees",canShow: this.canActivate("subject_hrm_employees",'all')},
+          )
+        }
+        // this.subSideBar.itemsArray
         if (mounted !== true) this.$router.push(this.subSideBar.itemsArray[0].url)
         this.drawer = true
         this.miniState = true
@@ -489,12 +514,12 @@ export default {
       } else if (payload === "payroll") {
         this.subSideBar.title = "payroll"
         this.subSideBar.itemsArray = [
-          {name: "Payslips", icon: "receipt", url: "/payroll/payslips"},
-          {name: "Earnings", icon: "money", url: "/payroll/earnings"},
-          {name: "Deductions", icon: "money", url: "/payroll/deductions"},
-          {name: "separator", icon: "", url: ""},
-          {name: "Earning Types", icon: "category", url: "/payroll/earningTypes"},
-          {name: "Deduction Types", icon: "category", url: "/payroll/deductionTypes"},
+          {name: "Payslips", icon: "receipt", url: "/payroll/payslips",canShow: this.canActivate("subject_payroll_payslips",'all')},
+          {name: "Earnings", icon: "money", url: "/payroll/earnings",canShow: this.canActivate("subject_payroll_earnings",'all')},
+          {name: "Deductions", icon: "money", url: "/payroll/deductions",canShow: this.canActivate("subject_payroll_deductions",'all')},
+          {name: "separator", icon: "", url: "",canShow: true,},
+          {name: "Earning Types", icon: "category", url: "/payroll/earningTypes",canShow: this.canActivate("subject_payroll_earning_types",'all')},
+          {name: "Deduction Types", icon: "category", url: "/payroll/deductionTypes",canShow: this.canActivate("subject_payroll_deduction_types",'all')},
         ]
         if (mounted !== true) this.$router.push(this.subSideBar.itemsArray[0].url)
         this.drawer = true
@@ -503,8 +528,8 @@ export default {
       } else if (payload === "projects") {
         this.subSideBar.title = "projects"
         this.subSideBar.itemsArray = [
-          {name: "Projects", icon: "work", url: "/projects/dashboard"},
-          {name: "Tasks", icon: "task", url: "/projects/tasks"}
+          {name: "Projects", icon: "work", url: "/projects/dashboard",canShow: this.canActivate("subject_projects",'all')},
+          {name: "Tasks", icon: "task", url: "/projects/tasks",canShow: this.canActivate("subject_projects_tasks",'all')}
         ]
         if (mounted !== true) this.$router.push(this.subSideBar.itemsArray[0].url)
         this.drawer = true
@@ -524,7 +549,7 @@ export default {
         }, 600);
       }
     },
-    ...mapActions('example', ['getUser']),
+      ...mapActions('example', ['getUser']),
       updateScroll() {
       var element = document.getElementById("room-container");
       if(element)
@@ -554,10 +579,8 @@ export default {
     }
   },
   async mounted() {
-    console.log("started: ", this.subSideBar )
-    this.defaultValueSubSide()
-    console.log("ended: ", this.subSideBar )
     await this.getUser();
+    this.defaultValueSubSide()
     this.brandCodeName = this.user.brand?.name ? this.user.brand?.name : this.user.brand?.brandCodeName
     this.brandLogo = this.user.brand?.logo
   }

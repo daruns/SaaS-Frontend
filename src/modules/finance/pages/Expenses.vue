@@ -3,11 +3,12 @@
     <div class="full-width flex justify-between items-center q-px-md header-height-standard" style="border-bottom: 1px solid lightgrey;">
       <div class="text-h4">Expenses</div>
       <div class="flex items-center">
-        <q-btn @click="action = 'Add';prompt = true" color="primary" label="Create Record" unelevated rounded no-caps />
+        <q-btn v-if="canActivate('subject_finance','create')" @click="action = 'Add';prompt = true" color="primary" label="Create Record" unelevated rounded no-caps />
       </div>
     </div>
     <breadcrumps class="q-pa-md full-width" :map="crumps" />
-    <div class="q-px-md">
+      <div v-if="!canActivate('subject_finance','read')"><Forbidden /></div>
+    <div  v-else class="q-px-md">
     <q-table
       :rows="expenses"
       :columns="columns"
@@ -73,10 +74,12 @@ import { mapActions, mapState } from 'vuex'
 import { date } from 'quasar'
 import breadcrumps from 'src/components/globalComponents/BreadCrumps.vue';
 import modal from '../components/AddEditExpense.vue'
+import Forbidden from 'src/components/globalComponents/Forbidden.vue';
 export default {
   props: ['type'],
   data() {
     return {
+      canActivate: this.$canActivate,
       prompt: false,
       loading: false,
       action: '',
@@ -101,10 +104,12 @@ export default {
   },
   components: {
     modal,
-    breadcrumps
-  },
+    breadcrumps,
+    Forbidden
+},
   methods: {
     ...mapActions('financeStore', ['getExpenses','deleteExpense']),
+
     rowColor(props) {
       if(props.rowIndex%2 !== 0)
       return 'background: #fff;'
@@ -115,12 +120,13 @@ export default {
       return date.formatDate(dtObj, 'YYYY-MM-DD HH:mm');
     },
     edit(payload) {
-        this.body = payload;
+      this.body = payload;
         this.action = 'Edit'; 
         this.prompt = true;
     }
   },
   async mounted() {
+    if (!this.canActivate('subject_finance','read')) return
     await this.getExpenses();
   }
 }

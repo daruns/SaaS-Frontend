@@ -1,5 +1,8 @@
 <template>
-    <q-page v-if="!isLoaded" class="flex flex-center">
+    <q-page  v-if="!canActivate('subject_finance','read')">
+      <Forbidden />
+    </q-page>
+    <q-page v-else-if="!isLoaded" class="flex flex-center">
       <q-spinner color="primary" size="md" />
     </q-page>
     <q-page v-else class="q-py-none q-my-none">
@@ -105,13 +108,16 @@ import breadcrumps from 'src/components/globalComponents/BreadCrumps.vue'
 import DownloadPDFButton from 'src/components/DownloadPDFButton.vue';
 
 import { mapActions, mapState } from 'vuex'
+import Forbidden from 'src/components/globalComponents/Forbidden.vue';
 export default {
     components: {
-      breadcrumps,
-      DownloadPDFButton
-    },
+    breadcrumps,
+    DownloadPDFButton,
+    Forbidden
+},
     data() {
       return{
+        canActivate: this.$canActivate,
         isLoaded: false,
         taxRatio: 0,
         total: 0,
@@ -232,8 +238,9 @@ export default {
       },
     },
     async mounted() {
+      await this.getUser()
+      if (!this.canActivate('subject_finance','read')) return
         await this.getQuote(this.$route.params.id);
-        await this.getUser();
         this.isLoaded = true;
         this.discount = Number(this.oneQuote.discount)
         this.taxRatio = Number(this.oneQuote.taxRate);

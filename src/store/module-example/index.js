@@ -3,7 +3,8 @@ import axios from "axios"
 const state = {
   isLoggedIn: localStorage.getItem('isLoggedIn') ? localStorage.getItem('') : '',
   accessToken: localStorage.getItem('accessToken') ? 'Bearer '+localStorage.getItem('') : '',
-  user: {avatar: null}
+  user: {avatar: null},
+  permissions: null,
 }
 
 const mutations = {
@@ -14,7 +15,10 @@ const mutations = {
     state.isLoggedIn = true
   },
   GET_USER(state, payload) {
-    state.user = payload; 
+    state.user = payload;
+    localStorage.setItem('myUserDetail',JSON.stringify(payload))
+    state.permissions = state.user?.permissions
+    localStorage.setItem('myUserPermissions',JSON.stringify(state.user?.permissions))
   }
 }
 
@@ -41,7 +45,7 @@ async signUp ({commit}, payload) {
 },
 
 async editBrand({commit}, payload) {
-  let response = await axios.post(process.env.OC_BACKEND_API + 'brands/update', payload, {headers: {Authorization: localStorage.getItem('accessToken')}});
+  let response = await axios.post(process.env.OC_BACKEND_API + 'auth/editBrand', payload, {headers: {Authorization: localStorage.getItem('accessToken')}});
   if(response.data.success){
     return true
   } else {

@@ -1,13 +1,15 @@
 <template>
-    <q-page class="q-pa-md">
+    <q-page v-if="!canActivate('subject_suppliers','read')"><Forbidden /></q-page>
+    <q-page v-else class="q-pa-md">
        <div class="flex justify-between items-center">
         <div>
-        <p class="text-h4">Suppliers</p>
+        <p class="text-h4">Suppliers</p>``
         <breadcrumps :map="crumps" />
         </div>
-        <q-btn @click="body =null; action= 'Add'; dialogue = true" color="primary" label="Create Record" unelevated rounded no-caps />
+        <q-btn v-if="canActivate('subject_suppliers','create')" @click="body =null; action= 'Add'; dialogue = true" color="primary" label="Create Record" unelevated rounded no-caps />
         </div>
     <q-table
+      v-if="canActivate('subject_suppliers','read')" 
       :rows="suppliers"
       :columns="columns"
       row-key="id"
@@ -21,22 +23,22 @@
             <p style="font-size: 20px;">{{props.row.name}}</p>
           </q-td>
           <q-td key="phoneNumbers" :props="props">
-              {{ props.row.phoneNumbers }}
+            {{ props.row.phoneNumbers }}
           </q-td>
           <!-- <q-td key="clientType" :props="props">
-              {{ props.row.clientType }}
+            {{ props.row.clientType }}
           </q-td>
           <q-td key="businessType" :props="props">
-              {{ props.row.businessType }}
+            {{ props.row.businessType }}
           </q-td> -->
           <q-td key="email" :props="props">
-              {{ props.row.email }}
+            {{ props.row.email }}
           </q-td>
           <q-td key="website" :props="props">
-              {{ props.row.website }}
+            {{ props.row.website }}
           </q-td>
           <q-td key="address" :props="props">
-              {{ props.row.address }}
+            {{ props.row.address }}
           </q-td>
           <q-td key="rate" class="fit" :props="props">
             <q-rating
@@ -51,18 +53,18 @@
               {{ props.row.zipCode }}
           </q-td>
          <q-td key="zipCode" :props="props">
-          <q-btn dense round flat icon="more_vert">
+          <q-btn v-if="canActivate('subject_suppliers','update') || canActivate('subject_suppliers','delete')" dense round flat icon="more_vert">
             <q-menu
               transition-show="scale"
               transition-hide="scale"
               
             >
               <q-list style="min-width: 75px">
-                <q-item @click="deleteSupplier({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
+                <q-item v-if="canActivate('subject_suppliers','delete')" @click="deleteSupplier({id: props.row.id})" style="padding 0 !important" clickable v-close-popup>
                   <q-item-section class="flex flex-center"><q-icon name="delete" color="negative" size="xs"></q-icon></q-item-section>
                 </q-item>
-                <q-separator />
-                <q-item @click="body = props.row; action = 'Edit'; dialogue = true" clickable v-close-popup>
+                <q-separator v-if="canActivate('subject_suppliers','update') && canActivate('subject_suppliers','delete')"/>
+                <q-item v-if="canActivate('subject_suppliers','update')" @click="body = props.row; action = 'Edit'; dialogue = true" clickable v-close-popup>
                   <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                 </q-item>
               </q-list>
@@ -82,12 +84,14 @@
 import { mapActions, mapState } from 'vuex';
 import modal from '../components/AddEditSupplier.vue'
 import breadcrumps from '../../../components/globalComponents/BreadCrumps.vue';
+import Forbidden from 'src/components/globalComponents/Forbidden.vue';
 export default {
   computed: {
     ...mapState('financeStore', ['suppliers'])
   },
   data() {
     return {
+      canActivate: this.$canActivate,
       id: null,
       dialogue: false,
       loading: false,
@@ -120,8 +124,9 @@ export default {
   },
   components: {
     modal,
-    breadcrumps
-  },
+    breadcrumps,
+    Forbidden
+},
   methods: {
     ...mapActions('financeStore',['getSuppliers','updateSupplier','deleteSupplier']),
     editClient(id) {
@@ -133,10 +138,11 @@ export default {
         return 'background: #fff;'
       }
   },
- async mounted() {
-   this.loading = true
-   await this.getSuppliers();
-   this.loading=false
+  async mounted() {
+    if (!this.canActivate('subject_suppliers','read')) return
+    this.loading = true
+    await this.getSuppliers();
+    this.loading=false
   }
 }
 </script>

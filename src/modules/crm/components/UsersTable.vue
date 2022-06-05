@@ -23,14 +23,13 @@
               {{ props.row.phoneNumber }}
           </q-td>
          <q-td key="actions" :props="props">
-          <q-btn dense round flat icon="more_vert">
+          <q-btn v-if="canActivate('subject_crm','update')" dense round flat icon="more_vert">
             <q-menu
               transition-show="scale"
               transition-hide="scale"
-              
             >
               <q-list style="min-width: 75px">
-                <q-item  @click="openModal(props.row, 'Edit')" clickable v-close-popup>
+                <q-item v-if="canActivate('subject_crm','update')" @click="openModal(props.row, 'Edit')" clickable v-close-popup>
                  <q-item-section class="flex flex-center"><q-icon name="edit" color="warning" size="xs"></q-icon></q-item-section>
                 </q-item>
               </q-list>
@@ -40,11 +39,11 @@
         </q-tr>
       </template>
       <template v-slot:top-right>
-         <q-btn :disable="currentClient.user !== null" @click="openModal({}, 'Add')" label="Create Record" no-caps color="primary" unelevated rounded />
+        <q-btn v-if="canActivate('subject_crm','create')" :disable="currentClient.user !== null" @click="openModal({}, 'Add')" label="Create Record" no-caps color="primary" unelevated rounded />
       </template>
     </q-table>
     <q-dialog seamless position="right" v-model="prompt" persistent>
-        <modal @closeDialogue="getClient(); prompt = false;" :body="body" :action="action" />
+      <modal @closeDialogue="getClient(); prompt = false;" :body="body" :action="action" />
     </q-dialog>
   </div>
 </template>
@@ -55,6 +54,7 @@ import modal from '../components/AddEditUser.vue'
 export default {
   data() {
     return {
+      canActivate: this.$canActivate,
     prompt: false,
     loading: false,
     users: [],
@@ -77,6 +77,7 @@ export default {
   },
   methods: {
       ...mapActions('crmStore', ['getOneClient']),
+      ...mapActions('example', ['getUser']),
     openModal(body, action) {
         this.body = body
         this.action = action
@@ -97,6 +98,7 @@ export default {
       }
   },
  async mounted() {
+   await this.getUser()
    this.loading = true
    await this.getClient();
    this.loading=false

@@ -7,6 +7,12 @@ export async function getEmployees({commit}, type) {
   let response = await axios.get(process.env.OC_BACKEND_API + 'employees', {headers: {Authorization: localStorage.getItem('accessToken')}})
   commit('GET_EMPLOYEES' ,{type: type, res: response.data.data})
 }
+
+export async function getUsers({commit}) {
+  let response = await axios.get(process.env.OC_BACKEND_API + 'employees/users', {headers: {Authorization: localStorage.getItem('accessToken')}})
+  commit('GET_EMPLOYEE_USERS' ,{res: response.data.data})
+}
+
 export async function getLeaves({commit}, type) {
   let response = await axios.get(process.env.OC_BACKEND_API + 'leaves', {headers: {Authorization: localStorage.getItem('accessToken')}})
   await commit('GET_LEAVES' ,{type: type, res: response.data.data})

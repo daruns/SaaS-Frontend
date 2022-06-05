@@ -19,7 +19,7 @@
               bg-color="white"
               label="Category"
               ref="categRef"
-              :rules="[val => (val && val.length > 0) || 'This field is required']"
+              :rules="[val => (val) || 'This field is required']"
               bottom-slots
             >
               <template v-slot:hint>
