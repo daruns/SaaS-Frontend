@@ -5,3 +5,7 @@ for(let i = 0; i<payload.length; i++) {
   state.users.push(payload[i])
 }
 }
+
+export function RAISE_ERROR (state, payload) {
+state.userError = payload
+}

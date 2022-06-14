@@ -70,7 +70,7 @@
         <div v-if="rooms.length === 0" class="q-pa-md text-grey">No rooms to show!</div>
         <div v-else v-for="(room, i) in rooms" :key="i">
           <div :class="'q-pa-xs'"> 
-        <q-item style="border-radius: 10px;" :class="room.id === chat.id ? 'bg-blue-1' : ''" 
+        <q-item :id="'room_by_id_#'+room.id" style="border-radius: 10px;" :class="room.id === chat.id ? 'bg-blue-1' : ''" 
          @click="getMessages(room, i)" clickable v-ripple>
         <q-item-section>
           <q-item-label>
@@ -604,6 +604,22 @@ export default {
           membsToAdd.push(Number(this.members[i].id));
       }
       socket.send(JSON.stringify({createRoom: {users: membsToAdd } } ) );
+      if (membsToAdd?.length > 0) {
+        let roomFound = this.rooms?.find(e => {
+          if (!membsToAdd.includes(this.user.id)) membsToAdd.push(this.user.id)
+          return membsToAdd.every(qwe => e.users.map(rty => rty.id).includes(qwe)) && e.users.map(rty => rty.id).every(qwe => membsToAdd.includes(qwe))
+        })
+        if (roomFound && roomFound?.id) {
+          var clickEvent = new MouseEvent("click", {
+            "view": window,
+            "bubbles": true,
+            "cancelable": false
+          });
+          let element = document.getElementById('room_by_id_#' + roomFound.id )
+          element.dispatchEvent(clickEvent);
+        }
+        this.updateScroll();
+      }
       membsToAdd = [];
       this.members = [];
       this.createRoom = false;

@@ -149,7 +149,8 @@
     </q-page>
 </template>
 <script>
-const socket = new WebSocket(process.env.CHAT_END_SOCKET);
+// const socketMain = new WebSocket(process.env.CHAT_END_SOCKET);
+
 import breadcrmps from '../../../components/globalComponents/BreadCrumps.vue';
 import { date } from 'quasar'
 import { mapState, mapActions } from 'vuex';
@@ -164,7 +165,7 @@ export default {
             isTyping: false,
             avatar: null,
             room_id: null,
-            socket: socket,
+            socket: null,
         }
     },
     components : {
@@ -181,7 +182,7 @@ export default {
         return date.formatDate(dt, 'HH:mm');
       },
      async typing() {
-        this.socket.send(JSON.stringify({typing:{room_id: Number(this.chat.id)}}));
+        this.socket?.send(JSON.stringify({typing:{room_id: Number(this.chat.id)}}));
       },
       download(file) {
         window.open(file.url);
@@ -191,7 +192,7 @@ export default {
         data.append('files', this.file)
         let res = await axios.post(process.env.OC_BACKEND_API + 'chats/addFiles/',data , {headers: {Authorization: localStorage.getItem('accessToken')}});
         if(res.data.success) {
-          this.socket.send(JSON.stringify({createMessage:{room_id: Number(this.chat.id), text: this.file.name, files: [res.data.data[0].id]}}));
+          this.socket?.send(JSON.stringify({createMessage:{room_id: Number(this.chat.id), text: this.file.name, files: [res.data.data[0].id]}}));
         }
       },
       setScrollPos() {
@@ -221,12 +222,13 @@ export default {
     },
    async mounted() {
       await this.getUser();
-    },
-   async mounted() {
       let i = 1
       let self = this
+      this.socket = this.sckt
+      console.log("socket ", this?.socket)
       this.socket.addEventListener('open', async function (event) {
-      this.socket.send(JSON.stringify({accessToken: localStorage.getItem('accessToken').substring(7, localStorage.getItem('accessToken').length)}));
+      console.log("socket ", this?.socket)
+      self.socket?.send(JSON.stringify({accessToken: localStorage.getItem('accessToken').substring(7, localStorage.getItem('accessToken').length)}));
       });
 
       this.socket.addEventListener('message', async function (event) {

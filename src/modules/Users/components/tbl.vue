@@ -60,6 +60,7 @@
 </template>
 
 <script>
+import { Notify } from 'quasar';
 import { mapState, mapActions } from 'vuex';
 import modal from './AddEditUser.vue';
 export default {
@@ -84,7 +85,7 @@ export default {
     modal
   },
   computed : {
-    ...mapState('userStore',['users']),
+    ...mapState('userStore',['userError','users']),
     usersRows(){
       let finalArr = []
       this.users.forEach(element => {
@@ -97,6 +98,13 @@ export default {
     ...mapActions('userStore', ['deleteUser','getUsers']),
     async delItem(id) {
       await this.deleteUser({id: id});
+      if (this.userError) this.$q.notify({
+        type: 'negative',
+        message: 'user has dependency data, pls delete them first',
+        color: 'negative',
+        position: 'top',
+        timeout: '1000'
+      })
     },
     edit(body) {
       this.body = body;
