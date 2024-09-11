@@ -1,0 +1,4 @@
+OC_BACKEND_API = "https://domain.com:5000/api/v1/"
+CHAT_END_SOCKET = "wss://domain.com:4000"
+CHAT_PATH = "https://www.domain.com/oc_front_end/dist/spa/#/chat"
+PORT = 5001
